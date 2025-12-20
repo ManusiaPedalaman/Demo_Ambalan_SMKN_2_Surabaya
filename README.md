@@ -20,7 +20,6 @@
 
 ## 🔗 Link Demo
 **[Kunjungi Website Ambalan](https://ambalan-smkn-2-surabaya.vercel.app/)**
-*(Ganti dengan link Vercel Anda yang sesungguhnya jika berbeda)*
 
 ---
 
@@ -51,33 +50,7 @@ Project ini dibangun dengan teknologi web terkini untuk performa kencang dan des
 
 ---
 
-## 🛠️ Cara Menjalankan (Local)
 
-Jika ingin menjalankan project ini di komputer Anda:
 
-1.  **Clone Repository:**
-    ```bash
-    git clone https://github.com/ManusiaPedalaman/Ambalan-SMKN-2-Surabaya.git
-    cd ambalan2
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Setup Environment Variables:**
-    Buat file `.env` dan isi dengan konfigurasi database & auth Anda.
-
-4.  **Jalankan Server:**
-    ```bash
-    npm run dev
-    ```
-
-5.  **Buka Browser:**
-    Akses `http://localhost:3000`.
-
----
-
-**Dibuat dengan ❤️ oleh Tim IT Ambalan SMKN 2 Surabaya**
+**Dibuat dengan ❤️ oleh anak Ambalan SMKN 2 Surabaya yaitu saya sendiri**
 *Progress over perfection.*
