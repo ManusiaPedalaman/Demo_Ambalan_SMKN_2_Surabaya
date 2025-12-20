@@ -99,7 +99,7 @@ export default function HeroSection() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/image/Hero1.webp"
+          src="/Image/Hero1.webp"
           alt="Ambalan SMKN 2 Surabaya Hero Background"
           fill
           priority
