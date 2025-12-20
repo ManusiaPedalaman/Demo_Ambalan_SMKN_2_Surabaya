@@ -161,7 +161,7 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${getNavbarBg()}`}
       >
-        <div className="w-full px-6 lg:px-[315px] py-4">
+        <div className="w-full px-6 md:px-12 lg:px-16 xl:px-[315px] py-4">
           <div className="flex items-center justify-between">
 
             {/* === LOGO === */}

@@ -101,7 +101,7 @@ export default function HeroSection() {
         transition={{ duration: 1.5, ease: 'easeOut' }}
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/image/hero2.webp')",
+          backgroundImage: "url('/Image/hero2.webp')",
         }}
       >
         {/* Dark Overlay with fade in */}

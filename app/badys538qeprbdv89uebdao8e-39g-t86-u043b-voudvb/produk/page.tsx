@@ -63,7 +63,7 @@ const MonthlyChart = ({ data, color = '#997B55', label }: { data: number[]; colo
     const steps = 5;
 
     return (
-        <div className="w-full bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 font-dm-sans">
+        <div className="w-full bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 font-dm-sans overflow-x-auto">
             <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-gray-700">{label}</h3>
                 <div className="text-sm text-gray-400">Tahun ini</div>
