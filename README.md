@@ -1,7 +1,8 @@
 # ⚜️ Ambalan Gajah Mada - Tribuana Tungga Dewi
 **Situs Resmi Ambalan Pramuka SMKN 2 Surabaya (16.041 - 16.042)**
 
-![Banner](https://github.com/ManusiaPedalaman/Ambalan-SMKN-2-Surabaya/blob/main/public/Image/Hero1.webp?raw=true)
+
+---<img width="1919" height="908" alt="Screenshot 2025-12-20 175737" src="https://github.com/user-attachments/assets/80267b26-77c4-47ad-83e7-ecaf94afbbbe" />
 
 <div align="center">
 
@@ -31,7 +32,7 @@
 - **🛡️ Dashboard Admin:** Sistem pengelolaan data anggota, inventaris, dan pendaftar yang aman.
 - **🔐 Autentikasi Modern:** Login menggunakan Google, Facebook, atau Email (NextAuth).
 
----
+
 
 ## ⚡ Tech Stack (Teknologi)
 Project ini dibangun dengan teknologi web terkini untuk performa kencang dan desain yang "Clean & Modern":
@@ -46,34 +47,3 @@ Project ini dibangun dengan teknologi web terkini untuk performa kencang dan des
 | **Animasi** | [Framer Motion](https://www.framer.com/motion/) | Animasi halus (transisi halaman, scroll, dll). |
 
 ---
-
-## 🛠️ Cara Menjalankan (Local)
-
-Jika ingin menjalankan project ini di komputer Anda:
-
-1.  **Clone Repository:**
-    ```bash
-    git clone https://github.com/ManusiaPedalaman/Ambalan-SMKN-2-Surabaya.git
-    cd ambalan2
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Setup Environment Variables:**
-    Buat file `.env` dan isi dengan konfigurasi database & auth Anda.
-
-4.  **Jalankan Server:**
-    ```bash
-    npm run dev
-    ```
-
-5.  **Buka Browser:**
-    Akses `http://localhost:3000`.
-
----
-
-**Dibuat dengan ❤️ oleh Tim IT Ambalan SMKN 2 Surabaya**
-*Progress over perfection.*
