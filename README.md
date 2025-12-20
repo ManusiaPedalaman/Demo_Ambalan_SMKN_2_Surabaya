@@ -1,7 +1,7 @@
 # ⚜️ Ambalan Gajah Mada - Tribuana Tungga Dewi
 **Situs Resmi Ambalan Pramuka SMKN 2 Surabaya (16.041 - 16.042)**
 
-![Banner](https://github.com/ManusiaPedalaman/Ambalan-SMKN-2-Surabaya/blob/main/public/Image/Hero1.webp?raw=true)
+<img src="https://github.com/user-attachments/assets/fefa7abe-c72d-46b4-9d79-1e81b6258324" width="100%" alt="Banner" />
 
 <div align="center">
 
@@ -22,6 +22,7 @@
 ---
 
 ## 📖 Tentang Project
+
 **Ambalan SMKN 2 Surabaya** adalah platform web modern yang dibangun untuk mendigitalisasi kegiatan kepramukaan di sekolah. Website ini tidak hanya berfungsi sebagai profil organisasi, tetapi juga sebagai **Sistem Manajemen Terpadu** untuk anggota dan pendaftar baru.
 
 ### Fitur Utama:
