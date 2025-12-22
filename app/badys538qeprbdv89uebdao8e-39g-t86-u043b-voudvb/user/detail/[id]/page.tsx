@@ -92,7 +92,7 @@ export default function UserDetailPage() {
         );
     }
 
-    // --- RENDER HELPERS ---
+
     const StatusBadge = ({ status, activeLabel = 'Aktif', inactiveLabel = 'Nonaktif' }: { status: string | boolean, activeLabel?: string, inactiveLabel?: string }) => {
         // Handle boolean or string status
         const isActive = status === 'Aktif' || status === true || status === 'Terjawab';
@@ -121,7 +121,7 @@ export default function UserDetailPage() {
         </div>
     );
 
-    // --- DYNAMIC CONTENT ---
+
     const renderContent = () => {
         switch (type) {
             case 'join':
@@ -229,7 +229,7 @@ export default function UserDetailPage() {
 
     return (
         <div className="min-h-screen bg-[#FDFBF9] font-dm-sans text-gray-800 pb-20">
-            {/* HEADER */}
+
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50 px-6 py-4">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div
@@ -242,7 +242,7 @@ export default function UserDetailPage() {
                         <span className="font-bold text-sm tracking-wide uppercase">KEMBALI</span>
                     </div>
 
-                    {/* ADMIN PROFILE */}
+
                     <div className="hidden md:flex items-center gap-3 bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
                             <User size={18} className="text-gray-600" />
@@ -256,7 +256,6 @@ export default function UserDetailPage() {
             </div>
 
             <main className="max-w-4xl mx-auto px-6 py-8">
-                {/* TITLE SECTION */}
                 <div className="mb-8">
                     <span className="text-[#9C7C5B] font-bold tracking-wider text-xs uppercase mb-2 block">
                         Detail Informasi

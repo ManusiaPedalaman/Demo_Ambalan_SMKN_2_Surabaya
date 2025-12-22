@@ -287,12 +287,12 @@ const JoinUs = () => {
     pesan: ''
   });
 
-  // State untuk Popup & Proses Pengiriman
+
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'confirmation' | 'login_required'>('confirmation');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
-  // Validation State
+
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -305,6 +305,17 @@ const JoinUs = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: false }));
   };
+
+  /* Logic Utk button Join invalid */
+  const isValid = Boolean(
+    formData.nama &&
+    formData.whatsapp &&
+    formData.sekolah &&
+    formData.kelas &&
+    formData.jurusan &&
+    formData.tanggalLahir &&
+    formData.pesan
+  );
 
   const handleJoinClick = () => {
     if (!session) {
@@ -319,33 +330,32 @@ const JoinUs = () => {
     if (!formData.sekolah) newErrors.sekolah = true;
     if (!formData.kelas) newErrors.kelas = true;
     if (!formData.jurusan) newErrors.jurusan = true;
-    if (!formData.tanggalLahir) newErrors.tanggalLahir = true; // Added
-    if (!formData.pesan) newErrors.pesan = true; // Added
+    if (!formData.tanggalLahir) newErrors.tanggalLahir = true;
+    if (!formData.pesan) newErrors.pesan = true;
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    // Reset status saat modal dibuka
     setStatus('idle');
     setModalType('confirmation');
     setShowModal(true);
   };
 
-  // --- LOGIC SISTEM MENGIRIM PESAN ---
+
   const handleSystemSubmit = async () => {
-    // 1. Ubah status jadi loading (User menunggu)
+
     setStatus('loading');
 
-    // 2. Kirim ke Server (Supabase + Telegram)
+
     const result = await submitJoinForm(formData);
 
-    // 3. Cek hasil dari server
+
     if (result.success) {
       setStatus('success');
 
-      // Reset form
+
       setFormData({
         nama: '',
         tanggalLahir: '',
@@ -356,7 +366,7 @@ const JoinUs = () => {
         pesan: ''
       });
     } else {
-      // Handle error if needed, for now just log
+
       console.error(result.error);
       setStatus('idle');
       alert('Gagal mengirim data. Silakan coba lagi.');
@@ -366,7 +376,7 @@ const JoinUs = () => {
   return (
     <div className={`min-h-screen flex flex-col lg:flex-row w-full overflow-hidden ${dmSans.className}`}>
 
-      {/* === MODAL POPUP === */}
+
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -390,7 +400,7 @@ const JoinUs = () => {
 
               <div className="p-8 flex flex-col items-center text-center">
 
-                {/* KONDISI 0: LOGIN REQUIRED */}
+
                 {modalType === 'login_required' ? (
                   <div className="flex flex-col items-center py-2">
                     <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -417,9 +427,9 @@ const JoinUs = () => {
                     </div>
                   </div>
                 ) : (
-                  /* KONDISI 1 & 2: SUKSES & KONFIRMASI */
+
                   <>
-                    {/* KONDISI 1: SUKSES */}
+
                     {status === 'success' ? (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -441,7 +451,7 @@ const JoinUs = () => {
                         </button>
                       </motion.div>
                     ) : (
-                      /* KONDISI 2: DISCLAIMER & PROSES (IDLE / LOADING) */
+
                       <>
                         <div className="flex flex-col items-center mb-6 w-full">
                           <div className="flex items-center gap-2 text-red-600 mb-2">
@@ -498,10 +508,10 @@ const JoinUs = () => {
         )}
       </AnimatePresence>
 
-      {/* === Bagian Kiri (Formulir) === */}
+
       <div className="w-full lg:w-[70%] bg-[#322F2D] p-6 md:p-16 lg:py-[100px] lg:px-[315px] lg:pr-[150px] flex flex-col justify-center relative z-10">
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full">
-          {/* Header */}
+
           <motion.h1 variants={itemVariants} className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight tracking-tight">
             Pendaftaran<br /> Anggota Ambalan
           </motion.h1>
@@ -509,10 +519,10 @@ const JoinUs = () => {
             Daftarkan diri Anda melalui formulir berikut.
           </motion.p>
 
-          {/* Form Area */}
+
           <form onSubmit={(e) => e.preventDefault()}>
 
-            {/* 1. Nama Lengkap */}
+
             <InputField
               name="nama"
               value={formData.nama}
@@ -522,7 +532,7 @@ const JoinUs = () => {
               error={errors.nama}
             />
 
-            {/* 2. Tanggal Lahir */}
+
             <InputField
               name="tanggalLahir"
               value={formData.tanggalLahir}
@@ -533,7 +543,7 @@ const JoinUs = () => {
               error={errors.tanggalLahir}
             />
 
-            {/* 3. Nomor WA (UPDATED PLACEHOLDER) */}
+
             <PhoneInput
               name="whatsapp"
               value={formData.whatsapp}
@@ -542,7 +552,7 @@ const JoinUs = () => {
               error={errors.whatsapp}
             />
 
-            {/* 4. Nama Sekolah */}
+
             <InputField
               name="sekolah"
               value={formData.sekolah}
@@ -551,7 +561,7 @@ const JoinUs = () => {
               error={errors.sekolah}
             />
 
-            {/* 5. Dropdowns */}
+
             <CustomSelect
               placeholder="Pilih Kelas"
               options={["X (Sepuluh)", "XI (Sebelas)", "XII (Dua Belas)"]}
@@ -573,7 +583,7 @@ const JoinUs = () => {
               error={errors.jurusan}
             />
 
-            {/* 6. Message */}
+
             <motion.div variants={itemVariants} className="mb-8">
               <textarea
                 name="pesan"
@@ -591,13 +601,18 @@ const JoinUs = () => {
               {errors.pesan && <p className="text-red-500 text-xs mt-1">silahkan masukan alasan anda</p>}
             </motion.div>
 
-            {/* Button Join */}
+
             <motion.button
               variants={itemVariants}
-              whileHover={{ scale: 1.02, backgroundColor: "#8A6A4B" }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleJoinClick} // Trigger Popup
-              className="w-full bg-[#9C7C5B] text-white font-bold py-4 rounded-lg transition-colors duration-300 shadow-lg tracking-wide text-lg"
+              whileHover={isValid ? { scale: 1.02, backgroundColor: "#8A6A4B" } : {}}
+              whileTap={isValid ? { scale: 0.98 } : {}}
+              onClick={handleJoinClick}
+              disabled={!isValid}
+              className={`w-full font-bold py-4 rounded-lg transition-colors duration-300 shadow-lg tracking-wide text-lg
+                ${isValid
+                  ? 'bg-[#9C7C5B] text-white cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300'
+                }`}
             >
               Join
             </motion.button>
@@ -605,7 +620,7 @@ const JoinUs = () => {
         </motion.div>
       </div>
 
-      {/* === Bagian Kanan (Gambar & Background) === */}
+
       <motion.div variants={rightSideVariants} initial="hidden" animate="visible" className="w-full lg:w-[55%] bg-[#C4A484] relative flex items-center justify-center min-h-[500px] lg:min-h-screen overflow-hidden">
         <div className="absolute top-0 left-0 w-64 h-64 bg-[#9C7C5B] rounded-br-[100px] transform -translate-x-20 -translate-y-20 z-0 pointer-events-none"></div>
         <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#8A5A2B] rounded-tl-[150px] transform translate-x-20 translate-y-30 z-0 pointer-events-none opacity-80"></div>

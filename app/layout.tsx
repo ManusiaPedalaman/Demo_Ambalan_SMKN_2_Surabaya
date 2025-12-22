@@ -1,19 +1,19 @@
-// app/layout.tsx
+
 
 import type { Metadata } from "next";
 import { Poppins, Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
-import LayoutWrapper from "./components/LayoutWrapper"; // Import the new wrapper
+import LayoutWrapper from "./components/LayoutWrapper";
 
-// Font utama untuk seluruh halaman
+
 const poppins = Poppins({
   subsets: ["latin"],
   variable: "--font-poppins",
-  weight: ["400", "500", "600", "700"], // Regular - Bold
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-// Font sekunder untuk kutipan klasik / teks formal
+
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
@@ -64,7 +64,7 @@ export default function RootLayout({
         className={`${poppins.variable} ${playfair.variable} ${dmSans.variable} antialiased ...`}
         suppressHydrationWarning={true}
       >
-        {/* Pass children to the new wrapper component */}
+
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>

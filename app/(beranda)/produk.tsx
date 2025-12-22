@@ -3,10 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DM_Sans } from 'next/font/google';
-import Link from 'next/link'; // Import Link untuk navigasi
+import Link from 'next/link'; 
 import Image from 'next/image';
 
-// Konfigurasi Font
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
@@ -19,14 +19,14 @@ interface Product {
   price: string;
   duration: string;
   image: string;
-  slug: string; // Added slug
+  slug: string; 
 }
 
 const Produk = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(4);
 
-  // State untuk animasi masuk (Scroll Reveal)
+
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -69,12 +69,12 @@ const Produk = () => {
       price: '10k',
       duration: '3 hari',
       image: '/Image/tali.webp',
-      slug: 'tali-pramuka', // Adjusted slug to match likely data
+      slug: 'tali-pramuka', 
     },
 
   ];
 
-  // Logic Intersection Observer untuk mendeteksi scroll
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -95,7 +95,7 @@ const Produk = () => {
     };
   }, []);
 
-  // Handle Responsiveness
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
@@ -141,7 +141,7 @@ const Produk = () => {
       className={`w-full bg-[#FDF8F3] py-16 px-4 md:px-8 lg:px-12 overflow-hidden ${dmSans.className}`}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Header dengan Animasi Fade Down */}
+
         <div
           className={`text-center mb-12 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
             }`}
@@ -155,10 +155,10 @@ const Produk = () => {
           </p>
         </div>
 
-        {/* Carousel Wrapper */}
+
         <div className="relative w-full">
 
-          {/* Navigation Buttons */}
+
           <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full flex justify-between pointer-events-none z-10 px-2 md:-px-4">
             <button
               onClick={prevSlide}
@@ -178,7 +178,7 @@ const Produk = () => {
             </button>
           </div>
 
-          {/* Products Grid */}
+
           <div
             className="grid gap-4 md:gap-6 px-4 md:px-12 py-4"
             style={{
@@ -186,16 +186,15 @@ const Produk = () => {
             }}
           >
             {visibleProducts.map((product, index) => (
-              // MENGUBAH HREF KE FOLDER Detail_Produk
               <Link
                 href={`/${product.slug}`}
                 key={product.id}
-                // Animasi Staggering (muncul berurutan)
+
                 style={{ transitionDelay: `${index * 150}ms` }}
                 className={`group block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-700 ease-out border border-gray-100 flex flex-col transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
                   }`}
               >
-                {/* Image Container */}
+
                 <div
                   className="relative w-full aspect-square overflow-hidden bg-[#F2E6D8]"
                 >
@@ -212,7 +211,7 @@ const Produk = () => {
                   </div>
                 </div>
 
-                {/* Product Info */}
+
                 <div className="p-5 flex flex-col flex-grow justify-between bg-white relative z-20">
                   <div>
                     <h3 className="text-gray-900 font-bold text-lg md:text-xl mb-1 line-clamp-1 tracking-tight" title={product.name}>
@@ -230,10 +229,8 @@ const Produk = () => {
                       </div>
                     </div>
 
-                    {/* Tombol Sewa:
-                        - Diubah dari <button> menjadi <div> agar valid di dalam <Link>
-                        - Tampilan tetap sama seperti tombol
-                    */}
+
+
                     <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shadow-lg transition-all duration-300 ease-out cursor-pointer
                       opacity-100 translate-y-0 
                       lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0
@@ -247,7 +244,7 @@ const Produk = () => {
           </div>
         </div>
 
-        {/* Dots Navigation */}
+
         {totalSlides > 1 && (
           <div
             className={`flex justify-center gap-2 mt-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
@@ -267,12 +264,12 @@ const Produk = () => {
           </div>
         )}
 
-        {/* View All Button */}
+
         <div
           className={`flex justify-center mt-12 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
         >
-          {/* Bungkus tombol dengan Link ke halaman Produk */}
+
           <Link href="/produk_kami">
             <button className="px-8 py-3 bg-white border-2 border-[#C9A86A] text-[#C9A86A] hover:bg-[#6B4D27] hover:text-white text-base font-bold rounded-full transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 tracking-wide">
               Lihat Semua Produk

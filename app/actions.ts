@@ -5,7 +5,7 @@ import { sendTelegramNotification } from '@/lib/telegram';
 
 export async function submitJoinForm(formData: any) {
     try {
-        // 1. Save to Supabase
+
         const { error: dbError } = await supabase.from('data_anggota_join').insert([
             {
                 nama_lengkap: formData.nama,
@@ -20,11 +20,10 @@ export async function submitJoinForm(formData: any) {
 
         if (dbError) {
             console.error('Supabase Join Error:', dbError);
-            // We continue to send Telegram even if DB fails, or vice versa? 
-            // Let's continue.
+
         }
 
-        // 2. Send Telegram
+
         const message = `
 *New Join Request*
 Nama: ${formData.nama}
@@ -80,7 +79,7 @@ beri emoji ✅ atau balas "terjawab" pada data hubungi di atas jika telah menyam
 
 export async function submitBookingForm(data: any) {
     try {
-        // 1. Insert into data_customer_penyewa (Data Penyewa)
+
         const { error: customerError } = await supabase.from('data_customer_penyewa').insert([
             {
                 nama_customer: data.userName,
@@ -95,15 +94,14 @@ export async function submitBookingForm(data: any) {
 
         if (customerError) {
             console.error('Supabase Customer Error:', customerError);
-            // We continue to try inserting product data or throw? 
-            // Let's log and continue to ensure at least partial data or Telegram is sent.
+
         }
 
-        // 2. Insert into data_produk_tersewa (Data Barang yang Disewa)
+
         const { error: productError } = await supabase.from('data_produk_tersewa').insert([
             {
-                id_produk: data.slug,              // Using slug as ID/Name reference
-                nama_produk: data.slug,            // or pass productName if avail, currently slug
+                id_produk: data.slug,
+                nama_produk: data.slug,
                 tgl_pengambilan: data.startDate,
                 tgl_pengembalian: data.endDate,
                 jam_sewa: data.pickupTime,
@@ -116,7 +114,7 @@ export async function submitBookingForm(data: any) {
 
         if (productError) console.error('Supabase Product Booking Error:', productError);
 
-        // 3. Send Telegram Notification (Gabungan Data)
+
         const message = `
 *New Booking Order*
 Product: ${data.slug}
@@ -139,9 +137,6 @@ Message: ${data.message || '-'}
     }
 }
 
-// --- DASHBOARD ACTIONS ---
-
-// --- DASHBOARD ACTIONS ---
 
 import { prisma } from "@/lib/prisma";
 
@@ -152,7 +147,7 @@ export async function getDashboardStats() {
         const productCount = await prisma.dataProdukTersedia.count();
         const eventCount = await prisma.dataMateriLatihan.count();
 
-        // Additional counts for dashboard
+
         const joinsCount = await prisma.dataAnggotaJoin.count();
         const bookingsCount = await prisma.dataProdukTersewa.count();
         const contactsCount = await prisma.dataUserHubungi.count();
@@ -185,9 +180,7 @@ export async function getDashboardStats() {
 
 export async function getAdminUsers() {
     try {
-        // Return detailed list for the table
-        // Note: DataAdminTerdaftar does not have 'created_at' or 'role' in schema provided.
-        // We map available fields.
+
         const adminList = await prisma.dataAdminTerdaftar.findMany({
             select: {
                 id_admin: true,
@@ -197,13 +190,13 @@ export async function getAdminUsers() {
             }
         });
 
-        // Adapt to the expected frontend format if possible, or frontend needs adjustment
+
         return adminList.map(admin => ({
             id: admin.id_admin,
-            username: admin.nama_lengkap || 'Admin', // Fallback
+            username: admin.nama_lengkap || 'Admin',
             email: admin.email,
-            role: 'ADMIN', // Hardcoded as it comes from Admin table
-            created_at: new Date().toISOString().split('T')[0] // Dummy date as field missing in schema
+            role: 'ADMIN',
+            created_at: new Date().toISOString().split('T')[0]
         }));
     } catch (error) {
         console.error('Error fetching admins:', error);
@@ -211,7 +204,7 @@ export async function getAdminUsers() {
     }
 }
 
-// --- NEW DATA FETCHING ACTIONS FOR DASHBOARD LISTS ---
+
 
 export async function getJoinsList() {
     try {
@@ -221,7 +214,7 @@ export async function getJoinsList() {
         });
 
         return joins.map(item => ({
-            id: item.id.toString(), // Necessary for delete action
+            id: item.id.toString(),
             nama: item.nama_lengkap,
             tanggal_lahir: item.tanggal_lahir ? item.tanggal_lahir.toISOString().split('T')[0] : '-',
             no_wa: item.no_wa,
@@ -255,7 +248,7 @@ export async function getBookingsList() {
             user_info: {
                 name: item.nama_peminjam || 'User',
             },
-            status: item.status_kembali // Mapped from DB
+            status: item.status_kembali
         }));
     } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -303,7 +296,7 @@ export async function getContactsList() {
             email: item.email,
             phone: item.no_wa,
             pesan: item.pesan,
-            status: item.status // Added status field
+            status: item.status
         }));
     } catch (error) {
         console.error("Error fetching contacts:", error);
@@ -319,7 +312,7 @@ export async function getRentersList() {
         });
 
         return renters.map(item => ({
-            id: item.id.toString(), // Necessary for delete action
+            id: item.id.toString(),
             nama_customer: item.nama_customer,
             sekolah_instansi: item.sekolah_instansi,
             produk_disewa: item.produk_disewa,
@@ -327,7 +320,7 @@ export async function getRentersList() {
             metode_bayar: item.metode_bayar,
             jam_pengambilan: item.jam_pengambilan || '-',
             jam_pengembalian: item.jam_pengembalian || '-',
-            status_bayar: item.status_bayar || 'Belum' // Added status_bayar
+            status_bayar: item.status_bayar || 'Belum'
         }));
     } catch (error) {
         console.error("Error fetching renters:", error);
@@ -418,7 +411,7 @@ export async function getMateriById(id: string) {
             nama: item.nama_materi,
             topik: item.topik ? item.topik.split(',') : [],
             icon: item.icon,
-            content: item.content, // Returns the JSON structure directly
+            content: item.content,
             status: 'Aktif'
         };
     } catch (error) {
@@ -533,7 +526,7 @@ export async function getAdminById(id: string) {
     }
 }
 
-// Helper for static price mapping
+
 const PRODUCT_PRICES: Record<string, string> = {
     'Tenda Segitiga/Kerucut': '30k / 3 hari',
     'Matras Spons': '5k / 1 hari',
@@ -553,7 +546,7 @@ export async function getProductsList() {
             id: item.id_produk,
             nama: item.nama_produk,
             status: item.status || 'Tersedia',
-            price: PRODUCT_PRICES[item.nama_produk] || '-' // Map price or default
+            price: PRODUCT_PRICES[item.nama_produk] || '-'
         }));
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -580,7 +573,7 @@ export async function getProductById(id: string) {
     }
 }
 
-// --- DELETE ACTIONS ---
+
 
 export async function deleteJoinMember(id: string) {
     try {
@@ -596,7 +589,7 @@ export async function deleteRenter(id: string) {
     try {
         const idBigInt = BigInt(id);
 
-        // 1. Get renter info before deleting
+
         const renter = await prisma.dataCustomerPenyewa.findUnique({
             where: { id: idBigInt }
         });
@@ -605,11 +598,10 @@ export async function deleteRenter(id: string) {
             return { success: false, error: 'Renter not found' };
         }
 
-        // 2. Delete from DataCustomerPenyewa
+
         await prisma.dataCustomerPenyewa.delete({ where: { id: idBigInt } });
 
-        // 3. Soft Delete corresponding from DataProdukTersewa (keep for charts, hide in table)
-        // We match by name, product, and pickup time to be specific
+
         await prisma.dataProdukTersewa.updateMany({
             where: {
                 nama_peminjam: renter.nama_customer,
@@ -668,7 +660,7 @@ export async function deleteProduct(id: string) {
     }
 }
 
-export async function deleteMateri(id: string) { // Not requested but consistent
+export async function deleteMateri(id: string) {
     try {
         await prisma.dataMateriLatihan.delete({ where: { id_materi: id } });
         return { success: true };

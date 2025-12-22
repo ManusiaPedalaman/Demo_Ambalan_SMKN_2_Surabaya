@@ -12,7 +12,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Data tidak lengkap" }, { status: 400 });
         }
 
-        // 1. Cek apakah email sudah ada di tabel DataUserLogin
+
         const existingUser = await prisma.dataUserLogin.findFirst({
             where: { email: email },
         });
@@ -21,14 +21,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Email sudah terdaftar" }, { status: 409 });
         }
 
-        // 2. Hash Password
+
+        
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // SPEIAL CASE: Registering as Admin (using Env credentials or specifically this email)
+
         const adminEmail = process.env.ADMIN_EMAIL || "AdminMada@gmail.com";
 
         if (email === adminEmail) {
-            // Cek apakah sudah ada di tabel admin
+
             const existingAdmin = await prisma.dataAdminTerdaftar.findFirst({
                 where: { email: email }
             });
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ message: "Registrasi Admin berhasil", user: newAdmin }, { status: 201 });
         }
 
-        // 3. Buat User Baru (Regular)
+
         const newUser = await prisma.dataUserLogin.create({
             data: {
                 id_login: uuidv4(),

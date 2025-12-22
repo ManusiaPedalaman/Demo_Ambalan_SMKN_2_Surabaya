@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { DM_Sans } from 'next/font/google';
 
-// 1. Konfigurasi Font DM Sans
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
@@ -21,7 +20,6 @@ const DDP: React.FC<DDPProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Logic Animasi Scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -42,7 +40,6 @@ const DDP: React.FC<DDPProps> = ({
     };
   }, []);
 
-  // Data Dasa Darma
   const darmaItems = [
     { number: 1, text: "Takwa kepada Tuhan Yang Maha Esa." },
     { number: 2, text: "Cinta alam dan kasih sayang sesama manusia." },
@@ -56,11 +53,9 @@ const DDP: React.FC<DDPProps> = ({
     { number: 10, text: "Suci dalam pikiran, perkataan, dan perbuatan." }
   ];
 
-  // Membagi data menjadi 2 kolom
   const leftColumn = darmaItems.slice(0, 5);
   const rightColumn = darmaItems.slice(5, 10);
 
-  // Komponen Item List
   const DarmaItem = ({ item, index, delayOffset }: { item: any, index: number, delayOffset: number }) => (
     <div
       className={`flex items-start gap-4 md:gap-5 transition-all duration-700 transform ${isVisible
@@ -87,10 +82,8 @@ const DDP: React.FC<DDPProps> = ({
   return (
     <section
       ref={sectionRef}
-      // UPDATE: Padding 150px (lg) & Alignment Center
       className={`relative py-20 px-6 md:px-12 lg:px-[150px] overflow-hidden bg-white ${dmSans.className}`}
     >
-      {/* Background Image / Pattern */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="/Image/Vector.png"
@@ -100,12 +93,8 @@ const DDP: React.FC<DDPProps> = ({
         />
       </div>
 
-      {/* Content Container 
-          UPDATE: max-w-6xl untuk membuat konten lebih rapat di tengah (rapi)
-      */}
       <div className="relative z-10 max-w-6xl mx-auto w-full">
 
-        {/* Header Section */}
         <div
           className={`text-center mb-16 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
             }`}
@@ -118,10 +107,8 @@ const DDP: React.FC<DDPProps> = ({
           </p>
         </div>
 
-        {/* Content Split Columns */}
         <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16 lg:gap-24">
 
-          {/* Left Column (1-5) */}
           <div className="flex-1 space-y-6 md:space-y-8">
             {leftColumn.map((item, index) => (
               <DarmaItem
@@ -133,7 +120,6 @@ const DDP: React.FC<DDPProps> = ({
             ))}
           </div>
 
-          {/* Right Column (6-10) */}
           <div className="flex-1 space-y-6 md:space-y-8">
             {rightColumn.map((item, index) => (
               <DarmaItem

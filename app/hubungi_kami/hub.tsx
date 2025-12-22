@@ -9,14 +9,14 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { submitContactForm } from '../actions';
 
-// --- Konfigurasi Font ---
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
   variable: '--font-dm-sans',
 });
 
-// --- Animasi Variants ---
+
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -49,7 +49,7 @@ const modalVariants: Variants = {
   exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
 };
 
-// --- Komponen Input Reusable (Standard) ---
+
 interface InputProps {
   name: string;
   value: string;
@@ -97,7 +97,7 @@ const CustomInput = ({ name, value, onChange, placeholder, type = "text", isText
   );
 };
 
-// --- Komponen Khusus: Switchable Phone Input ---
+
 interface PhoneInputProps {
   name: string;
   value: string;
@@ -106,23 +106,23 @@ interface PhoneInputProps {
 }
 
 const PhoneInput = ({ name, value, onChange, error }: PhoneInputProps) => {
-  // State untuk melacak apakah input sedang aktif (diklik)
+
   const [isActive, setIsActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Efek: Jika user mengklik container placeholder, otomatis fokus ke input asli
+
   useEffect(() => {
     if (isActive && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isActive]);
 
-  // Update active state when value exists
+
   useEffect(() => {
     if (value) setIsActive(true);
   }, [value]);
 
-  // Handle Blur: Jika kosong dan user klik luar, kembalikan ke tampilan placeholder biasa
+
   const handleBlur = () => {
     if (!value) {
       setIsActive(false);
@@ -132,7 +132,6 @@ const PhoneInput = ({ name, value, onChange, error }: PhoneInputProps) => {
   return (
     <motion.div variants={itemVariants} className="relative mb-5 h-[58px]">
       {!isActive && !value ? (
-        // STATE 1: Tampilan Awal (Seperti Input Biasa)
         <div
           onClick={() => setIsActive(true)}
           className="w-full h-full bg-white rounded-lg px-5 flex items-center text-gray-400 cursor-text
@@ -141,15 +140,14 @@ const PhoneInput = ({ name, value, onChange, error }: PhoneInputProps) => {
           Nomor Telepon / WhatsApp
         </div>
       ) : (
-        // STATE 2: Tampilan Input Aktif (+62 Style)
         <div className={`w-full h-full bg-white rounded-lg flex items-center overflow-hidden border transition-all ${error ? 'border-red-500 ring-red-200 ring-1' : 'border-transparent ring-2 ring-[#9C7C5B]'
           }`}>
-          {/* Bagian Kiri (+62) - Abu-abu */}
+
           <div className="bg-gray-100 px-4 h-full flex items-center justify-center border-r border-gray-200 text-gray-600 font-medium select-none min-w-[60px]">
             +62
           </div>
 
-          {/* Bagian Kanan (Input Angka) */}
+
           <input
             ref={inputRef}
             name={name}
@@ -167,17 +165,17 @@ const PhoneInput = ({ name, value, onChange, error }: PhoneInputProps) => {
   );
 };
 
-// --- MAIN COMPONENT ---
+
 export default function Hub() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  // Revised State Management
+
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'confirmation' | 'login_required'>('confirmation');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
-  // State Data Formulir
+
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
@@ -187,26 +185,34 @@ export default function Hub() {
 
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
 
-  // --- LOGIC VALIDASI INPUT ---
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     let validatedValue = value;
 
-    // 1. Validasi Nama: Hanya Huruf
+
     if (name === 'nama') {
       validatedValue = value.replace(/[^a-zA-Z\s]/g, '');
     }
 
-    // 2. Validasi Telepon: Hanya Angka (Regex)
+
     if (name === 'phone') {
       validatedValue = value.replace(/[^0-9]/g, '');
     }
 
-    // 3. Email & Pesan: Dibiarkan standard
+
 
     setFormData(prev => ({ ...prev, [name]: validatedValue }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: false }));
   };
+
+  /* Logic button Hubungi invalid */
+  const isValid = Boolean(
+    formData.nama &&
+    formData.email &&
+    formData.phone &&
+    formData.pesan
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,7 +234,7 @@ export default function Hub() {
       return;
     }
 
-    // Show Confirmation Modal
+
     setModalType('confirmation');
     setStatus('idle');
     setShowModal(true);
@@ -237,18 +243,19 @@ export default function Hub() {
   const handleFinalSubmit = async () => {
     setStatus('loading');
 
-    // 1. Send to Server (Supabase + Telegram)
+
     await submitContactForm(formData);
 
-    // 2. Success UI
+
     setStatus('success');
+    // Reset Form
     setFormData({ nama: '', email: '', phone: '', pesan: '' });
   };
 
   return (
     <section id="contact-form" className={`w-full min-h-screen bg-white overflow-hidden ${dmSans.className}`}>
 
-      {/* === MODAL POPUP (UNIFIED) === */}
+
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -264,7 +271,7 @@ export default function Hub() {
               exit="exit"
               className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden relative"
             >
-              {/* Close Button available unless loading */}
+
               {status !== 'loading' && (
                 <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10">
                   <X size={24} />
@@ -273,7 +280,7 @@ export default function Hub() {
 
               <div className="p-8 flex flex-col items-center text-center">
 
-                {/* KONDISI 0: LOGIN REQUIRED */}
+
                 {modalType === 'login_required' ? (
                   <div className="flex flex-col items-center py-2">
                     <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -300,9 +307,9 @@ export default function Hub() {
                     </div>
                   </div>
                 ) : (
-                  /* KONDISI 1 & 2: SUKSES & KONFIRMASI */
+
                   <>
-                    {/* KONDISI 1: SUKSES */}
+
                     {status === 'success' ? (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -324,7 +331,7 @@ export default function Hub() {
                         </button>
                       </motion.div>
                     ) : (
-                      /* KONDISI 2: DISCLAIMER & PROSES (IDLE / LOADING) */
+
                       <>
                         <div className="flex flex-col items-center mb-6 w-full">
                           <div className="flex items-center gap-2 text-red-600 mb-2">
@@ -383,7 +390,7 @@ export default function Hub() {
 
       <div className="flex flex-col lg:flex-row w-full min-h-screen">
 
-        {/* === KOLOM KIRI: FORMULIR === */}
+
         <div className="w-full lg:w-[60%] bg-[#322F2D] p-6 md:p-16 lg:py-[100px] lg:pl-[310px] lg:pr-[100px] flex flex-col justify-center relative z-10">
 
           <motion.div
@@ -393,7 +400,7 @@ export default function Hub() {
             viewport={{ once: true }}
             className="w-full"
           >
-            {/* Header */}
+
             <motion.h1 variants={itemVariants} className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight tracking-tight">
               Butuh Informasi? <br />
               <span className="text-[#C9A86A]">Hubungi Kami</span>
@@ -402,10 +409,10 @@ export default function Hub() {
               Isi formulir di bawah ini untuk pertanyaan atau kerja sama.
             </motion.p>
 
-            {/* Form Area */}
+
             <form onSubmit={handleSubmit}>
 
-              {/* 1. Nama Lengkap (Hanya Huruf) */}
+
               <CustomInput
                 name="nama"
                 value={formData.nama}
@@ -414,7 +421,7 @@ export default function Hub() {
                 error={errors.nama}
               />
 
-              {/* 2. Alamat Email */}
+
               <CustomInput
                 name="email"
                 type="email"
@@ -424,15 +431,15 @@ export default function Hub() {
                 error={errors.email}
               />
 
-              {/* 3. Nomor Telepon / WA (Interactive Switch) */}
+
               <PhoneInput
                 name="phone"
                 value={formData.phone}
-                onChange={(e) => handleInputChange(e)} // Casting event type agar compatible
+                onChange={(e) => handleInputChange(e)}
                 error={errors.phone}
               />
 
-              {/* 4. Pesan */}
+
               <CustomInput
                 name="pesan"
                 isTextArea={true}
@@ -442,14 +449,20 @@ export default function Hub() {
                 error={errors.pesan}
               />
 
-              {/* Tombol Kirim */}
+
               <motion.button
                 variants={itemVariants}
-                disabled={status === 'loading' || status === 'success'}
-                whileHover={{ scale: 1.02, backgroundColor: "#8A6A4B" }}
-                whileTap={{ scale: 0.98 }}
+                disabled={!isValid || status === 'loading' || status === 'success'}
+                whileHover={isValid ? { scale: 1.02, backgroundColor: "#8A6A4B" } : {}}
+                whileTap={isValid ? { scale: 0.98 } : {}}
+                onClick={handleSubmit}
                 className={`w-full py-4 rounded-lg shadow-lg transition-all duration-300 font-bold text-white tracking-wide text-lg flex items-center justify-center gap-2
-                  ${status === 'success' ? 'bg-green-600' : 'bg-[#9C7C5B]'}
+                  ${isValid && status !== 'success'
+                    ? 'bg-[#9C7C5B] hover:bg-[#8A6A4B] cursor-pointer'
+                    : status === 'success'
+                      ? 'bg-green-600 cursor-default'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300'
+                  }
                 `}
               >
                 <>
@@ -461,7 +474,7 @@ export default function Hub() {
           </motion.div>
         </div>
 
-        {/* === KOLOM KANAN: PETA / MAP === */}
+
         <motion.div
           className="w-full lg:w-[40%] relative min-h-[500px] lg:min-h-screen bg-gray-100 overflow-hidden flex items-center justify-center border-l-4 border-[#9C7C5B]"
           variants={rightSideVariants}
@@ -469,7 +482,7 @@ export default function Hub() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {/* Background Image Map */}
+
           <div className="absolute inset-0 z-0">
             <Image
               src="/Image/baris.webp"
@@ -481,14 +494,14 @@ export default function Hub() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10"></div>
           </div>
 
-          {/* Map Info Card Overlay */}
+
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.6 }}
             className="relative z-10 w-[85%] max-w-[380px] bg-white rounded-xl shadow-2xl overflow-hidden"
           >
-            {/* Header Card: Mini Map */}
+
             <div className="relative w-full h-40 bg-gray-200 overflow-hidden group cursor-pointer">
               <Image
                 src="/Image/MAP.webp"
@@ -498,7 +511,7 @@ export default function Hub() {
               />
             </div>
 
-            {/* Body Card */}
+
             <div className="p-6">
               <div className="flex justify-between items-start mb-2">
                 <div>
@@ -518,7 +531,7 @@ export default function Hub() {
                 Jl. Tentara Genie Pelajar No.26, Petemon, Kec. Sawahan, Surabaya, Jawa Timur
               </p>
 
-              {/* Navigate Button */}
+
               <a
                 href="https://www.google.com/maps/place/SMK+Negeri+2+Surabaya/@-7.2585122,112.7229803,1198m/data=!3m2!1e3!4b1!4m6!3m5!1s0x2dd7f9503d619c43:0x411d4cbbe989434!8m2!3d-7.2585122!4d112.7255606!16s%2Fg%2F122rvvd1?authuser=0&entry=ttu&g_ep=EgoyMDI1MTEyMy4xIKXMDSoASAFQAw%3D%3D"
                 target="_blank"

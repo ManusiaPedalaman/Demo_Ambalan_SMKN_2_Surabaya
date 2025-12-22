@@ -35,19 +35,19 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
     const [loading, setLoading] = useState(true);
     const [activeSubCatIndex, setActiveSubCatIndex] = useState(0);
 
-    // Fetch Data
+
     useEffect(() => {
         const fetchData = async () => {
             if (!id) return;
             setLoading(true);
             try {
-                // Determine if ID is dynamic or needs specific lookup
-                // For now, assume params.id is the ID we want
+
+
                 const data = await getMateriById(id);
                 if (data) {
                     setMateri(data);
                 } else {
-                    // console.error("Materi not found");
+
                 }
             } catch (error) {
                 console.error("Error loading materi:", error);
@@ -76,14 +76,14 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
         );
     }
 
-    // Default content structure if JSON is missing/different
+
     const contentData = materi.content || { subCategories: [] };
     const subCategories = contentData.subCategories || [];
     const activeSubCat = subCategories[activeSubCatIndex];
 
     return (
         <div className="font-dm-sans min-h-screen bg-[#FAFAFA] p-4 md:p-8 pb-20">
-            {/* Header / Nav */}
+
             <div className="max-w-6xl mx-auto mb-8">
                 <Link href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/latihan" className="inline-flex items-center gap-2 text-gray-500 hover:text-[#8B6E4A] mb-4 text-sm font-medium transition-colors">
                     <ChevronLeft size={16} />
@@ -98,7 +98,7 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
                         </p>
                     </div>
 
-                    {/* Simple User Profile Badge */}
+
                     <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
                         <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden relative">
                             {session?.user?.image ? (
@@ -116,10 +116,10 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
                 </div>
             </div>
 
-            {/* Main Content Grid */}
+
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-                {/* Left Sidebar: SubCategories Navigation */}
+
                 <div className="order-2 lg:order-1 lg:col-span-1">
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sticky top-8">
                         <h3 className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-wider">Kategori Latihan</h3>
@@ -147,74 +147,24 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
                     </div>
                 </div>
 
-                {/* Right Content Area */}
+
                 <div className="order-1 lg:order-2 lg:col-span-3">
                     {activeSubCat ? (
                         <div className="flex flex-col gap-8">
 
-                            {/* Title Section */}
+
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                                    {/* Icon Placeholder based on parent logic if needed, or generic */}
+
                                     <Layers className="text-[#8B6E4A]" />
                                     {activeSubCat.title}
                                 </h2>
                                 <p className="text-gray-400 text-sm mt-1">Pilih materi spesifik di bawah ini.</p>
 
-                                {/* If there are inner tabs/pills like the design image 'Simpul Mati', 'Simpul Jangkar' inside the specific subcat? 
-                                    Actually the design image shows 'Tali Temali' as main header, 'Simpul Mati' | 'Simpul Jangkar' as pills buttons.
-                                    And Side menu has 'Tali Temali', 'Sandi & Morse' etc.
-                                    
-                                    So: 
-                                    - Left Side Menu = Materi List (Topik/Materi Utama)
-                                    - Top Content Pills = SubCategories (Simpul Mati, Jangkar)
-                                    
-                                    But here we are viewing ONE Materi (e.g. Tali Temali).
-                                    So the Left menu should probably list the SubCategories of THIS Materi? 
-                                    OR, the Left menu lists ALL Materis (Navigation)?
-                                    
-                                    The User Request Image 2 shows:
-                                    Left Sidebar: "Kategori Latihan" -> Tali Temali (Active), Sandi & Morse, Navigasi...
-                                    Right Content: "Tali Temali" (Title) -> "Simpul Mati" (Active Pill), "Simpul Jangkar" (Pill).
-                                    
-                                    Wait, my current architecture passes `id` of the Materi.
-                                    If I am viewing 'Tali Temali', `id` is 'tali-temali'.
-                                    The Content JSON has `subCategories`.
-                                    
-                                    So:
-                                    1. Left Sidebar in design actually navigates between DIFFERENT Materi IDs?
-                                       If so, I need to fetch ALL Materi IDs to populate the sidebar.
-                                       This is fetching "List of Materi".
-                                    
-                                    2. The Pills in the content area navigate 'subCategories' of the CURRENT Materi.
-                                    
-                                    Let's adjust to match likely user intent from the image:
-                                    - Left Sidebar: List of available Materi (requires fetching list).
-                                    - Main Area Header: Current Materi Title.
-                                    - Main Area Tabs (Pills): SubCategories (Simpul Mati, Simpul Jangkar).
-                                    - Main Area Content: Explanations, Video, Quiz.
-                                    
-                                    However, simplified version first: 
-                                    - Just display the functionality for THIS Materi.
-                                    - The layout I built above has SubCats on the Left. 
-                                    - Let's move SubCats to Pills on Top (like design) and make Left Sidebar static or hidden for now?
-                                    - No, let's Stick to the prompt: "tampilan baru yang mana menampilkan contoh nya seperti pada gambar".
-                                    
-                                    Image analysis:
-                                    sidebar: Kategori Latihan (Tali Temali, Sandi, etc). This seems to be the global navigation.
-                                    content: Tali Temali -> Pills -> Content.
-                                    
-                                    If I want to perfectly replicate the sidebar, I need to fetch all materi list.
-                                    `getMateriList` takes no args and returns list. I can use that.
-                                    
-                                    Refining the component:
-                                    - Fetch both single materi AND list of materi.
-                                */
-                                }
+
                             </div>
 
-                            {/* SubCategory Pills (Pilihan Materi Spesifik) */}
-                            {/* Only show if multiple subcats exist */}
+
                             {subCategories.length > 0 && (
                                 <div className="flex flex-wrap gap-2">
                                     {subCategories.map((sub: any, idx: number) => (
@@ -234,7 +184,7 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
                                 </div>
                             )}
 
-                            {/* Explanation Frames */}
+
                             {activeSubCat.explanationFrames && (
                                 <div>
                                     <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">
@@ -255,7 +205,7 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
                                 </div>
                             )}
 
-                            {/* Video Tutorial */}
+
                             {activeSubCat.videoId && (
                                 <div>
                                     <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">
@@ -277,7 +227,8 @@ export default function MateriDetailPage({ params }: { params: Promise<{ id: str
                                 </div>
                             )}
 
-                            {/* Quiz Preview */}
+
+
                             {activeSubCat.quiz && activeSubCat.quiz.length > 0 && (
                                 <div>
                                     <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-4">

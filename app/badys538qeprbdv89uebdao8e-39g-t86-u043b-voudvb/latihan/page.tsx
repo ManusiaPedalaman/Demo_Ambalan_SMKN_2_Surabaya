@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-// import { supabase } from '@/lib/supabase'; // Removed direct Supabase usage
+
 import {
     Users,
     Package,
@@ -54,7 +54,7 @@ export default function DashboardPage() {
     const { data: session } = useSession();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-    // State to track active card
+
     const [activeCard, setActiveCard] = useState<number>(0);
 
     useEffect(() => {
@@ -64,15 +64,15 @@ export default function DashboardPage() {
         }
     }, []);
 
-    // --- REAL DATA STATE ---
+
     const [joinsData, setJoinsData] = useState<any[]>([]);
     const [bookingsData, setBookingsData] = useState<any[]>([]);
     const [contactsData, setContactsData] = useState<any[]>([]);
     const [rentersData, setRentersData] = useState<any[]>([]);
-    const [userData, setUserData] = useState<any[]>([]); // New State for Users
-    const [materiData, setMateriData] = useState<any[]>([]); // New State for Materi
-    const [productData, setProductData] = useState<any[]>([]); // New State for Products
-    const [adminData, setAdminData] = useState<any[]>([]); // New State for Admins
+    const [userData, setUserData] = useState<any[]>([]); 
+    const [materiData, setMateriData] = useState<any[]>([]); 
+    const [productData, setProductData] = useState<any[]>([]); 
+    const [adminData, setAdminData] = useState<any[]>([]); 
     const [statsCounts, setStatsCounts] = useState({
         adminCount: 0,
         userCount: 0,
@@ -86,7 +86,7 @@ export default function DashboardPage() {
 
     const [loading, setLoading] = useState(true);
 
-    // --- DELETE MODAL STATE ---
+
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -113,20 +113,20 @@ export default function DashboardPage() {
         }
     };
 
-    // --- FETCH DATA FROM SERVER ACTIONS ---
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // 1. Fetch Stats
+
                 const counts = await getDashboardStats();
                 setStatsCounts(counts);
 
-                // 2. Fetch Admin List
+
                 const admins = await getAdminUsers();
                 setAdminData(admins);
 
-                // 3. Fetch Lists via Server Actions
+
                 const joins = await getJoinsList();
                 setJoinsData(joins);
 
@@ -158,7 +158,8 @@ export default function DashboardPage() {
         fetchData();
     }, []);
 
-    // 8 Summary Cards Data (Dynamic Values)
+
+    
     const stats = [
         {
             id: 7,
@@ -169,7 +170,7 @@ export default function DashboardPage() {
         },
     ];
 
-    // Helper to render Action Button
+
     const ActionButton = ({ itemId, index, totalItems }: { itemId: string; index: number; totalItems: number }) => {
         const router = useRouter();
         const [isOpen, setIsOpen] = useState(false);
@@ -177,7 +178,7 @@ export default function DashboardPage() {
         let menuItems: { label: string; color?: string; action?: string }[] = [];
 
         const handleDelete = async () => {
-            // Trigger Modal
+
             setDeleteItemId(itemId);
             setIsDeleteModalOpen(true);
         };
@@ -186,9 +187,9 @@ export default function DashboardPage() {
             router.push(`/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/latihan/detail/${itemId}`);
         };
 
-        // Define menu items based on activeCard
+
         switch (activeCard) {
-            case 0: // Materi
+            case 0: 
                 menuItems = [
                     { label: 'Detail', action: 'detail' },
                     { label: 'Hapus', color: 'text-red-600', action: 'delete' }
@@ -211,7 +212,7 @@ export default function DashboardPage() {
                     <MoreHorizontal size={18} />
                 </button>
 
-                {/* Backdrop to close when clicking outside */}
+
                 {isOpen && (
                     <div
                         className="fixed inset-0 z-40"
@@ -219,7 +220,7 @@ export default function DashboardPage() {
                     />
                 )}
 
-                {/* Tooltip/Dropdown: Positioned to the LEFT (right-full) */}
+
                 {isOpen && (
                     <div className={`absolute right-full mr-2 w-32 bg-white shadow-lg rounded-lg border border-gray-100 z-50 overflow-hidden ${index < totalItems / 2 ? 'top-0' : 'bottom-0'
                         }`}>
@@ -247,14 +248,14 @@ export default function DashboardPage() {
         );
     };
 
-    // --- EXPORT FUNCTIONS ---
+
     const handleExport = () => {
         let title = '';
         let formattedData: any[] = [];
 
-        // Helper to format specific fields
+
         switch (activeCard) {
-            case 0: // Materi
+            case 0: 
                 title = 'Data_Materi_Latihan';
                 formattedData = materiData.map(item => ({
                     'ID Materi': item.id,
@@ -271,14 +272,14 @@ export default function DashboardPage() {
             return;
         }
 
-        // --- Create Workbook & Sheet ---
+
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(formattedData);
 
-        // --- Apply Styling (Borders for All Cells) ---
+
         const range = XLSX.utils.decode_range(ws['!ref']!);
 
-        // Define Border Style
+
         const borderStyle = {
             top: { style: "thin", color: { rgb: "000000" } },
             bottom: { style: "thin", color: { rgb: "000000" } },
@@ -286,19 +287,19 @@ export default function DashboardPage() {
             right: { style: "thin", color: { rgb: "000000" } }
         };
 
-        // Apply style to every cell in range
+
         for (let R = range.s.r; R <= range.e.r; ++R) {
             for (let C = range.s.c; C <= range.e.c; ++C) {
                 const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
                 if (!ws[cellRef]) continue;
 
-                // Initialize s (style) object if not present
+
                 if (!ws[cellRef].s) ws[cellRef].s = {};
 
-                // Apply borders
+
                 ws[cellRef].s.border = borderStyle;
 
-                // Optional: Make header bold
+
                 if (R === 0) {
                     ws[cellRef].s.font = { bold: true };
                     ws[cellRef].s.fill = { fgColor: { rgb: "EEEEEE" } };
@@ -306,17 +307,17 @@ export default function DashboardPage() {
             }
         }
 
-        // Set column widths (optional, auto-width approximation)
+
         const cols = Object.keys(formattedData[0]).map(() => ({ wch: 20 }));
         ws['!cols'] = cols;
 
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-        // --- Trigger Download ---
+
         XLSX.writeFile(wb, `${title}_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // --- RENDER CONTENT BASED ON ACTIVE CARD ---
+
     const renderContent = () => {
         if (loading) {
             return (
@@ -329,7 +330,7 @@ export default function DashboardPage() {
         }
 
         switch (activeCard) {
-            case 0: // Total Materi Latihan
+            case 0: 
                 if (materiData.length === 0) {
                     return (
                         <tbody>
@@ -386,7 +387,7 @@ export default function DashboardPage() {
 
     return (
         <div className="font-dm-sans min-h-screen p-4 md:p-8 pb-10">
-            {/* Header */}
+
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">Latihan</h1>
                 <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
@@ -406,7 +407,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Scale-able Card Grid/Scroll - 8 Items */}
+
             <div className="mb-10 w-full overflow-x-auto pb-4 scrollbar-hide">
                 <div className="flex gap-4 min-w-max">
                     {stats.map((stat, index) => {
@@ -447,10 +448,10 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Dynamic Content Section */}
+
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px] p-6">
 
-                {/* Table Header / Title */}
+
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 className="text-lg font-bold text-[#8B6E4A]">
@@ -460,9 +461,9 @@ export default function DashboardPage() {
                             Data {stats[activeCard].title}
                         </p>
                     </div>
-                    {/* Optional: Filter / Detail Button */}
+
                     <div className="flex items-center gap-3">
-                        {/* Show Sheets Button for appropriate cards */}
+
                         {[0].includes(activeCard) && (
                             <button
                                 onClick={handleExport}
@@ -473,9 +474,9 @@ export default function DashboardPage() {
                             </button>
                         )}
 
-                        {/* Specific Action Buttons */}
-                        {/* Specific Action Buttons - ADD (+ Button) */}
-                        {activeCard === 5 && ( // Produk Tersedia
+
+
+                        {activeCard === 5 && ( 
                             <button className="flex items-center gap-2 bg-[#8B6E4A] hover:bg-[#7a5f3d] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">
                                 <Plus size={18} />
                                 <span>Produk</span>
@@ -487,14 +488,14 @@ export default function DashboardPage() {
                     </div>
                 </div >
 
-                {/* Table */}
+
                 <div className="w-full overflow-x-auto border border-gray-200 rounded-xl">
                     <table className="w-full text-sm text-left">
                         {renderContent()}
                     </table>
                 </div >
 
-                {/* Pagination Footer */}
+
                 <div className="flex items-center justify-between mt-6 text-xs text-gray-500 font-medium">
                     <div className="flex items-center gap-2">
                         <span>Rows :</span>
@@ -517,7 +518,6 @@ export default function DashboardPage() {
                 </div >
 
             </div>
-            {/* === DELETE CONFIRMATION MODAL === */}
             <AnimatePresence>
                 {isDeleteModalOpen && (
                     <motion.div

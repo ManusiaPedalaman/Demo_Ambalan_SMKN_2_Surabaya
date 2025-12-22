@@ -20,9 +20,8 @@ export default function HeroSection() {
     setIsLoaded(true);
   }, []);
 
-  // --- FUNGSI INTERAKSI ---
 
-  // Fungsi 1: Scroll ke bawah
+
   const handleScrollToContent = () => {
     const targetSection = document.getElementById('explore-target');
     if (targetSection) {
@@ -30,12 +29,11 @@ export default function HeroSection() {
     }
   };
 
-  // Fungsi 2: Pindah ke halaman Produk
   const handleNavigateToProduk = () => {
     router.push('/produk_kami');
   };
 
-  // --- VARIAN ANIMASI ---
+
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -95,8 +93,6 @@ export default function HeroSection() {
 
   return (
     <section className={`relative min-h-screen w-full overflow-hidden ${poppins.className}`}>
-      {/* Background Image with Overlay */}
-      {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/Image/Hero1.webp"
@@ -106,7 +102,7 @@ export default function HeroSection() {
           className="object-cover object-center"
           quality={90}
         />
-        {/* Dark Overlay with fade in */}
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -115,8 +111,7 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* Content */}
-      {/* UPDATE: Padding kiri kanan diubah menjadi 150px pada layar besar (lg) */}
+      
       <div className="relative z-10 flex min-h-screen items-center px-6 py-20 sm:px-8 md:px-12 lg:px-[315px]">
         <motion.div
           variants={containerVariants}
@@ -124,7 +119,7 @@ export default function HeroSection() {
           animate={isLoaded ? "visible" : "hidden"}
           className="max-w-4xl"
         >
-          {/* Main Title */}
+
           <motion.div variants={textVariants} className="overflow-hidden">
             <h1 className="mb-4 text-4xl font-semibold leading-tight text-white sm:text-5xl md:mb-6 md:text-6xl lg:text-7xl">
               The Real
@@ -135,7 +130,7 @@ export default function HeroSection() {
             </h1>
           </motion.div>
 
-          {/* Subtitle */}
+
           <motion.div
             variants={textVariants}
             className="mb-6 space-y-0.5 md:mb-8"
@@ -148,12 +143,12 @@ export default function HeroSection() {
             </p>
           </motion.div>
 
-          {/* CTA Buttons */}
+
           <motion.div
             variants={fadeVariants}
             className="flex flex-wrap gap-3 sm:gap-4"
           >
-            {/* Button 1: Scroll Kebawah */}
+
             <motion.button
               variants={buttonVariants}
               whileHover={{
@@ -167,13 +162,13 @@ export default function HeroSection() {
               Jelajahi
             </motion.button>
 
-            {/* Separator Line */}
+
             <motion.div
               variants={buttonVariants}
               className="hidden sm:block w-[1.5px] bg-[#C9A86A] self-stretch mx-1"
             />
 
-            {/* Button 2: Link ke Produk */}
+
             <motion.button
               variants={buttonVariants}
               whileHover={{
@@ -192,7 +187,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Decorative Bottom Gradient */}
+
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -200,7 +195,7 @@ export default function HeroSection() {
         className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/30 to-transparent md:h-32"
       />
 
-      {/* Target ID untuk Scroll (Invisible Element) */}
+
       <div id="explore-target" className="absolute bottom-0 w-full h-1" />
     </section>
   );

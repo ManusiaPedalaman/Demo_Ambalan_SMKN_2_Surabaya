@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -22,7 +23,7 @@ export default function Navbar() {
 
   const isTransparentPage = pathname === '/' || pathname === '/tentang';
 
-  // FUNGSI UNTUK MENANGANI FILE YANG DIPILIH (Simulasi ganti avatar)
+
   const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -30,7 +31,7 @@ export default function Navbar() {
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setPreviewImage(base64String);
-        // Simpan ke LocalStorage agar tidak hilang saat refresh
+
         if (typeof window !== 'undefined') {
           localStorage.setItem('userAvatar', base64String);
         }
@@ -42,14 +43,14 @@ export default function Navbar() {
     }
   };
 
-  // FUNGSI UNTUK MENGAKTIFKAN PEMILIHAN FILE DARI TOMBOL
+
   const handleProfileImageChange = () => {
-    setIsProfileMenuOpen(false); // Tutup dropdown
-    fileInputRef.current?.click(); // Memicu klik pada input file tersembunyi
+    setIsProfileMenuOpen(false);
+    fileInputRef.current?.click();
   };
 
 
-  // LOGIKA: Menutup dropdown saat klik di luar area profil
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && event.target instanceof Node) {
@@ -66,7 +67,7 @@ export default function Navbar() {
     };
   }, []);
 
-  // LOGIKA: Load avatar dari LocalStorage saat mount
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedAvatar = localStorage.getItem('userAvatar');
@@ -76,7 +77,7 @@ export default function Navbar() {
     }
   }, []);
 
-  // LOGIKA: Mengubah state saat scroll
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -90,7 +91,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Helper untuk menentukan Warna Navbar Background
+
   const getNavbarBg = () => {
     if (isMobileMenuOpen) return 'bg-white';
     if (isTransparentPage && !isProfileMenuOpen) {
@@ -99,7 +100,7 @@ export default function Navbar() {
     return 'bg-white shadow-sm';
   };
 
-  // Helper untuk menentukan Warna Text Menu
+
   const getLinkClass = (href: string) => {
     const isActive = href === '/'
       ? pathname === href
@@ -122,7 +123,7 @@ export default function Navbar() {
     return "text-[#3D3D3D]";
   };
 
-  // Helper untuk warna Text Logo (Ambalan)
+
   const getLogoTextColor = () => {
     if (isTransparentPage && !isScrolled && !isMobileMenuOpen && !isProfileMenuOpen) {
       return { title: 'text-[#A4D8F3]', subtitle: 'text-gray-200' };
@@ -132,7 +133,7 @@ export default function Navbar() {
 
   const logoColors = getLogoTextColor();
 
-  // Helper untuk mendapatkan inisial user
+
   const getUserInitials = () => {
     if (session?.user?.name) {
       const names = session.user.name.split(' ');
@@ -146,9 +147,58 @@ export default function Navbar() {
 
   const isAdmin = (session?.user as any)?.role === 'ADMIN';
 
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   return (
     <>
-      {/* Input File Tersembunyi untuk mengganti gambar profil */}
+
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setShowLogoutModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <LogOut size={32} className="text-red-600 ml-1" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>Konfirmasi Keluar</h3>
+                <p className="text-gray-500 text-sm mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  "Apakah Anda yakin ingin keluar dari akun Anda?"
+                </p>
+
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => setShowLogoutModal(false)}
+                    className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors shadow-lg shadow-red-200"
+                    style={{ fontFamily: 'Poppins, sans-serif' }}
+                  >
+                    Keluar
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <input
         type="file"
         ref={fileInputRef}
@@ -157,14 +207,14 @@ export default function Navbar() {
         className="hidden"
       />
 
-      {/* Desktop & Mobile Navbar */}
+
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${getNavbarBg()}`}
       >
         <div className="w-full px-6 md:px-12 lg:px-16 xl:px-[315px] py-4">
           <div className="flex items-center justify-between">
 
-            {/* === LOGO === */}
+
             <Link href="/" className="flex items-center gap-2.5 group">
               <Image
                 src="/Logo/LogoAmbalan.svg"
@@ -189,7 +239,7 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* === DESKTOP MENU === */}
+
             <div className="hidden lg:flex items-center justify-center flex-1 gap-8 px-8">
               <Link
                 href="/"
@@ -229,13 +279,13 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* === CTA & PROFILE (DESKTOP) === */}
+
             <div className="hidden lg:flex items-center gap-3 relative" ref={profileRef}>
 
               {session ? (
-                // === LOGGED IN STATE: Tampilkan Hubungi Kami & Profile Avatar ===
+
                 <>
-                  {/* Tombol Hubungi Kami (Opsional, bisa diubah sesuai kebutuhan navigasi login) */}
+
                   <Link
                     href="/hubungi_kami"
                     className={`px-6 py-2.5 rounded-full font-medium transition-all duration-300 whitespace-nowrap inline-block shadow-md hover:shadow-lg hover:-translate-y-0.5 
@@ -246,7 +296,7 @@ export default function Navbar() {
                     Hubungi Kami
                   </Link>
 
-                  {/* Tombol Profile Avatar/Inisial */}
+
                   <button
                     onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white transition-all duration-300 ring-2 ring-offset-2 hover:ring-offset-1 
@@ -268,11 +318,11 @@ export default function Navbar() {
                     )}
                   </button>
 
-                  {/* Profile Dropdown */}
+
                   {isProfileMenuOpen && (
                     <div className="absolute right-0 top-full mt-4 w-64 bg-[#3D3D3D] rounded-xl shadow-2xl py-2 transition-all duration-300 origin-top animate-fade-in">
 
-                      {/* Bagian Atas Dropdown (Email dan Avatar) */}
+
                       <div className="flex flex-col items-center p-4">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-2 overflow-hidden
                             ${session.user?.image ? 'p-0 bg-transparent' : 'bg-[#C7A682]'}
@@ -294,10 +344,10 @@ export default function Navbar() {
                         </span>
                       </div>
 
-                      {/* Menu Navigasi Dropdown */}
+
                       <div className='flex flex-col p-2 pt-0'>
 
-                        {/* Tombol EDIT PROFILE: Memicu Input File */}
+
                         <button
                           onClick={handleProfileImageChange}
                           className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
@@ -306,7 +356,7 @@ export default function Navbar() {
                           Edit Profile
                         </button>
 
-                        {/* Menu Khusus Admin */}
+
                         {isAdmin && (
                           <Link
                             href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb"
@@ -320,7 +370,7 @@ export default function Navbar() {
 
                         <button
                           onClick={() => {
-                            signOut({ callbackUrl: '/' });
+                            setShowLogoutModal(true);
                             setIsProfileMenuOpen(false);
                           }}
                           className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
@@ -333,10 +383,10 @@ export default function Navbar() {
                   )}
                 </>
               ) : (
-                // === LOGGED OUT STATE: Tampilkan Masuk & Daftar (Sesuai Gambar) ===
+
                 <>
                   <Link
-                    // Menggunakan rute berdasarkan struktur file Anda: /login/masuk
+
                     href="/login"
                     onClick={() => setIsProfileMenuOpen(false)}
                     className={`px-6 py-2.5 rounded-full font-medium transition-all duration-300 whitespace-nowrap inline-block 
@@ -347,7 +397,7 @@ export default function Navbar() {
                     Masuk
                   </Link>
                   <Link
-                    // Menggunakan rute berdasarkan struktur file Anda: /login/daftar
+
                     href="/register"
                     onClick={() => setIsProfileMenuOpen(false)}
                     className={`px-6 py-2.5 rounded-full font-medium transition-all duration-300 whitespace-nowrap inline-block shadow-md hover:shadow-lg hover:-translate-y-0.5 
@@ -361,11 +411,11 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* === MOBILE HAMBURGER BUTTON === */}
+
             <button
               onClick={() => {
                 setIsMobileMenuOpen(!isMobileMenuOpen);
-                setIsProfileMenuOpen(false); // Tutup dropdown profil saat membuka menu mobile
+                setIsProfileMenuOpen(false);
               }}
               className={`lg:hidden w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 shadow-md ${isMobileMenuOpen
                 ? 'bg-[#5E4B35] hover:bg-[#4a3b2a]'
@@ -384,7 +434,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* === MOBILE MENU DROPDOWN === */}
+
       <div
         className={`fixed top-[72px] left-0 right-0 bg-white shadow-xl z-40 lg:hidden transition-all duration-300 origin-top ${isMobileMenuOpen ? 'max-h-screen opacity-100 scale-y-100' : 'max-h-0 opacity-0 scale-y-0 overflow-hidden'
           }`}
@@ -427,10 +477,10 @@ export default function Navbar() {
             Produk Kami
           </Link>
 
-          {/* Jika sudah login, tampilkan Profile, Keluar, dan Hubungi Kami */}
+
           {session ? (
             <>
-              {/* Tombol Profile di Mobile memicu input file tersembunyi */}
+
               <button
                 onClick={() => {
                   handleProfileImageChange();
@@ -455,7 +505,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => {
-                  signOut({ callbackUrl: '/' });
+                  setShowLogoutModal(true);
                   setIsMobileMenuOpen(false);
                 }}
                 className="w-full text-left font-medium py-3 transition-all duration-300 text-lg border-b border-gray-100 text-red-600"
@@ -473,10 +523,10 @@ export default function Navbar() {
               </Link>
             </>
           ) : (
-            // Jika BELUM login, tampilkan Masuk dan Daftar
+
             <div className='flex flex-col space-y-4 pt-4'>
               <Link
-                // Menggunakan rute berdasarkan struktur file Anda: /login/masuk
+
                 href="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="bg-gray-100 border border-[#6B4D27] text-[#6B4D27] px-6 py-3 rounded-full font-medium text-center transition-all duration-300 shadow-sm"
@@ -485,7 +535,7 @@ export default function Navbar() {
                 Masuk
               </Link>
               <Link
-                // Menggunakan rute berdasarkan struktur file Anda: /login/daftar
+
                 href="/register"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="bg-[#6B4D27] hover:bg-[#7A5F3D] text-white px-6 py-3 rounded-full font-medium text-center transition-all duration-300 shadow-md"

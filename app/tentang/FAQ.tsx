@@ -5,14 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
 import { DM_Sans } from 'next/font/google';
 
-// 1. Konfigurasi Font DM Sans
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
   variable: '--font-dm-sans',
 });
 
-// 2. Data FAQ (Sesuai Gambar)
+
 const faqData = [
   {
     id: 1,
@@ -68,7 +68,7 @@ const faqData = [
 
 export default function FAQ() {
   // State untuk melacak item mana yang terbuka (null artinya tertutup semua)
-  const [activeIndex, setActiveIndex] = useState<number | null>(0); // Default no 1 terbuka sesuai gambar
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const toggleFAQ = (index: number) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -78,7 +78,6 @@ export default function FAQ() {
     <section className={`w-full bg-white py-20 px-6 md:px-12 lg:px-24 overflow-hidden ${dmSans.className}`}>
       <div className="max-w-5xl mx-auto">
 
-        {/* === Header Section === */}
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 50 }}
@@ -94,7 +93,6 @@ export default function FAQ() {
           </p>
         </motion.div>
 
-        {/* === FAQ List === */}
         <motion.div
           className="flex flex-col"
           initial={{ opacity: 0, y: 30 }}
@@ -107,7 +105,6 @@ export default function FAQ() {
 
             return (
               <div key={item.id} className="border-b border-gray-200">
-                {/* Question Header (Clickable) */}
                 <button
                   onClick={() => toggleFAQ(index)}
                   className="w-full flex justify-between items-center py-6 text-left focus:outline-none group"
@@ -116,7 +113,6 @@ export default function FAQ() {
                     {item.question}
                   </span>
 
-                  {/* Icon Toggle (+ / -) */}
                   <span className="flex-shrink-0 transition-transform duration-300">
                     {isOpen ? (
                       <Minus className="w-6 h-6 text-black" />
@@ -126,7 +122,6 @@ export default function FAQ() {
                   </span>
                 </button>
 
-                {/* Answer Content (Animated) */}
                 <AnimatePresence>
                   {isOpen && (
                     <motion.div

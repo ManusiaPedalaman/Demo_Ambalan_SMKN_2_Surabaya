@@ -12,7 +12,7 @@ export default function Sidebar() {
     const pathname = usePathname();
 
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
 
@@ -20,7 +20,7 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Mobile Toggle Button */}
+
             <button
                 onClick={toggleMobile}
                 className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-white rounded-lg shadow-md text-gray-600 hover:text-[#8B6E4A] transition-colors"
@@ -28,7 +28,7 @@ export default function Sidebar() {
                 {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
-            {/* Overlay for Mobile */}
+
             <AnimatePresence>
                 {isMobileOpen && (
                     <motion.div
@@ -41,14 +41,59 @@ export default function Sidebar() {
                 )}
             </AnimatePresence>
 
-            {/* Sidebar Container */}
+            <AnimatePresence>
+                {showLogoutModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 font-dm-sans"
+                        onClick={() => setShowLogoutModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden relative"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="p-6 flex flex-col items-center text-center">
+                                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                                    <LogOut size={32} className="text-red-600 ml-1" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-800 mb-2">Konfirmasi Keluar</h3>
+                                <p className="text-gray-500 text-sm mb-6">
+                                    "Apakah Anda yakin ingin keluar dari akun Anda?"
+                                </p>
+
+                                <div className="flex gap-3 w-full">
+                                    <button
+                                        onClick={() => setShowLogoutModal(false)}
+                                        className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
+                                    >
+                                        Batal
+                                    </button>
+                                    <button
+                                        onClick={() => signOut({ callbackUrl: '/' })}
+                                        className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors shadow-lg shadow-red-200"
+                                    >
+                                        Keluar
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+
             <div className={`
                 fixed top-0 left-0 h-screen bg-white border-r border-gray-100 flex flex-col z-[50] font-dm-sans w-64
                 transform transition-transform duration-300 ease-in-out
                 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
                 lg:translate-x-0
             `}>
-                {/* Logo Section */}
+
                 <div className="pt-8 pb-6 flex flex-col items-center">
                     <Link href="/" className="flex flex-col items-center gap-2 group">
                         <Image
@@ -69,10 +114,10 @@ export default function Sidebar() {
                     </Link>
                 </div>
 
-                {/* Menu Items */}
+
                 <nav className="flex-1 overflow-y-auto py-8 px-6 space-y-4">
 
-                    {/* Dashboard */}
+
                     <Link
                         href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb"
                         onClick={() => setIsMobileOpen(false)}
@@ -86,7 +131,7 @@ export default function Sidebar() {
                         <span className="font-medium text-[15px]">Dashboard</span>
                     </Link>
 
-                    {/* Produk */}
+
                     <Link
                         href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/produk"
                         onClick={() => setIsMobileOpen(false)}
@@ -100,8 +145,8 @@ export default function Sidebar() {
                         <span className="font-medium text-[15px]">Produk</span>
                     </Link>
 
-                    {/* User Dropdown */}
-                    {/* User */}
+
+
                     <Link
                         href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/user"
                         onClick={() => setIsMobileOpen(false)}
@@ -115,7 +160,7 @@ export default function Sidebar() {
                         <span className="font-medium text-[15px]">User</span>
                     </Link>
 
-                    {/* Latihan */}
+
                     <Link
                         href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/latihan"
                         onClick={() => setIsMobileOpen(false)}
@@ -132,11 +177,11 @@ export default function Sidebar() {
 
                 </nav>
 
-                {/* Bottom Section */}
+
                 <div className="p-6">
                     <div className="h-[1px] w-full bg-gray-100 mb-6"></div>
                     <button
-                        onClick={() => signOut({ callbackUrl: '/' })}
+                        onClick={() => setShowLogoutModal(true)}
                         className="flex items-center gap-3 group px-2 transition-all duration-200 hover:pl-4"
                     >
                         <div className="w-10 h-10 rounded-xl bg-[#F8E7E7] text-[#D35E5E] flex items-center justify-center group-hover:bg-[#D35E5E] group-hover:text-white transition-colors">

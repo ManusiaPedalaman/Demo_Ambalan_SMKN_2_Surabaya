@@ -19,7 +19,7 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
 });
 
-// --- DATA DENGAN 10 PERTANYAAN ---
+
 const pillarsData = [
   {
     id: 'tali-temali',
@@ -277,25 +277,25 @@ const pillarsData = [
 ];
 
 export default function Latihan() {
-  // --- STATE UTAMA ---
+
   const [activePillarId, setActivePillarId] = useState(pillarsData[0].id);
   const [activeSubCatId, setActiveSubCatId] = useState(pillarsData[0].subCategories[0].id);
 
-  // --- STATE QUIZ ---
+
   const [quizStep, setQuizStep] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [scoreCount, setScoreCount] = useState(0);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
 
-  // --- STATE IMAGE ---
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // --- DATA AKTIF ---
+
   const activePillar = pillarsData.find(p => p.id === activePillarId) || pillarsData[0];
   const activeSubCategory = activePillar.subCategories.find(s => s.id === activeSubCatId) || activePillar.subCategories[0];
   const currentQuizData = activeSubCategory.quiz;
 
-  // --- RESET LOGIC ---
+
   const resetQuiz = () => {
     setQuizStep(0);
     setSelectedOption(null);
@@ -303,24 +303,24 @@ export default function Latihan() {
     setIsQuizFinished(false);
   };
 
-  // Reset sub kategori & jawaban saat pilar utama berubah
+
   useEffect(() => {
     setActiveSubCatId(activePillar.subCategories[0].id);
     resetQuiz();
   }, [activePillarId]);
 
-  // Reset jawaban saat sub kategori berubah
+
   useEffect(() => {
     resetQuiz();
   }, [activeSubCatId]);
 
-  // --- HANDLERS ---
+
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index);
   };
-  // ... (existing handlers)
 
-  // ...
+
+
 
 
 
@@ -344,11 +344,11 @@ export default function Latihan() {
     <section className={`w-full min-h-screen bg-[#FAFAFA] pt-24 pb-20 ${dmSans.className}`}>
       <div className="w-full px-6 md:px-12 lg:px-[315px] mx-auto">
 
-        {/* Back Button (Visible on Mobile & Desktop) */}
+
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
 
-          {/* === MOBILE NAVIGATION (ACCORDION STYLE) === */}
+
           <div className="lg:hidden w-full mb-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-4 border-b border-gray-50 bg-gray-50/50">
               <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Pilih Materi</h3>
@@ -358,7 +358,7 @@ export default function Latihan() {
               const isActive = activePillarId === pillar.id;
               return (
                 <div key={pillar.id} className="border-b border-gray-50 last:border-0">
-                  {/* Header Accordion */}
+
                   <button
                     onClick={() => setActivePillarId(pillar.id)}
                     className={`w-full flex items-center justify-between p-4 transition-all duration-300 ${isActive ? 'bg-[#FDF8F3] text-[#C9A86A]' : 'text-gray-600 hover:bg-gray-50'
@@ -371,7 +371,7 @@ export default function Latihan() {
                     <ChevronDown size={18} className={`transition-transform duration-300 ${isActive ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {/* Isi Accordion (Sub Kategori) */}
+
                   <AnimatePresence>
                     {isActive && (
                       <motion.div
@@ -386,7 +386,7 @@ export default function Latihan() {
                               key={sub.id}
                               onClick={() => {
                                 setActiveSubCatId(sub.id);
-                                // Optional: Scroll to content if needed
+
                               }}
                               className={`w-full text-left px-4 py-3 rounded-lg text-sm ml-4 border-l-2 transition-all ${activeSubCatId === sub.id
                                 ? 'border-[#C9A86A] text-[#C9A86A] bg-gray-50 font-medium'
@@ -405,7 +405,7 @@ export default function Latihan() {
             })}
           </div>
 
-          {/* === DESKTOP SIDEBAR (STICKY) === */}
+
           <div className="hidden lg:block w-1/4 sticky top-24 z-20">
             <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 px-3">
@@ -429,7 +429,7 @@ export default function Latihan() {
             </div>
           </div>
 
-          {/* === MAIN CONTENT (KANAN) === */}
+
           <div className="w-full lg:w-3/4">
             <AnimatePresence mode="wait">
               <motion.div
@@ -439,13 +439,13 @@ export default function Latihan() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Header */}
+
                 <div className="mb-8 hidden lg:block">
                   <h1 className="text-4xl font-bold text-[#231F1E] mb-2">{activePillar.title}</h1>
                   <p className="text-gray-500 text-sm">Pilih materi spesifik di bawah ini.</p>
                 </div>
 
-                {/* SUB-CATEGORY TABS (Desktop Only) */}
+
                 <div className="hidden lg:flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
                   {activePillar.subCategories.map((sub) => (
                     <button
@@ -461,7 +461,7 @@ export default function Latihan() {
                   ))}
                 </div>
 
-                {/* Mobile Content Header */}
+
                 <div className="lg:hidden mb-6 border-b pb-4 border-gray-200">
                   <h2 className="text-2xl font-bold text-[#231F1E]">{activeSubCategory.title}</h2>
                   <p className="text-xs text-gray-400 mt-1">{activePillar.title}</p>
@@ -474,7 +474,7 @@ export default function Latihan() {
                   transition={{ duration: 0.4 }}
                   className="space-y-10"
                 >
-                  {/* 1. PENJELASAN */}
+
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <BookOpen className="text-[#C9A86A]" size={20} />
@@ -491,7 +491,7 @@ export default function Latihan() {
                     </div>
                   </div>
 
-                  {/* 2. VIDEO TUTORIAL */}
+
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <PlayCircle className="text-[#C9A86A]" size={20} />
@@ -499,7 +499,7 @@ export default function Latihan() {
                     </div>
                     <div className="w-full aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-lg border-4 border-white relative">
                       {activeSubCategory.videoId ? (() => {
-                        // Helper to extract ID inside render for simplicity (or move outside)
+
                         const getVideoId = (url: string) => {
                           const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
                           const match = url.match(regExp);
@@ -523,7 +523,7 @@ export default function Latihan() {
                     </div>
                   </div>
 
-                  {/* 3. GAMBAR TUTORIAL */}
+
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <ImageIcon className="text-[#C9A86A]" size={20} />
@@ -541,7 +541,7 @@ export default function Latihan() {
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                               />
 
-                              {/* Overlay Actions */}
+
                               <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                                 <button
                                   onClick={() => setSelectedImage(img.url)}
@@ -563,7 +563,7 @@ export default function Latihan() {
                     )}
                   </div>
 
-                  {/* 4. UJI PEMAHAMAN */}
+
                   <div className="bg-[#FFFBF2] p-6 md:p-10 rounded-3xl border border-[#F5E6D3] min-h-[400px] relative overflow-hidden">
                     {currentQuizData.length === 0 ? (
                       <div className="flex items-center justify-center h-full text-gray-500">Belum ada kuis tersedia.</div>
@@ -696,7 +696,7 @@ export default function Latihan() {
         </div>
       </div>
 
-      {/* IMAGE MODAL */}
+
       <AnimatePresence>
         {selectedImage && (
           <motion.div

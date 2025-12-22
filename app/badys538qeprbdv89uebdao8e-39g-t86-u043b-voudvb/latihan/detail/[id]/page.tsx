@@ -63,7 +63,7 @@ export default function MateriDetailPage() {
 
     return (
         <div className="min-h-screen bg-[#FDFBF9] font-dm-sans text-gray-800 pb-20">
-            {/* HEADER */}
+
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50 px-6 py-4">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div
@@ -89,14 +89,14 @@ export default function MateriDetailPage() {
             </div>
 
             <main className="max-w-4xl mx-auto px-6 py-8">
-                {/* HEADER SECTION */}
+
                 <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm mb-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#9C7C5B]/5 rounded-bl-full -mr-10 -mt-10" />
 
                     <div className="flex items-start justify-between relative z-10">
                         <div className="flex items-center gap-6">
                             <div className="w-20 h-20 rounded-2xl bg-[#FDFBF9] border border-gray-100 flex items-center justify-center text-[#9C7C5B] shadow-sm">
-                                {/* Use icon from data if available, else fallback */}
+
                                 <Layers size={40} />
                             </div>
                             <div>
@@ -119,7 +119,7 @@ export default function MateriDetailPage() {
                     </div>
                 </div>
 
-                {/* CONTENT PREVIEW */}
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2">
                         <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">

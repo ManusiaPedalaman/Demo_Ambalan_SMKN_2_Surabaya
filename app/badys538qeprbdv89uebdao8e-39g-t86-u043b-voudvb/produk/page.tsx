@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-// import { supabase } from '@/lib/supabase'; // Removed direct Supabase usage
 import { useRouter } from 'next/navigation';
 import {
     Users,
@@ -50,16 +49,16 @@ import XLSX from 'xlsx-js-style';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X, Loader2, CheckCircle2 } from 'lucide-react';
 
-// --- CHART COMPONENT ---
+
 const MonthlyChart = ({ data, color = '#997B55', label }: { data: number[]; color?: string; label: string }) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Determine scale max (round up to nearest 10)
+
     const rawMax = Math.max(...data, 10);
     const maxVal = Math.ceil(rawMax / 10) * 10;
 
-    // Create 5 steps for Y-axis (0, 20%, 40%, 60%, 80%, 100% of maxVal)
-    // Actually let's just do 5 intervals -> 6 lines (0, 1/5, 2/5 ...)
+
+    
     const steps = 5;
 
     return (
@@ -70,25 +69,24 @@ const MonthlyChart = ({ data, color = '#997B55', label }: { data: number[]; colo
             </div>
 
             <div className="flex gap-4">
-                {/* Y-Axis Labels */}
+
                 <div className="flex flex-col justify-between text-[10px] text-gray-400 py-1 h-64 text-right min-w-[20px]">
                     {[...Array(steps + 1)].map((_, i) => {
-                        // Reverse index for rendering top-to-bottom
                         const val = Math.round((maxVal / steps) * (steps - i));
                         return <span key={i}>{val.toString().padStart(2, '0')}</span>;
                     })}
                 </div>
 
-                {/* Chart Area */}
+
                 <div className="relative h-64 flex-1 flex items-end justify-between gap-2">
-                    {/* Y-Axis Grid Lines */}
+
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
                         {[...Array(steps + 1)].map((_, i) => (
                             <div key={i} className={`w-full border-b border-gray-100 ${i === 0 ? 'border-solid border-gray-200' : 'border-dashed'}`} />
                         ))}
                     </div>
 
-                    {/* Bars */}
+
                     {data.map((val, idx) => (
                         <div key={idx} className="flex flex-col items-center flex-1 z-10 group h-full justify-end">
                             <div className="relative w-full flex justify-center items-end h-full">
@@ -99,7 +97,7 @@ const MonthlyChart = ({ data, color = '#997B55', label }: { data: number[]; colo
                                     className="w-3/4 rounded-t-lg relative"
                                     style={{ backgroundColor: color }}
                                 >
-                                    {/* Tooltip */}
+
                                     <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded pointer-events-none transition-opacity whitespace-nowrap z-20">
                                         {val} Record
                                     </div>
@@ -118,7 +116,7 @@ export default function DashboardPage() {
     const { data: session } = useSession();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-    // State to track active card
+
     const [activeCard, setActiveCard] = useState<number>(1);
 
     useEffect(() => {
@@ -128,15 +126,15 @@ export default function DashboardPage() {
         }
     }, []);
 
-    // --- REAL DATA STATE ---
+
     const [joinsData, setJoinsData] = useState<any[]>([]);
     const [bookingsData, setBookingsData] = useState<any[]>([]);
     const [contactsData, setContactsData] = useState<any[]>([]);
     const [rentersData, setRentersData] = useState<any[]>([]);
-    const [userData, setUserData] = useState<any[]>([]); // New State for Users
-    const [materiData, setMateriData] = useState<any[]>([]); // New State for Materi
-    const [productData, setProductData] = useState<any[]>([]); // New State for Products
-    const [adminData, setAdminData] = useState<any[]>([]); // New State for Admins
+    const [userData, setUserData] = useState<any[]>([]); 
+    const [materiData, setMateriData] = useState<any[]>([]); 
+    const [productData, setProductData] = useState<any[]>([]); 
+    const [adminData, setAdminData] = useState<any[]>([]); 
     const [statsCounts, setStatsCounts] = useState({
         adminCount: 0,
         userCount: 0,
@@ -148,7 +146,7 @@ export default function DashboardPage() {
         rentersCount: 0
     });
 
-    // Monthly Data for Charts
+
     const [bookingsChart, setBookingsChart] = useState<number[]>(new Array(12).fill(0));
     const [rentersChart, setRentersChart] = useState<number[]>(new Array(12).fill(0));
 
@@ -156,7 +154,7 @@ export default function DashboardPage() {
         const monthlyCounts = new Array(12).fill(0);
 
         bookingsData.forEach(item => {
-            let dateStr = item.start_date || ''; // Assuming Booking structure
+            let dateStr = item.start_date || ''; 
 
             if (dateStr && dateStr !== '-') {
                 const d = new Date(dateStr);
@@ -167,12 +165,12 @@ export default function DashboardPage() {
         });
 
         setBookingsChart(monthlyCounts);
-        setRentersChart([...monthlyCounts]); // Renters follow the same timeline as bookings
+        setRentersChart([...monthlyCounts]); 
     }, [bookingsData]);
 
     const [loading, setLoading] = useState(true);
 
-    // --- DELETE MODAL STATE ---
+
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -188,7 +186,6 @@ export default function DashboardPage() {
                     result = await deleteRenter(deleteItemId);
                     if (result.success) {
                         setRentersData(p => p.filter(i => i.id !== deleteItemId));
-                        // Refresh bookings to reflect cascading delete
                         getBookingsList().then(setBookingsData);
                     }
                     break;
@@ -208,20 +205,20 @@ export default function DashboardPage() {
         }
     };
 
-    // --- FETCH DATA FROM SERVER ACTIONS ---
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // 1. Fetch Stats
+
                 const counts = await getDashboardStats();
                 setStatsCounts(counts);
 
-                // 2. Fetch Admin List
+
                 const admins = await getAdminUsers();
                 setAdminData(admins);
 
-                // 3. Fetch Lists via Server Actions
+
                 const joins = await getJoinsList();
                 setJoinsData(joins);
 
@@ -253,7 +250,7 @@ export default function DashboardPage() {
         fetchData();
     }, []);
 
-    // 8 Summary Cards Data (Dynamic Values)
+
     const stats = [
         {
             id: 1,
@@ -278,18 +275,15 @@ export default function DashboardPage() {
         },
     ];
 
-    // Helper to render Action Button
-    // Moved useRouter outside of component loop if possible, but ActionButton is component inside component.
-    // Better to use useRouter at top level and pass router or navigation function? NO, hook rule.
-    // So ActionButton must use hook if it's a component.
+
     const ActionButton = ({ itemId, index, totalItems }: { itemId: string; index: number; totalItems: number }) => {
-        const router = useRouter(); // Using hook here is valid since ActionButton is a React Component
+        const router = useRouter(); 
         const [isOpen, setIsOpen] = useState(false);
         const [isDeleting, setIsDeleting] = useState(false);
         let menuItems: { label: string; color?: string; action?: string }[] = [];
 
         const handleUpdateStatus = async (status: string) => {
-            // Optimistic update
+
             setProductData(prev => prev.map(item =>
                 item.id === itemId ? { ...item, status } : item
             ));
@@ -320,26 +314,22 @@ export default function DashboardPage() {
             router.push(`/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/produk/detail/${itemId}?type=${type}`);
         };
 
-        // Define menu items based on activeCard
+
         switch (activeCard) {
-            case 1: // Produk Tersewa
+            case 1: 
                 menuItems = [
                     { label: 'Sudah', action: 'status_sudah' },
                     { label: 'Belum', color: 'text-red-600', action: 'status_belum' },
                     { label: 'Detail', action: 'detail' }
                 ];
                 break;
-            case 5: // Produk Tersedia (Tersedia/Tidak Tersedia/Hapus)
+            case 5: 
                 menuItems = [
                     { label: 'Tersedia', action: 'status_tersedia' },
                     { label: 'Tidak Tersedia', color: 'text-red-600', action: 'status_tidak_tersedia' },
-                    { label: 'Hapus', action: 'delete' } // Detail for product not explicitly requested in list but good to have? Design shows Detail page for Products.
-                    // Wait, looking at the code I'm replacing... case 5 didn't have Detail in my previous view? 
-                    // Let's check the code snippet I saw earlier (lines 323-327).
-                    // It had: Tersedia, Tidak Tersedia, Hapus. No Detail.
-                    // User Request: "ketika admin klik detail pada action di ketiga tabel" -> So I MUST add Detail to activeCard 5 too.
+                    { label: 'Hapus', action: 'delete' } 
                 ];
-                // Updating to include Detail
+
                 menuItems = [
                     { label: 'Tersedia', action: 'status_tersedia' },
                     { label: 'Tidak Tersedia', color: 'text-red-600', action: 'status_tidak_tersedia' },
@@ -347,7 +337,7 @@ export default function DashboardPage() {
                     { label: 'Hapus', action: 'delete' }
                 ];
                 break;
-            case 3: // Renters
+            case 3: 
                 menuItems = [
                     { label: 'Sudah', action: 'status_bayar_sudah' },
                     { label: 'Belum', color: 'text-red-600', action: 'status_bayar_belum' },
@@ -434,14 +424,14 @@ export default function DashboardPage() {
         );
     };
 
-    // --- EXPORT FUNCTIONS ---
+
     const handleExport = () => {
         let title = '';
         let formattedData: any[] = [];
 
-        // Helper to format specific fields
+
         switch (activeCard) {
-            case 1: // Produk Tersewa
+            case 1: 
                 title = 'Data_Produk_Tersewa';
                 formattedData = bookingsData.map(item => ({
                     'Nama Peminjam': item.user_info?.name || item.user_id || '-',
@@ -453,7 +443,7 @@ export default function DashboardPage() {
                     'Status': 'Tersewa'
                 }));
                 break;
-            case 3: // User Penyewa (Renters)
+            case 3: 
                 title = 'Data_User_Penyewa';
                 formattedData = rentersData.map(item => ({
                     'Nama Customer': item.nama_customer,
@@ -464,7 +454,7 @@ export default function DashboardPage() {
                     'Jam Sewa': `${item.jam_pengambilan || '-'} - ${item.jam_pengembalian || '-'}`
                 }));
                 break;
-            case 5: // Produk Tersedia
+            case 5: 
                 title = 'Data_Produk_Tersedia';
                 formattedData = productData.map(item => ({
                     'ID Produk': item.id,
@@ -481,14 +471,12 @@ export default function DashboardPage() {
             return;
         }
 
-        // --- Create Workbook & Sheet ---
+        
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(formattedData);
-
-        // --- Apply Styling (Borders for All Cells) ---
         const range = XLSX.utils.decode_range(ws['!ref']!);
 
-        // Define Border Style
+
         const borderStyle = {
             top: { style: "thin", color: { rgb: "000000" } },
             bottom: { style: "thin", color: { rgb: "000000" } },
@@ -496,19 +484,19 @@ export default function DashboardPage() {
             right: { style: "thin", color: { rgb: "000000" } }
         };
 
-        // Apply style to every cell in range
+
         for (let R = range.s.r; R <= range.e.r; ++R) {
             for (let C = range.s.c; C <= range.e.c; ++C) {
                 const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
                 if (!ws[cellRef]) continue;
 
-                // Initialize s (style) object if not present
+
                 if (!ws[cellRef].s) ws[cellRef].s = {};
 
-                // Apply borders
+
                 ws[cellRef].s.border = borderStyle;
 
-                // Optional: Make header bold
+
                 if (R === 0) {
                     ws[cellRef].s.font = { bold: true };
                     ws[cellRef].s.fill = { fgColor: { rgb: "EEEEEE" } };
@@ -516,17 +504,17 @@ export default function DashboardPage() {
             }
         }
 
-        // Set column widths (optional, auto-width approximation)
+
         const cols = Object.keys(formattedData[0]).map(() => ({ wch: 20 }));
         ws['!cols'] = cols;
 
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-        // --- Trigger Download ---
+
         XLSX.writeFile(wb, `${title}_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // --- RENDER CONTENT BASED ON ACTIVE CARD ---
+
     const renderContent = () => {
         if (loading) {
             return (
@@ -539,7 +527,7 @@ export default function DashboardPage() {
         }
 
         switch (activeCard) {
-            case 1: // Produk yang Tersewa
+            case 1: 
                 if (bookingsData.length === 0) {
                     return (
                         <tbody>
@@ -586,7 +574,7 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 3: // User yang Menyewa
+            case 3: 
                 if (rentersData.length === 0) {
                     return (
                         <tbody>
@@ -622,7 +610,7 @@ export default function DashboardPage() {
                                     <td className="px-6 py-4 text-gray-600 border border-gray-300">
                                         <span className={`px-2 py-1 rounded text-xs font-bold ${item.status_bayar === 'Belum'
                                             ? 'bg-red-100 text-red-700'
-                                            : 'bg-green-100 text-green-700' // Matches the "Sudah" / Active color style
+                                            : 'bg-green-100 text-green-700' 
                                             }`}>
                                             {item.metode_bayar}
                                         </span>
@@ -635,7 +623,7 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 5: // Produk yang Tersedia
+            case 5: 
                 if (productData.length === 0) {
                     return (
                         <tbody>
@@ -662,7 +650,7 @@ export default function DashboardPage() {
                                     <td className="px-6 py-4 font-medium text-gray-600 border border-gray-300">{item.id}</td>
                                     <td className="px-6 py-4 text-gray-600 border border-gray-300">{item.nama}</td>
                                     <td className="px-6 py-4 text-gray-600 border border-gray-300">
-                                        {/* @ts-ignore */}
+
                                         <span dangerouslySetInnerHTML={{ __html: (item.price || '-').replace(' / ', '<span class="text-xs text-gray-400">/</span>').replace(/(\d+k)/, '<span class="text-[#EF4444] font-bold">$1</span>') }} />
                                     </td>
                                     <td className="px-6 py-4 text-gray-600 border border-gray-300">
@@ -696,7 +684,7 @@ export default function DashboardPage() {
 
     return (
         <div className="font-dm-sans min-h-screen p-4 md:p-8 pb-10">
-            {/* Header */}
+
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">Produk</h1>
                 <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
@@ -716,7 +704,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Scale-able Card Grid/Scroll - 8 Items */}
+
             <div className="mb-10 w-full overflow-x-auto pb-4 scrollbar-hide">
                 <div className="flex gap-4 min-w-max">
                     {stats.map((stat, index) => {
@@ -757,7 +745,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Dynamic Content Section */}
+
             {activeCard === 1 && (
                 <MonthlyChart data={bookingsChart} label="Produk Tersewa" color="#997B55" />
             )}
@@ -766,7 +754,7 @@ export default function DashboardPage() {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px] p-6">
 
-                {/* Table Header / Title */}
+
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 className="text-lg font-bold text-[#8B6E4A]">
@@ -776,9 +764,9 @@ export default function DashboardPage() {
                             Data {stats.find(s => s.id === activeCard)?.title || ''}
                         </p>
                     </div>
-                    {/* Optional: Filter / Detail Button */}
+
                     <div className="flex items-center gap-3">
-                        {/* Show Sheets Button for appropriate cards */}
+
                         {[1, 3, 5, 7].includes(activeCard) && (
                             <button
                                 onClick={handleExport}
@@ -789,15 +777,14 @@ export default function DashboardPage() {
                             </button>
                         )}
 
-                        {/* Specific Action Buttons */}
-                        {/* Specific Action Buttons - ADD (+ Button) */}
-                        {activeCard === 5 && ( // Produk Tersedia
+
+                        {activeCard === 5 && ( 
                             <button className="flex items-center gap-2 bg-[#8B6E4A] hover:bg-[#7a5f3d] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">
                                 <Plus size={18} />
                                 <span>Produk</span>
                             </button>
                         )}
-                        {activeCard === 7 && ( // Materi
+                        {activeCard === 7 && ( 
                             <Link href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/latihan" className="flex items-center gap-2 bg-[#8B6E4A] hover:bg-[#7a5f3d] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">
                                 <span>Detail</span>
                             </Link>
@@ -807,14 +794,14 @@ export default function DashboardPage() {
                     </div>
                 </div >
 
-                {/* Table */}
+
                 <div className="w-full overflow-x-auto border border-gray-200 rounded-xl">
                     <table className="w-full text-sm text-left">
                         {renderContent()}
                     </table>
                 </div >
 
-                {/* Pagination Footer */}
+
                 <div className="flex items-center justify-between mt-6 text-xs text-gray-500 font-medium">
                     <div className="flex items-center gap-2">
                         <span>Rows :</span>
@@ -839,7 +826,6 @@ export default function DashboardPage() {
                 </div >
 
             </div>
-            {/* === DELETE CONFIRMATION MODAL === */}
             <AnimatePresence>
                 {isDeleteModalOpen && (
                     <motion.div

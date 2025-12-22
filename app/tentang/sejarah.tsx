@@ -6,7 +6,7 @@ import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Calendar, Bookmark } from 'lucide-react';
 
-// Konfigurasi Font
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
@@ -19,7 +19,7 @@ const playfair = DM_Sans({
   variable: '--font-playfair',
 });
 
-// Data Sejarah (Rangkuman 9 Slide dari PPT)
+
 const historyData = [
   {
     id: 1,
@@ -51,7 +51,7 @@ const historyData = [
     fullDate: 'Mei 2005',
     title: 'Perekrutan Gerilya',
     description: 'Dimulainya perekrutan anggota secara "gerilya". Terkumpul 13 orang diantaranya (12 orang dari jurusan Audio Video, dan 1 orang dari jurusan Otomotif) yang menjadi Angkatan Pertama Ambalan dengan Pradana Kak Aris Pratama.',
-    image: '/Image/sejarah1.webp', // Ganti dengan image yang sesuai jika ada
+    image: '/Image/sejarah1.webp',
   },
   {
     id: 5,
@@ -99,7 +99,7 @@ export default function Sejarah() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
-  // Logic Navigasi dengan Arah Animasi
+
   const handleNext = () => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % historyData.length);
@@ -112,7 +112,7 @@ export default function Sejarah() {
 
   const currentData = historyData[currentIndex];
 
-  // Variasi Animasi Slide
+
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 50 : -50,
@@ -132,7 +132,6 @@ export default function Sejarah() {
     <section className={`w-full bg-[#1E1C1B] py-20 px-4 md:px-8 lg:px-12 overflow-hidden ${dmSans.className} ${playfair.variable}`}>
       <div className="max-w-7xl mx-auto">
 
-        {/* Header Section */}
         <div className="mb-12 md:mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
           <div>
             <motion.span
@@ -152,7 +151,6 @@ export default function Sejarah() {
             </motion.h2>
           </div>
 
-          {/* Indikator Halaman (01 / 09) */}
           <div className="text-white/50 font-mono text-lg hidden md:block">
             <span className="text-white text-2xl">{String(currentIndex + 1).padStart(2, '0')}</span>
             <span className="mx-2">/</span>
@@ -160,10 +158,8 @@ export default function Sejarah() {
           </div>
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
 
-          {/* === KOLOM KIRI: GAMBAR (7 Kolom) === */}
           <div className="lg:col-span-7 relative min-h-[300px] md:min-h-[450px] rounded-2xl overflow-hidden group">
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
@@ -187,12 +183,10 @@ export default function Sejarah() {
                     e.currentTarget.parentElement!.style.backgroundColor = "#2A2827";
                   }}
                 />
-                {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1E1C1B] via-transparent to-transparent opacity-60" />
               </motion.div>
             </AnimatePresence>
 
-            {/* Floating Year Badge di Gambar */}
             <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md border border-[#C7A682]/20 px-6 py-3 rounded-full">
               <span className={`${playfair.className} text-3xl font-bold text-[#C7A682]`}>
                 {currentData.year}
@@ -200,12 +194,9 @@ export default function Sejarah() {
             </div>
           </div>
 
-          {/* === KOLOM KANAN: KONTEN (5 Kolom) === */}
           <div className="lg:col-span-5 flex flex-col">
 
-            {/* Card Konten */}
             <div className="bg-[#252322] border border-white/5 rounded-2xl p-6 md:p-10 h-full flex flex-col justify-between relative overflow-hidden">
-              {/* Decorative Background Elements */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#C7A682]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
               <AnimatePresence mode='wait' custom={direction}>
@@ -219,7 +210,6 @@ export default function Sejarah() {
                   transition={{ duration: 0.3 }}
                   className="relative z-10"
                 >
-                  {/* Tanggal */}
                   <div className="flex items-center gap-2 text-[#C7A682] mb-4">
                     <Calendar size={18} />
                     <span className="text-sm font-medium tracking-wide uppercase">
@@ -227,19 +217,16 @@ export default function Sejarah() {
                     </span>
                   </div>
 
-                  {/* Judul */}
                   <h3 className={`${playfair.className} text-3xl md:text-4xl font-bold text-white mb-6 leading-tight`}>
                     {currentData.title}
                   </h3>
 
-                  {/* Deskripsi */}
                   <p className="text-gray-400 text-base leading-relaxed mb-8 text-justify">
                     {currentData.description}
                   </p>
                 </motion.div>
               </AnimatePresence>
 
-              {/* === NAVIGATION BUTTONS === */}
               <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
                 <div className="text-gray-500 text-xs uppercase tracking-widest">
                   Geser untuk melihat

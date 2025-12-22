@@ -15,7 +15,7 @@ import {
     Legend
 } from 'recharts';
 
-// --- MOCK DATA ---
+
 const lineChartData = [
     { name: 'Jan', uv: 400 },
     { name: 'Feb', uv: 300 },
@@ -32,12 +32,12 @@ const lineChartData = [
 ];
 
 const productPieData = [
-    { name: 'Tenda Segitiga/Kerucut', value: 100, color: '#3D2B1F' }, // Dark Brown
-    { name: 'Tenda Barak', value: 12, color: '#5E4B35' }, // Medium Brown
-    { name: 'Tongkat', value: 18, color: '#8B6E4A' }, // Light Brown
-    { name: 'Tali', value: 22, color: '#A68B6C' }, // Beige
-    { name: 'Matras', value: 26, color: '#C7A682' }, // Lighter Beige
-    { name: 'Paket Lengkap', value: 42, color: '#DBC29E' }, // Pale Beige
+    { name: 'Tenda Segitiga/Kerucut', value: 100, color: '#3D2B1F' },
+    { name: 'Tenda Barak', value: 12, color: '#5E4B35' },
+    { name: 'Tongkat', value: 18, color: '#8B6E4A' },
+    { name: 'Tali', value: 22, color: '#A68B6C' },
+    { name: 'Matras', value: 26, color: '#C7A682' },
+    { name: 'Paket Lengkap', value: 42, color: '#DBC29E' },
 ];
 
 const memberPieData = [
@@ -51,7 +51,7 @@ const memberPieData = [
 export default function DashboardCharts() {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Line Chart Section */}
+
             <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
                     <div>
@@ -69,7 +69,7 @@ export default function DashboardCharts() {
                 </div>
 
                 <div className="h-[300px] w-full relative">
-                    {/* Overlay Label Example */}
+
                     <div className="absolute top-[20%] left-[55%] bg-[#8B6E4A] text-white text-xs px-3 py-1 rounded-full z-10 shadow-lg">
                         100 produk
                     </div>
@@ -104,9 +104,9 @@ export default function DashboardCharts() {
                 </div>
             </div>
 
-            {/* Pie Charts Section */}
+
             <div className="flex flex-col gap-6">
-                {/* Chart Produk */}
+
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex-1">
                     <div className="flex items-center justify-between mb-4">
                         <div>
@@ -154,7 +154,7 @@ export default function DashboardCharts() {
                     </div>
                 </div>
 
-                {/* Chart Anggota */}
+
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex-1">
                     <div className="flex items-center justify-between mb-4">
                         <div>

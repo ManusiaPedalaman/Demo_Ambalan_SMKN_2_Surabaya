@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { DM_Sans } from 'next/font/google';
 import { motion, Variants } from 'framer-motion';
 
-// Konfigurasi Font
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
@@ -14,7 +14,7 @@ const dmSans = DM_Sans({
 
 export default function Sambutan() {
 
-  // Variasi Animasi untuk Text Container
+
   const textContainerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -26,7 +26,7 @@ export default function Sambutan() {
     },
   };
 
-  // Variasi Animasi untuk Item Teks
+
   const textItemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -36,7 +36,7 @@ export default function Sambutan() {
     },
   };
 
-  // Variasi Animasi untuk Gambar
+
   const imageVariants: Variants = {
     hidden: { opacity: 0, x: 50 },
     visible: {
@@ -50,11 +50,7 @@ export default function Sambutan() {
     <section className={`w-full overflow-hidden ${dmSans.className}`}>
       <div className="flex flex-col lg:flex-row min-h-[650px]">
 
-        {/* === BAGIAN KIRI: TEKS === */}
         <motion.div
-          // --- PENGATURAN JARAK (PADDING) ---
-          // lg:pl-[150px] -> Jarak dari pinggir kiri layar ke Teks (Sesuai request sebelumnya)
-          // lg:pr-[100px] -> Jarak dari Teks ke Gambar (Ubah angka 100px ini untuk mengatur jarak teks ke gambar)
           className="w-full lg:w-[60%] bg-[#231F1E] p-8 md:p-16 lg:py-[100px] lg:pl-[310px] lg:pr-[100px] flex flex-col justify-center relative z-10"
 
           variants={textContainerVariants}
@@ -108,7 +104,6 @@ export default function Sambutan() {
           </div>
         </motion.div>
 
-        {/* === BAGIAN KANAN: GAMBAR === */}
         <motion.div
           className="w-full lg:w-[40%] relative bg-gray-800 flex items-end justify-center overflow-hidden"
           variants={imageVariants}
@@ -125,7 +120,6 @@ export default function Sambutan() {
             priority
           />
 
-          {/* Overlay gradient untuk transisi halus di mobile */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#231F1E] via-transparent to-transparent lg:hidden" />
         </motion.div>
 

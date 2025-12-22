@@ -1,7 +1,7 @@
 'use client';
 
 
-// Force rebuild
+
 import React, { useState, use, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,39 +24,37 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Font Configuration ---
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
   variable: '--font-dm-sans',
 });
 
-// --- Dummy Data (Extended for Design) ---
+
 import { products } from '../data/products';
 
 export default function DetailProduct({ params }: { params: Promise<{ slug: string }> }) {
-  // 1. Unwrap Params
+
   const { slug } = use(params);
 
-  // 2. Find Product by Slug
-  // We'll use a loose match or default to 'tenda-segitiga' for the slicing demo if slug doesn't match exactly,
-  // to ensure the user sees the design requested.
+
+
   const product = (products as any[]).find(p => p.slug === slug) || products[0];
 
   const [activeImage, setActiveImage] = useState(0);
-  const [dbStatus, setDbStatus] = useState<string>('Memuat...'); // Default loading or optimistic
+  const [dbStatus, setDbStatus] = useState<string>('Memuat...');
 
-  // Fetch Real Status
+
   React.useEffect(() => {
     async function fetchStatus() {
-      // Use dbName if available, otherwise name
+
       const queryName = product.dbName || product.name;
       const res = await getProductStatusByName(queryName);
       if (res.success) {
         setDbStatus(res.status);
       } else {
-        // Fallback to static if fail, or keep as is?
-        // product.status is static 'Tersedia'. Let's trust DB.
+
         setDbStatus(product.status);
       }
     }
@@ -77,9 +75,9 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
   const { data: session, status } = useSession();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showStatusModal, setShowStatusModal] = useState(false); // NEW STATUS MODAL
+  const [showStatusModal, setShowStatusModal] = useState(false);
 
-  // -- Booking State --
+
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [pickupTime, setPickupTime] = useState('');
@@ -87,12 +85,12 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
   const [paymentMethod, setPaymentMethod] = useState('');
   const [quantity, setQuantity] = useState(1);
 
-  // Dropdown States
+
   const [isPickupOpen, setIsPickupOpen] = useState(false);
   const [isReturnOpen, setIsReturnOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns when clicking outside
+
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -104,31 +102,72 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // -- Validation State --
+
   const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
+
+  /* Logic Logic untuk button Booking invalid */
+  const isFormValid = () => {
+    // Validasi basic state yang sudah ada
+    if (!startDate || !endDate || !pickupTime || !returnTime || !paymentMethod || !quantity) return false;
+
+    // Untuk input text yg diambil lewat querySelector saat submit,
+    // kita sebaiknya tambahkan state agar bisa re-render button disabled state.
+    // Tapi karena code existing menggunakan querySelector di onSubmit,
+    // kita akan cek manual element value tapi React tidak re-render otomatis jika DOM berubah tanpa state.
+    // SOLUSI: Sebaiknya kita tambahkan state untuk input-input tersebut agar button bisa reactive.
+    // Namun untuk meminimalisir refactor besar, kita pakai approach:
+    // User ingin button "gray" sebelum memasukkan data. 
+    // Kita cek 'errors' object? Tidak cukup krn error muncul setelah validasi.
+
+    // Kita akan tetap menggunakan querySelector check inside a useEffect or similar? 
+    // No, React way is controlled components. 
+    // Looking at the code:
+    // Input 'Nama Lengkap', 'No WhatsApp', 'Sekolah', 'Pesan' TIDAK CONTROLLED (tidak ada value={state}).
+    // Mereka pakai onInput utk regex tapi tidak set state.
+    // Kita HARUS mengubah input-input ini menjadi Controlled Components agar bisa mendeteksi isian user secara real-time.
+    return false; // Placeholder logic, see below
+  };
+
+  // --- REFACTORING TO CONTROLLED INPUTS ---
+  const [formData, setFormData] = useState({
+    name: '',
+    whatsapp: '',
+    school: '',
+    message: ''
+  });
 
   const validateBooking = () => {
     const newErrors: { [key: string]: boolean } = {};
-    const nameInput = document.querySelector('input[placeholder="Masukkan Nama Lengkap..."]') as HTMLInputElement;
-    const waInput = document.querySelector('input[placeholder="08..."]') as HTMLInputElement;
-    const schoolInput = document.querySelector('input[placeholder="Masukkan Nama Sekolah / Instansi..."]') as HTMLInputElement;
-    const messageInput = document.querySelector('textarea[placeholder="Tulis pesan di sini..."]') as HTMLTextAreaElement;
 
-    if (!nameInput?.value) newErrors.name = true;
+    if (!formData.name) newErrors.name = true;
     if (!startDate) newErrors.startDate = true;
     if (!endDate) newErrors.endDate = true;
-    if (!pickupTime) newErrors.pickupTime = true; // Added
-    if (!returnTime) newErrors.returnTime = true; // Added
-    if (!waInput?.value) newErrors.whatsapp = true;
-    if (!schoolInput?.value) newErrors.school = true;
-    if (!paymentMethod) newErrors.paymentMethod = true; // Added
-    if (!messageInput?.value) newErrors.message = true; // Added
+    if (!pickupTime) newErrors.pickupTime = true;
+    if (!returnTime) newErrors.returnTime = true;
+    if (!formData.whatsapp) newErrors.whatsapp = true;
+    if (!formData.school) newErrors.school = true;
+    if (!paymentMethod) newErrors.paymentMethod = true;
+    if (!formData.message) newErrors.message = true;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // -- Price Calculation Logic --
+  const isBookingValid = Boolean(
+    formData.name &&
+    startDate &&
+    endDate &&
+    pickupTime &&
+    returnTime &&
+    formData.whatsapp &&
+    formData.school &&
+    paymentMethod &&
+    formData.message &&
+    quantity > 0 &&
+    dbStatus === 'Tersedia'
+  );
+
+
   const calculateTotal = () => {
     if (!startDate || !endDate) return { price: 0, days: 0 };
 
@@ -136,22 +175,16 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     const end = new Date(endDate);
     const diffTime = end.getTime() - start.getTime();
 
-    // Check if end date is before start date
+
     if (diffTime < 0) return { price: 0, days: 0 };
 
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    // Usually booking is at least 1 day? Or if start==end -> 1 day? 
-    // User example 5-10 = 5 days difference (5,6,7,8,9,10? No usually 10-5 = 5 nights).
-    // Let's stick to standard difference. If start=5, end=10, days=5.
+
 
     if (diffDays <= 0) return { price: 0, days: 0 };
 
     const durationNum = parseInt(product.duration.split(' ')[0]) || 1;
-    // Calculation: (Total Days / Duration Unit) * Price
-    // Example: (5 days / 3 days) * 10000 = 1.66 * 10000 = 16666?
-    // User said: "misal produk tali yang mana 10.000 per 3 hari maka kalkulasi kan dari tangal 5 - 10 per 3 hari berapa harganya?"
-    // 5-10 is 5 days. 5/3 = 1.6 periods. 
-    // Usually rentals round up periods. 2 periods * 10000 = 20000.
+
     const periods = Math.ceil(diffDays / durationNum);
     const totalPrice = periods * product.price * quantity;
 
@@ -160,18 +193,18 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
   const { price: totalPrice, days: totalDays } = calculateTotal();
 
-  // Time Options
+
   const timeOptions = Array.from({ length: 11 }, (_, i) => i + 7).map((hour) =>
     `${hour < 10 ? '0' + hour : hour}.00`
   );
 
-  // --- Related Products Carousel State ---
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(4);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Logic Intersection Observer
+
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -186,7 +219,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     return () => { if (sectionRef.current) observer.disconnect(); };
   }, []);
 
-  // Handle Responsiveness
+
   React.useEffect(() => {
     const handleResize = () => {
       if (typeof window !== 'undefined') {
@@ -214,12 +247,9 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     <section ref={sectionRef} className={`min-h-screen bg-[#FDF8F3] py-32 px-4 md:px-8 lg:px-12 ${dmSans.className}`}>
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
-        {/* === LEFT COLUMN (Images & Info) === */}
         <div className="w-full lg:w-[40%] flex flex-col gap-6 lg:sticky lg:top-32 h-fit">
 
-          {/* Main Image */}
           <div className="w-full aspect-[4/3] bg-[#C9826B]/20 rounded-2xl relative overflow-hidden border border-[#C9826B]/30 p-8 flex items-center justify-center group">
-            {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10 bg-[url('/Image/Vector.webp')] bg-repeat bg-cover mix-blend-overlay"></div>
 
             <Image
@@ -231,7 +261,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
             />
           </div>
 
-          {/* Thumbnails */}
           <div className="flex gap-4">
             {product.images.map((img: string, idx: number) => (
               <button
@@ -251,7 +280,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
             ))}
           </div>
 
-          {/* Author/Owner Info Card */}
           <div className="w-full bg-white rounded-xl border border-gray-100 p-8 flex flex-col gap-3 shadow-sm">
             <div className="flex items-center gap-2">
               <span className="text-gray-500 text-sm font-medium">by:</span>
@@ -266,7 +294,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
             </div>
           </div>
 
-          {/* Disclaimer Card */}
           <div className="w-full bg-red-50/50 rounded-xl border border-red-200 p-8 flex flex-col gap-2 shadow-sm relative overflow-hidden">
             <div className="flex items-center justify-center gap-2 text-red-600 mb-2">
               <AlertTriangle className="w-6 h-6" />
@@ -279,10 +306,8 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
         </div>
 
 
-        {/* === RIGHT COLUMN (Details & Booking) === */}
         <div className="w-full lg:w-[60%] flex flex-col gap-8">
 
-          {/* Product Details Card */}
           <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{product.name}</h1>
@@ -308,7 +333,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               </span>
             </div>
 
-            {/* Specs Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 py-6 border-y border-gray-100 mb-8">
               <div>
                 <p className="text-xs text-gray-500 font-bold uppercase mb-1">Berat</p>
@@ -328,7 +352,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               </div>
             </div>
 
-            {/* Description & Features */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-[#C9A86A]">
                 <Edit3 className="w-5 h-5" />
@@ -353,7 +376,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
             </div>
           </div>
 
-          {/* Booking Form Card */}
           <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm border-t-4 border-t-[#8A6A4B]">
             <div className="flex items-center gap-3 mb-8">
               <div className="bg-[#FDF8F3] p-2 rounded-lg">
@@ -364,7 +386,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
             <form className="space-y-6">
 
-              {/* Nama Lengkap */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
                 <input
@@ -374,16 +395,16 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                     ? 'border-red-500 ring-red-200 focus:ring-red-500'
                     : 'border-gray-300 focus:ring-[#C9A86A] focus:border-transparent'
                     }`}
-                  onInput={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    input.value = input.value.replace(/[^a-zA-Z\s]/g, '');
+                  value={formData.name}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                    setFormData({ ...formData, name: val });
                     if (errors.name) setErrors({ ...errors, name: false });
                   }}
                 />
                 {errors.name && <p className="text-red-500 text-xs mt-1">silahkan masukan contoh Nama Lengkap anda</p>}
               </div>
 
-              {/* Tanggal & Jam Pengambilan */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4" ref={dropdownRef}>
                 <div className="md:col-span-4">
                   <label className="block text-sm font-bold text-gray-700 mb-2">Tanggal Pengambilan</label>
@@ -405,7 +426,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                   </div>
                 </div>
 
-                {/* Custom PickUp Time Dropdown */}
                 <div className="md:col-span-2 relative">
                   <label className="block text-sm font-bold text-gray-700 mb-2">Jam</label>
                   <div
@@ -441,7 +461,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
                 <div className="md:col-span-1 flex items-center justify-center pt-6 font-bold text-gray-400">s.d</div>
 
-                {/* Tanggal & Jam Pengembalian */}
                 <div className="md:col-span-3">
                   <label className="block text-sm font-bold text-gray-700 mb-2">Tanggal Pengembalian</label>
                   <div className="relative">
@@ -462,7 +481,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                   </div>
                 </div>
 
-                {/* Custom Return Time Dropdown */}
                 <div className="md:col-span-2 relative">
                   <label className="block text-sm font-bold text-gray-700 mb-2">Jam</label>
                   <div
@@ -498,7 +516,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               </div>
 
 
-              {/* WA & Sekolah */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">No WhatsApp</label>
@@ -510,9 +527,10 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                         ? 'border-red-500 ring-red-200 focus:ring-red-500'
                         : 'border-gray-300 focus:ring-[#C9A86A]'
                         }`}
-                      onInput={(e) => {
-                        const input = e.target as HTMLInputElement;
-                        input.value = input.value.replace(/[^0-9]/g, '');
+                      value={formData.whatsapp}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9]/g, '');
+                        setFormData({ ...formData, whatsapp: val });
                         if (errors.whatsapp) setErrors({ ...errors, whatsapp: false });
                       }}
                     />
@@ -530,9 +548,10 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                       ? 'border-red-500 ring-red-200 focus:ring-red-500'
                       : 'border-gray-300 focus:ring-[#C9A86A]'
                       }`}
-                    onInput={(e) => {
-                      const input = e.target as HTMLInputElement;
-                      input.value = input.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                    value={formData.school}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                      setFormData({ ...formData, school: val });
                       if (errors.school) setErrors({ ...errors, school: false });
                     }}
                   />
@@ -540,7 +559,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                 </div>
               </div>
 
-              {/* Jumlah Produk & Pembayaran */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-[25px] items-start">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Jumlah Produk</label>
@@ -600,7 +618,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               </div>
 
 
-              {/* Pesan */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Pesan</label>
                 <textarea
@@ -610,14 +627,15 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                     ? 'border-red-500 ring-red-200 focus:ring-red-500'
                     : 'border-gray-300 focus:ring-[#C9A86A]'
                     }`}
-                  onInput={(e) => {
+                  value={formData.message}
+                  onChange={(e) => {
+                    setFormData({ ...formData, message: e.target.value });
                     if (errors.message) setErrors({ ...errors, message: false });
                   }}
                 ></textarea>
                 {errors.message && <p className="text-red-500 text-xs mt-1">silahkan masukan pesan anda</p>}
               </div>
 
-              {/* Footer Booking */}
               <div className="pt-6 border-t border-dashed border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="text-center md:text-left">
                   <p className="text-sm text-gray-500 font-bold">Total Biaya Sewa</p>
@@ -628,7 +646,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                 <button
                   type="button"
                   onClick={async () => {
-                    // Check DB Status
+
                     if (dbStatus !== 'Tersedia') {
                       setShowStatusModal(true);
                       return;
@@ -647,13 +665,22 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                             quantity,
                             totalPrice: calculateTotal().price,
                             paymentMethod,
-                            userName: (document.querySelector('input[placeholder="Masukkan Nama Lengkap..."]') as HTMLInputElement)?.value,
-                            whatsapp: (document.querySelector('input[placeholder="08..."]') as HTMLInputElement)?.value,
-                            school: (document.querySelector('input[placeholder="Masukkan Nama Sekolah / Instansi..."]') as HTMLInputElement)?.value,
-                            message: (document.querySelector('textarea[placeholder="Tulis pesan di sini..."]') as HTMLTextAreaElement)?.value
+                            userName: formData.name,
+                            whatsapp: formData.whatsapp,
+                            school: formData.school,
+                            message: formData.message
                           };
 
                           await submitBookingForm(bookingData);
+                          // Reset Form
+                          setFormData({ name: '', whatsapp: '', school: '', message: '' });
+                          setStartDate('');
+                          setEndDate('');
+                          setPickupTime('');
+                          setReturnTime('');
+                          setPaymentMethod('');
+                          setQuantity(1);
+
                           setShowSuccessModal(true);
                         } catch (e) {
                           console.error('Booking failed', e);
@@ -663,7 +690,12 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                       setShowLoginModal(true);
                     }
                   }}
-                  className="w-full md:w-auto bg-[#322F2D] hover:bg-[#1E1C1B] text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  disabled={!isBookingValid}
+                  className={`w-full md:w-auto px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1
+                    ${isBookingValid
+                      ? 'bg-[#322F2D] hover:bg-[#1E1C1B] text-white cursor-pointer'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed hover:none transform-none'
+                    }`}
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Booking Sekarang
@@ -675,7 +707,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
         </div>
       </div >
 
-      {/* --- LOGIN REQUIRED MODAL --- */}
       {
         showLoginModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
@@ -703,13 +734,11 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
         )
       }
 
-      {/* --- SUCCESS / DISCLAIMER MODAL --- */}
       {
         showSuccessModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
             <div className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl transform scale-100 transition-transform duration-300 relative overflow-hidden">
 
-              {/* Disclaimer Section */}
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="flex items-center gap-2 text-red-600 mb-3">
                   <AlertTriangle className="w-6 h-6" />
@@ -722,10 +751,8 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
               <div className="border-t border-gray-100 my-6"></div>
 
-              {/* Notification Section */}
               <div className="flex flex-col items-center text-center mb-8">
                 <div className="flex items-center gap-2 text-green-600 mb-3">
-                  {/* WhatsApp Icon (using simple SVG or lucide generic) */}
                   <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
@@ -750,17 +777,14 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
         )
       }
 
-      {/* === RELATED PRODUCTS CAROUSEL === */}
       <div className="max-w-7xl mx-auto mt-20 pt-12 border-t border-dashed border-gray-300">
         <div className={`text-center mb-12 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Produk Lainnya</h2>
           <p className="text-gray-500">Cari perlengkapan lain yang kamu butuhkan</p>
         </div>
 
-        {/* Carousel Wrapper */}
         <div className="relative w-full">
 
-          {/* Navigation Buttons */}
           <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full flex justify-between pointer-events-none z-10 px-2 md:-px-4">
             <button
               onClick={prevSlide}
@@ -778,7 +802,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
             </button>
           </div>
 
-          {/* Products Grid */}
           <div
             className="grid gap-4 md:gap-6 px-4 md:px-12 py-4"
             style={{
@@ -793,18 +816,16 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                 className={`group block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-700 ease-out border border-gray-100 flex flex-col transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
                   }`}
               >
-                {/* Image Container */}
                 <div className="relative w-full aspect-square overflow-hidden bg-[#F2E6D8]">
                   <div className="absolute inset-0 bg-[#C9826B]/10 group-hover:bg-[#C9826B]/20 transition-colors duration-300" />
                   <Image
-                    src={p.images[0]} // Access first image from array
+                    src={p.images[0]}
                     alt={p.name}
                     fill
                     className="w-full h-full object-contain p-6 transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
                   />
                 </div>
 
-                {/* Product Info */}
                 <div className="p-5 flex flex-col flex-grow justify-between bg-white relative z-20">
                   <div>
                     <h3 className="text-gray-900 font-bold text-lg md:text-xl mb-1 line-clamp-1 tracking-tight" title={p.name}>
@@ -831,7 +852,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
           </div>
         </div>
 
-        {/* Dots Navigation */}
         {totalSlides > 1 && (
           <div className={`flex justify-center gap-2 mt-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {Array.from({ length: totalSlides }).map((_, index) => (
@@ -849,8 +869,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
       </div>
 
 
-
-      {/* === STATUS MODAL === */}
       <AnimatePresence>
         {showStatusModal && (
           <motion.div
@@ -868,7 +886,6 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-8 flex flex-col items-center text-center">
-                {/* Icon Wrapper */}
                 <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6 ring-4 ring-red-50/50">
                   <AlertTriangle className="w-10 h-10 text-red-500" />
                 </div>

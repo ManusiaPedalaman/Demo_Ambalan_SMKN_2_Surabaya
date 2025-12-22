@@ -1,0 +1,62 @@
+%% ------------------------------------------------------
+%% THIS CODE IS FOR: https://www.mermaidchart.com/
+%% NOTE: Copy ONE diagram at a time if the tool doesn't support multiple.
+%% ------------------------------------------------------
+
+%% === DFD LEVEL 0 (Context Diagram) ===
+flowchart LR
+    User["User / Pengunjung"]
+    Admin["Administrator"]
+    Sistem(("Sistem Informasi Ambalan"))
+
+    %% Arus Data User
+    User -- "Data Login, Form Join, Pesan Kontak" --> Sistem
+    Sistem -- "Info Produk, Materi Latihan, Status" --> User
+
+    %% Arus Data Admin
+    Admin -- "Data Produk Baru, Update Status Sewa, Login" --> Sistem
+    Sistem -- "Laporan Peminjaman, Data Pendaftar, Pesan Masuk" --> Admin
+
+%% ------------------------------------------------------
+%% PLEASE COPY THE PART ABOVE OR BELOW SEPARATELY
+%% IF THE TOOL SHOWS ERROR
+%% ------------------------------------------------------
+
+%% === DFD LEVEL 1 (Decomposition) ===
+flowchart TD
+    %% Entities
+    User["User"]
+    Admin["Administrator"]
+
+    %% Processes
+    P1(("1.0 Autentikasi"))
+    P2(("2.0 Layanan Informasi"))
+    P3(("3.0 Operasional User"))
+    P4(("4.0 Manajemen Admin"))
+
+    %% Data Stores
+    DB_User[("DB User & Admin")]
+    DB_Konten[("DB Produk & Materi")]
+    DB_Trans[("DB Transaksi & Pesan")]
+
+    %% Flows P1 Autentikasi
+    User -->|"Input Login/Register"| P1
+    Admin -->|"Input Login"| P1
+    P1 -->|"Verifikasi"| DB_User
+    DB_User -->|"Info Akun"| P1
+    P1 -->|"Akses Diberikan"| User
+    P1 -->|"Akses Dashboard"| Admin
+
+    %% Flows P2 Layanan Informasi
+    P2 -->|"Tampil Materi/Produk"| User
+    DB_Konten -->|"Data Stok & Materi"| P2
+
+    %% Flows P3 Operasional User
+    User -->|"Input Form Join/Hubungi"| P3
+    P3 -->|"Simpan Data"| DB_Trans
+
+    %% Flows P4 Manajemen Admin
+    Admin -->|"Kelola Produk, Sewa, Cek Pesan"| P4
+    P4 -->|"Update/Insert"| DB_Konten
+    P4 -->|"Update Status Sewa"| DB_Trans
+    DB_Trans -->|"List Pendaftar/Pesan"| P4

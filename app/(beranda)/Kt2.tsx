@@ -27,12 +27,12 @@ const Kt2: React.FC<Kt2Props> = ({
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          // Optional: Stop observing after animation starts
+
           observer.unobserve(entry.target)
         }
       },
       {
-        threshold: 0.2, // Trigger when 20% of element is visible
+        threshold: 0.2,
       }
     )
 
@@ -214,7 +214,7 @@ const Kt2: React.FC<Kt2Props> = ({
           animation-delay: 1500ms;
         }
 
-        /* Hidden state before animation triggers */
+
         .kt2-hidden {
           opacity: 0;
         }
@@ -226,15 +226,15 @@ const Kt2: React.FC<Kt2Props> = ({
 
       <section
         ref={sectionRef}
-        // UPDATE: Padding kiri kanan 150px (lg), px-6 (mobile), px-12 (tablet)
-        // Flex center digunakan untuk memposisikan konten di tengah vertikal & horizontal
+
+
         className={`relative w-full flex items-center justify-center overflow-hidden px-6 md:px-12 lg:px-[150px] ${dmSans.className}`}
         style={{
           paddingTop,
           paddingBottom
         }}
       >
-        {/* Background Image with Overlay */}
+
         <div className="absolute inset-0 z-0">
           <div className={isVisible ? "animate-fade-in" : ""}>
             <Image
@@ -247,26 +247,25 @@ const Kt2: React.FC<Kt2Props> = ({
               sizes="100vw"
             />
           </div>
-          {/* Gradient Overlay - Modern style */}
+
           <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/50"></div>
 
-          {/* Animated Gradient Accent */}
+
           <div className={`absolute inset-0 bg-gradient-to-tr from-orange-600/20 via-transparent to-lime-400/10 ${isVisible ? "animate-gradient-shift" : ""}`}></div>
         </div>
 
-        {/* Content Container 
-            UPDATE: Max-width 6xl dan mx-auto untuk sentralisasi konten di dalam padding 
-        */}
+
+
         <div className="relative z-10 w-full max-w-6xl mx-auto">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Title with staggered animation */}
+
             <h2
               className={`text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-5 lg:mb-6 leading-tight ${isVisible ? "animate-slide-up animation-delay-200" : "kt2-hidden"}`}
             >
               Berkaryalah.
             </h2>
 
-            {/* Subtitle with staggered animation */}
+
             <p
               className={`text-white/90 text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-6 md:mb-7 lg:mb-8 leading-relaxed px-2 ${isVisible ? "animate-slide-up animation-delay-400" : "kt2-hidden"}`}
             >
@@ -275,7 +274,7 @@ const Kt2: React.FC<Kt2Props> = ({
               bersama Pramuka.
             </p>
 
-            {/* Decorative Line with draw animation */}
+
             <div
               className={`flex justify-center ${isVisible ? "animate-slide-up animation-delay-600" : "kt2-hidden"}`}
             >
@@ -303,7 +302,7 @@ const Kt2: React.FC<Kt2Props> = ({
           </div>
         </div>
 
-        {/* Decorative Elements - Animated Floating Dots */}
+
         <div className={`absolute top-8 left-4 sm:top-10 sm:left-10 w-2 h-2 bg-orange-500 rounded-full opacity-60 ${isVisible ? "animate-float-slow" : ""}`}></div>
         <div className={`absolute top-16 right-6 sm:top-20 sm:right-16 w-2 sm:w-3 h-2 sm:h-3 bg-orange-400 rounded-full opacity-50 ${isVisible ? "animate-float-medium animation-delay-1000" : ""}`}></div>
         <div className={`absolute bottom-24 left-6 sm:bottom-32 sm:left-20 w-2 h-2 bg-orange-600 rounded-full opacity-70 ${isVisible ? "animate-float-fast" : ""}`}></div>
@@ -311,7 +310,7 @@ const Kt2: React.FC<Kt2Props> = ({
         <div className={`absolute top-1/3 left-3 sm:left-8 w-2 h-2 bg-orange-400 rounded-full opacity-50 ${isVisible ? "animate-float-medium animation-delay-1500" : ""}`}></div>
         <div className={`absolute top-1/2 right-5 sm:right-12 w-2 sm:w-3 h-2 sm:h-3 bg-orange-600 rounded-full opacity-40 ${isVisible ? "animate-float-fast animation-delay-800" : ""}`}></div>
 
-        {/* Additional modern decorative elements */}
+
         <div className={`absolute top-20 right-1/4 w-1 h-1 bg-lime-400 rounded-full opacity-70 ${isVisible ? "animate-twinkle" : ""}`}></div>
         <div className={`absolute bottom-32 left-1/3 w-1 h-1 bg-lime-400 rounded-full opacity-60 ${isVisible ? "animate-twinkle animation-delay-1200" : ""}`}></div>
       </section>

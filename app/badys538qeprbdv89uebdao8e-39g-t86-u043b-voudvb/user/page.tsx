@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-// import { supabase } from '@/lib/supabase'; // Removed direct Supabase usage
+
 import {
     Users,
     Package,
@@ -37,7 +37,7 @@ import XLSX from 'xlsx-js-style';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, X, Loader2, CheckCircle2 } from 'lucide-react';
 
-// --- CHART COMPONENT ---
+
 const MonthlyChart = ({ data, color = '#997B55', label }: { data: number[]; color?: string; label: string }) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const rawMax = Math.max(...data, 10);
@@ -91,7 +91,7 @@ export default function DashboardPage() {
     const { data: session } = useSession();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-    // State to track active card
+
     const [activeCard, setActiveCard] = useState<number>(0);
 
     useEffect(() => {
@@ -101,13 +101,13 @@ export default function DashboardPage() {
         }
     }, []);
 
-    // --- REAL DATA STATE ---
+
     const [joinsData, setJoinsData] = useState<any[]>([]);
     const [contactsData, setContactsData] = useState<any[]>([]);
     const [userData, setUserData] = useState<any[]>([]);
     const [adminData, setAdminData] = useState<any[]>([]);
 
-    // Stats
+
     const [statsCounts, setStatsCounts] = useState({
         adminCount: 0,
         userCount: 0,
@@ -115,12 +115,12 @@ export default function DashboardPage() {
         contactsCount: 0
     });
 
-    // Chart States
+
     const [joinsChart, setJoinsChart] = useState<number[]>(new Array(12).fill(0));
     const [userChart, setUserChart] = useState<number[]>(new Array(12).fill(0));
 
     useEffect(() => {
-        // Process Joins Chart
+
         const joinsCounts = new Array(12).fill(0);
         joinsData.forEach(item => {
             const dateStr = item.created_at;
@@ -130,7 +130,7 @@ export default function DashboardPage() {
                     joinsCounts[d.getMonth()]++;
                 }
             } else {
-                // Should we default to current month? Yes for now to show something
+
                 const now = new Date();
                 joinsCounts[now.getMonth()]++;
             }
@@ -139,7 +139,7 @@ export default function DashboardPage() {
     }, [joinsData]);
 
     useEffect(() => {
-        // Process User Chart
+
         const userCounts = new Array(12).fill(0);
         userData.forEach(item => {
             const dateStr = item.created_at;
@@ -158,7 +158,7 @@ export default function DashboardPage() {
 
     const [loading, setLoading] = useState(true);
 
-    // --- DELETE MODAL STATE ---
+
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -188,12 +188,12 @@ export default function DashboardPage() {
         }
     };
 
-    // --- FETCH DATA FROM SERVER ACTIONS ---
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // 1. Fetch Stats
+
                 const counts = await getDashboardStats();
                 setStatsCounts(prev => ({
                     ...prev,
@@ -203,7 +203,7 @@ export default function DashboardPage() {
                     contactsCount: counts.contactsCount
                 }));
 
-                // 2. Fetch Lists via Server Actions
+
                 const joins = await getJoinsList();
                 setJoinsData(joins);
 
@@ -226,7 +226,7 @@ export default function DashboardPage() {
         fetchData();
     }, []);
 
-    // 8 Summary Cards Data (Dynamic Values)
+
     const stats = [
         {
             id: 0,
@@ -258,7 +258,7 @@ export default function DashboardPage() {
         },
     ];
 
-    // Helper to render Action Button
+
     const ActionButton = ({ itemId, index, totalItems }: { itemId: string; index: number; totalItems: number }) => {
         const router = useRouter();
         const [isOpen, setIsOpen] = useState(false);
@@ -266,7 +266,7 @@ export default function DashboardPage() {
         let menuItems: { label: string; color?: string; action?: string }[] = [];
 
         const handleDelete = async () => {
-            // Trigger Modal
+
             setDeleteItemId(itemId);
             setIsDeleteModalOpen(true);
         };
@@ -281,12 +281,12 @@ export default function DashboardPage() {
             router.push(`/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/user/detail/${itemId}?type=${type}`);
         };
 
-        // Define menu items based on activeCard
+
         switch (activeCard) {
-            case 0: // Anggota Join
-            case 2: // User Hubungi
-            case 4: // User Login
-            case 6: // Admin
+            case 0:
+            case 2:
+            case 4:
+            case 6:
                 menuItems = [
                     { label: 'Detail', action: 'detail' },
                     { label: 'Hapus', color: 'text-red-600', action: 'delete' }
@@ -309,7 +309,7 @@ export default function DashboardPage() {
                     <MoreHorizontal size={18} />
                 </button>
 
-                {/* Backdrop to close when clicking outside */}
+
                 {isOpen && (
                     <div
                         className="fixed inset-0 z-40"
@@ -317,7 +317,7 @@ export default function DashboardPage() {
                     />
                 )}
 
-                {/* Tooltip/Dropdown: Positioned to the LEFT (right-full) */}
+
                 {isOpen && (
                     <div className={`absolute right-full mr-2 w-32 bg-white shadow-lg rounded-lg border border-gray-100 z-50 overflow-hidden ${index < totalItems / 2 ? 'top-0' : 'bottom-0'
                         }`}>
@@ -345,14 +345,14 @@ export default function DashboardPage() {
         );
     };
 
-    // --- EXPORT FUNCTIONS ---
+
     const handleExport = () => {
         let title = '';
         let formattedData: any[] = [];
 
-        // Helper to format specific fields
+
         switch (activeCard) {
-            case 0: // Anggota Join
+            case 0:
                 title = 'Data_Anggota_Join';
                 formattedData = joinsData.map(item => ({
                     'Nama Lengkap': item.nama,
@@ -364,7 +364,8 @@ export default function DashboardPage() {
                     'Pesan': item.pesan
                 }));
                 break;
-            case 2: // User Hubungi
+
+            case 2:
                 title = 'Data_User_Hubungi';
                 formattedData = contactsData.map(item => ({
                     'Nama Lengkap': item.nama,
@@ -374,7 +375,8 @@ export default function DashboardPage() {
                     'Status': item.status || 'Belum Terjawab'
                 }));
                 break;
-            case 4: // User Login
+
+            case 4:
                 title = 'Data_User_Login';
                 formattedData = userData.map(item => ({
                     'Email User': item.email,
@@ -382,7 +384,8 @@ export default function DashboardPage() {
                     'Status': 'Aktif'
                 }));
                 break;
-            case 6: // Admin
+
+            case 6:
                 title = 'Data_Admin_Terdaftar';
                 formattedData = adminData.map(item => ({
                     'Username': item.username,
@@ -399,14 +402,14 @@ export default function DashboardPage() {
             return;
         }
 
-        // --- Create Workbook & Sheet ---
+
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(formattedData);
 
-        // --- Apply Styling (Borders for All Cells) ---
+
         const range = XLSX.utils.decode_range(ws['!ref']!);
 
-        // Define Border Style
+
         const borderStyle = {
             top: { style: "thin", color: { rgb: "000000" } },
             bottom: { style: "thin", color: { rgb: "000000" } },
@@ -414,19 +417,19 @@ export default function DashboardPage() {
             right: { style: "thin", color: { rgb: "000000" } }
         };
 
-        // Apply style to every cell in range
+
         for (let R = range.s.r; R <= range.e.r; ++R) {
             for (let C = range.s.c; C <= range.e.c; ++C) {
                 const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
                 if (!ws[cellRef]) continue;
 
-                // Initialize s (style) object if not present
+
                 if (!ws[cellRef].s) ws[cellRef].s = {};
 
-                // Apply borders
+
                 ws[cellRef].s.border = borderStyle;
 
-                // Optional: Make header bold
+
                 if (R === 0) {
                     ws[cellRef].s.font = { bold: true };
                     ws[cellRef].s.fill = { fgColor: { rgb: "EEEEEE" } };
@@ -434,17 +437,17 @@ export default function DashboardPage() {
             }
         }
 
-        // Set column widths (optional, auto-width approximation)
+
         const cols = Object.keys(formattedData[0]).map(() => ({ wch: 20 }));
         ws['!cols'] = cols;
 
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-        // --- Trigger Download ---
+
         XLSX.writeFile(wb, `${title}_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // --- RENDER CONTENT BASED ON ACTIVE CARD ---
+
     const renderContent = () => {
         if (loading) {
             return (
@@ -457,7 +460,7 @@ export default function DashboardPage() {
         }
 
         switch (activeCard) {
-            case 0: // Anggota yang Join
+            case 0:
                 if (joinsData.length === 0) {
                     return (
                         <tbody>
@@ -497,7 +500,8 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 2: // Contact Us
+
+            case 2:
                 if (contactsData.length === 0) {
                     return (
                         <tbody>
@@ -533,7 +537,8 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 4: // User yang Login (Regular Users)
+
+            case 4:
                 if (userData.length === 0) {
                     return (
                         <tbody>
@@ -571,7 +576,8 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 6: // ADMIN DATA
+
+            case 6:
                 if (adminData.length === 0) {
                     return (
                         <tbody>
@@ -626,7 +632,7 @@ export default function DashboardPage() {
 
     return (
         <div className="font-dm-sans min-h-screen p-4 md:p-8 pb-10">
-            {/* Header */}
+
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">User</h1>
                 <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
@@ -646,7 +652,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Scale-able Card Grid/Scroll - 8 Items */}
+
             <div className="mb-10 w-full overflow-x-auto pb-4 scrollbar-hide">
                 <div className="flex gap-4 min-w-max">
                     {stats.map((stat, index) => {
@@ -687,7 +693,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Dynamic Content Section */}
+
             {activeCard === 0 && (
                 <MonthlyChart data={joinsChart} label="Anggota Baru" color="#9C7C5B" />
             )}
@@ -696,7 +702,7 @@ export default function DashboardPage() {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px] p-6">
 
-                {/* Table Header / Title */}
+
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h2 className="text-lg font-bold text-[#8B6E4A]">
@@ -706,9 +712,9 @@ export default function DashboardPage() {
                             Data {stats.find(s => s.id === activeCard)?.title || ''}
                         </p>
                     </div>
-                    {/* Optional: Filter / Detail Button */}
+
                     <div className="flex items-center gap-3">
-                        {/* Show Sheets Button for appropriate cards */}
+
                         {[1, 3, 5, 7].includes(activeCard) && (
                             <button
                                 onClick={handleExport}
@@ -719,33 +725,25 @@ export default function DashboardPage() {
                             </button>
                         )}
 
-                        {/* Specific Action Buttons */}
-                        {/* Specific Action Buttons - ADD (+ Button) */}
-                        {activeCard === 5 && ( // Produk Tersedia
-                            <button className="flex items-center gap-2 bg-[#8B6E4A] hover:bg-[#7a5f3d] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">
-                                <Plus size={18} />
-                                <span>Produk</span>
-                            </button>
-                        )}
-                        {activeCard === 7 && ( // Materi
-                            <button className="flex items-center gap-2 bg-[#8B6E4A] hover:bg-[#7a5f3d] text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors">
-                                <Plus size={18} />
-                                <span>Materi</span>
-                            </button>
-                        )}
+
+
+
+
+
+
 
 
                     </div>
                 </div >
 
-                {/* Table */}
+
                 <div className="w-full overflow-x-auto border border-gray-200 rounded-xl">
                     <table className="w-full text-sm text-left">
                         {renderContent()}
                     </table>
                 </div >
 
-                {/* Pagination Footer */}
+
                 <div className="flex items-center justify-between mt-6 text-xs text-gray-500 font-medium">
                     <div className="flex items-center gap-2">
                         <span>Rows :</span>
@@ -771,7 +769,7 @@ export default function DashboardPage() {
                 </div >
 
             </div>
-            {/* === DELETE CONFIRMATION MODAL === */}
+
             <AnimatePresence>
                 {isDeleteModalOpen && (
                     <motion.div

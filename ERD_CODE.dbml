@@ -1,0 +1,87 @@
+//// ------------------------------------------------------
+//// THIS CODE IS FOR: https://dbdiagram.io/
+//// COPY AND PASTE IT THERE
+//// ------------------------------------------------------
+
+Table data_user_login {
+  id_login varchar [pk]
+  email varchar
+  password_hash varchar
+  status varchar [default: "Login"]
+  created_at timestamp [default: `now()`]
+}
+
+Table data_produk_tersedia {
+  id_produk varchar [pk]
+  nama_produk varchar
+  status varchar [default: "Tersedia"]
+}
+
+Table data_materi_latihan {
+  id_materi varchar [pk]
+  nama_materi varchar
+  topik varchar
+  icon varchar
+  content json
+}
+
+Table data_user_hubungi {
+  id bigint [pk, increment]
+  nama_lengkap varchar
+  email varchar
+  no_wa varchar
+  pesan varchar
+  status varchar [default: "Belum Terjawab"]
+}
+
+Table data_anggota_join {
+  id bigint [pk, increment]
+  nama_lengkap varchar
+  tanggal_lahir date
+  no_wa varchar
+  asal_sekolah varchar
+  kelas varchar
+  jurusan varchar
+  pesan varchar
+  created_at timestamp [default: `now()`]
+}
+
+Table data_produk_tersewa {
+  id bigint [pk, increment]
+  id_produk varchar
+  nama_produk varchar
+  tgl_pengambilan date
+  tgl_pengembalian date
+  jam_sewa varchar
+  jam_kembali varchar
+  jumlah_produk varchar
+  nama_peminjam varchar
+  status_kembali varchar [default: "Belum"]
+}
+
+Table data_customer_penyewa {
+  id bigint [pk, increment]
+  nama_customer varchar
+  sekolah_instansi varchar
+  produk_disewa varchar
+  no_wa varchar
+  metode_bayar varchar
+  jam_pengambilan varchar
+  jam_pengembalian varchar
+  status_bayar varchar [default: "Belum"]
+}
+
+Table data_admin_terdaftar {
+  id_admin varchar [pk]
+  nama_lengkap varchar
+  email varchar
+  password_hash varchar
+  status varchar [default: "Login"]
+}
+
+// RELATIONSHIPS
+// Dalam Prisma schema Anda, relasi belum didefinisikan secara eksplisit (pakai @relation),
+// tapi secara logika bisnis, relasinya adalah:
+
+// Produk Tersewa mengacu pada master data Produk Tersedia
+Ref: data_produk_tersewa.id_produk > data_produk_tersedia.id_produk

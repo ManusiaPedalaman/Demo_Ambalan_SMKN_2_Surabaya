@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-// Google Font DM Sans
+
 if (typeof document !== 'undefined') {
   const fontLink = document.createElement('link');
   fontLink.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap';
@@ -12,7 +12,7 @@ if (typeof document !== 'undefined') {
   }
 }
 
-// Helper Hex to RGB (Dipindahkan ke atas untuk menghindari error inisialisasi)
+
 const hexToRgb = (hex: string, alpha: number = 1): string => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -64,13 +64,13 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
       style={{ transitionDelay: `${index * 150}ms` }}
     >
-      {/* Card Background with Hover Effect */}
+
       <div className="absolute inset-0 bg-gradient-to-br rounded-2xl 
         opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 
         transform group-hover:scale-105 transition-transform"
         style={{ backgroundImage: 'linear-gradient(to bottom right, rgba(122, 95, 61, 0.1), transparent)' }} />
 
-      {/* Icon with Animation */}
+
       <div className="mb-4 md:mb-6 relative">
         <div className="absolute inset-0 rounded-full blur-xl opacity-0 
           group-hover:opacity-60 transition-opacity duration-500 transform scale-150"
@@ -81,7 +81,7 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
         </div>
       </div>
 
-      {/* Title */}
+
       <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4 
         transition-colors duration-300"
         style={{
@@ -92,13 +92,13 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
         <span className="group-hover:text-[#7A5F3D] transition-colors duration-300">{title}</span>
       </h3>
 
-      {/* Description */}
+
       <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-xs md:max-w-none
         group-hover:text-gray-700 transition-colors duration-300 text-justify">
         {description}
       </p>
 
-      {/* Decorative Line */}
+
       <div className="absolute bottom-0 left-1/2 md:left-0 transform -translate-x-1/2 md:translate-x-0
         w-0 group-hover:w-12 h-1 
         transition-all duration-500 rounded-full mt-4"
@@ -144,8 +144,8 @@ const Penjelasan1 = ({
 
   return (
     <section
-      // UPDATE: Menambahkan lg:px-[150px] untuk padding kanan kiri 150px pada desktop
-      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px]"
+
+    className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px]"
       style={{
         backgroundImage: 'linear-gradient(to bottom, white, rgba(122, 95, 61, 0.05))',
         paddingTop,
@@ -153,14 +153,14 @@ const Penjelasan1 = ({
         fontFamily: "'DM Sans', sans-serif"
       }}
     >
-      {/* Decorative Background Elements */}
+
       <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl -z-10"
         style={{ backgroundColor: 'rgba(122, 95, 61, 0.08)' }} />
       <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl -z-10"
         style={{ backgroundColor: 'rgba(122, 95, 61, 0.05)' }} />
 
       <div className="max-w-7xl mx-auto relative">
-        {/* Header */}
+
         <div
           ref={headerRef}
           className={`mb-12 md:mb-16 transition-all duration-1000 ease-out
@@ -182,16 +182,16 @@ const Penjelasan1 = ({
             Karena Pramuka hadir untuk membentuk karakter, keterampilan, dan jiwa kepemimpinan generasi muda.
           </p>
 
-          {/* Decorative Underline */}
+
           <div className={`mt-6 h-1.5 w-24 rounded-full
             transition-all duration-700 delay-700
             ${headerVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'} origin-left`}
             style={{ backgroundImage: 'linear-gradient(to right, #7A5F3D, rgba(122, 95, 61, 0.6))' }} />
         </div>
 
-        {/* Content Grid */}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 lg:gap-12">
-          {/* Card 1 - Pembentukan Karakter */}
+
           <FeatureCard
             index={0}
             icon={
@@ -203,7 +203,7 @@ const Penjelasan1 = ({
             description="Pramuka menanamkan nilai disiplin, tanggung jawab, dan kerjasama melalui kegiatan berlandaskan Dasa Dharma dan Satya Pramuka."
           />
 
-          {/* Card 2 - Keterampilan Hidup */}
+
           <FeatureCard
             index={1}
             icon={
@@ -215,7 +215,7 @@ const Penjelasan1 = ({
             description="Melatih anggota untuk mandiri dengan keterampilan survival, pertolongan pertama, hingga penguasaan tali-temali dan pioneering."
           />
 
-          {/* Card 3 - Kegiatan Beragam */}
+
           <FeatureCard
             index={2}
             icon={

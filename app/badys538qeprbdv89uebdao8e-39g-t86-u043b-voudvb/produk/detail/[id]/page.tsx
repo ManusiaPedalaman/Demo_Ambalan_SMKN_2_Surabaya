@@ -90,9 +90,9 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
         </div>
     );
 
-    // --- COMPONENTS ---
 
-    // Unified Status Badge (Matching User Detail)
+
+
     const StatusBadge = ({ status, type = 'default' }: { status: string, type?: 'status' | 'payment' | 'default' }) => {
         let colors = "bg-gray-100 text-gray-600 border-gray-200";
         let dotColor = "bg-gray-400";
@@ -125,7 +125,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
         );
     };
 
-    // Unified Info Card (Matching User Detail)
+
     const InfoCard = ({ icon: Icon, label, value, subValue, fullWidth = false }: any) => (
         <div className={`bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4 ${fullWidth ? 'col-span-full' : ''}`}>
             <div className="w-10 h-10 rounded-full bg-[#FDFBF9] flex items-center justify-center flex-shrink-0 text-[#9C7C5B]">
@@ -139,11 +139,11 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
         </div>
     );
 
-    // --- RENDERERS ---
+
 
     const renderBookingDetail = () => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Header Card */}
+
             <div className="col-span-full bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-6">
                     <div className="w-20 h-20 rounded-full bg-[#FDFBF9] flex items-center justify-center text-[#9C7C5B] border-2 border-white shadow-lg">
@@ -159,7 +159,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
                 <StatusBadge status={data.status} type="status" />
             </div>
 
-            {/* Info Cards */}
+
             <InfoCard icon={Box} label="Jumlah" value={`${data.quantity} Unit`} />
             <InfoCard icon={Calendar} label="Tanggal Ambil" value={data.start_date} subValue={data.pickup_time} />
             <InfoCard icon={Calendar} label="Tanggal Kembali" value={data.end_date} subValue={data.return_time} />
@@ -169,7 +169,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
 
     const renderRenterDetail = () => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Header Card */}
+
             <div className="col-span-full bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-6">
                     <div className="w-20 h-20 rounded-full bg-[#FDFBF9] flex items-center justify-center text-[#9C7C5B] border-2 border-white shadow-lg">
@@ -197,13 +197,13 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
         const productInfo = staticData || {};
         const isAvailable = data.status === 'Tersedia';
 
-        // Check availability of images
+
         const hasImages = productInfo.images && productInfo.images.length > 0;
         const mainImage = hasImages ? productInfo.images[0] : null;
 
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Header Card */}
+
                 <div className="col-span-full bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-6">
                         <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-[#9C7C5B] border-2 border-gray-100 shadow-lg overflow-hidden relative">
@@ -221,7 +221,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
                     <StatusBadge status={data.status} type="status" />
                 </div>
 
-                {/* Pricing & Condition */}
+
                 <InfoCard
                     icon={CreditCard}
                     label="Harga Sewa"
@@ -230,7 +230,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
                 />
                 <InfoCard icon={CheckCircle2} label="Kondisi" value="Baik (98%)" />
 
-                {/* Specs */}
+
                 <div className="col-span-full">
                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 mt-2 ml-1">Spesifikasi</h3>
                 </div>
@@ -240,7 +240,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
                 <InfoCard icon={Info} label="Berat" value={productInfo.specs?.berat} />
                 <InfoCard icon={Shield} label="Fitur" value={productInfo.specs?.ketahananAir} />
 
-                {/* Description */}
+
                 <div className="col-span-full bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mt-2">
                     <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
                         <div className="w-8 h-8 rounded-full bg-[#FDFBF9] flex items-center justify-center text-[#9C7C5B]">
@@ -258,7 +258,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
 
     return (
         <div className={`min-h-screen bg-[#FDFBF9] pb-20 font-dm-sans ${dmSans.className} text-gray-800`}>
-            {/* HEADER */}
+
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50 px-6 py-4">
                 <div className="max-w-5xl mx-auto flex items-center justify-between">
                     <div
@@ -271,7 +271,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
                         <span className="font-bold text-sm tracking-wide uppercase">KEMBALI</span>
                     </div>
 
-                    {/* ADMIN PROFILE */}
+
                     <div className="hidden md:flex items-center gap-3 bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
                             <User size={18} className="text-gray-600" />
@@ -285,7 +285,7 @@ export default function DetailPage({ params }: { params: Promise<{ id: string }>
             </div>
 
             <main className="max-w-4xl mx-auto px-6 py-8">
-                {/* TITLE SECTION */}
+
                 <div className="mb-8">
                     <span className="text-[#9C7C5B] font-bold tracking-wider text-xs uppercase mb-2 block">
                         Detail Informasi

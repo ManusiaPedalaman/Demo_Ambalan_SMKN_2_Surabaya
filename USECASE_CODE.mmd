@@ -1,0 +1,37 @@
+%% ------------------------------------------------------
+%% THIS CODE IS FOR: https://www.mermaidchart.com/
+%% COPY AND PASTE IT THERE
+%% ------------------------------------------------------
+
+usecaseDiagram
+    actor "User (Pengunjung/Anggota)" as User
+    actor "Administrator" as Admin
+
+    package "Sistem Informasi Ambalan" {
+        usecase "Melihat Beranda & Tentang" as UC1
+        usecase "Mengakses Materi Latihan" as UC2
+        usecase "Melihat Daftar Produk" as UC3
+        usecase "Mengisi Form Hubungi Kami" as UC4
+        usecase "Daftar Anggota Baru (Join)" as UC5
+        usecase "Login / Register Akun" as UC6
+        
+        usecase "Dashboard Admin" as UC7
+        usecase "Kelola Data Produk (CRUD)" as UC8
+        usecase "Kelola Peminjaman Barang" as UC9
+        usecase "Lihat Pesan Masuk & Pendaftar" as UC10
+    }
+
+    %% User Interactions
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
+
+    %% Admin Interactions
+    Admin --> UC6
+    Admin --> UC7
+    Admin --> UC8
+    Admin --> UC9
+    Admin --> UC10

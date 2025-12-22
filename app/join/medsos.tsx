@@ -5,10 +5,10 @@ import { Playfair_Display, DM_Sans } from 'next/font/google';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 
-// 1. Konfigurasi Font
+
 const playfair = DM_Sans({
   subsets: ['latin'],
-  weight: ['700'], // Bold untuk judul
+
   variable: '--font-playfair',
 });
 
@@ -18,7 +18,7 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
 });
 
-// 2. Data Kontak (Sesuai Gambar)
+
 const contactData = [
   {
     id: 1,
@@ -53,8 +53,8 @@ const contactData = [
 ];
 
 export default function Medsos() {
-  
-  // --- VARIAN ANIMASI ---
+
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -68,18 +68,18 @@ export default function Medsos() {
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } 
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }
     },
   };
 
   return (
     <section className={`w-full bg-[#FFFFFF] py-20 lg:py-32 overflow-hidden ${dmSans.className}`}>
-      
-      {/* Container Utama: Padding kiri kanan 150px di desktop */}
-      <motion.div 
+
+
+      <motion.div
         className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-[315px]"
         variants={containerVariants}
         initial="hidden"
@@ -87,10 +87,10 @@ export default function Medsos() {
         viewport={{ once: true, amount: 0.3 }}
       >
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
-          
-          {/* === BAGIAN KIRI: JUDUL BESAR === */}
+
+
           <div className="w-full lg:w-[35%]">
-            <motion.h2 
+            <motion.h2
               variants={itemVariants}
               className={`${playfair.className} text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A1A1A] leading-tight`}
             >
@@ -99,29 +99,29 @@ export default function Medsos() {
             </motion.h2>
           </div>
 
-          {/* === BAGIAN KANAN: GRID KONTAK === */}
+
           <div className="w-full lg:w-[65%] grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 lg:gap-8">
             {contactData.map((item) => (
-              <motion.div 
-                key={item.id} 
+              <motion.div
+                key={item.id}
                 variants={itemVariants}
                 className="flex flex-col"
               >
-                {/* Label (e.g., DM Instagram) */}
+
                 <h3 className="text-lg md:text-xl font-bold text-[#1A1A1A] mb-3">
                   {item.label}
                 </h3>
 
-                {/* Value/Handle (e.g., @arsmekda) */}
-                <Link 
-                  href={item.link} 
+
+                <Link
+                  href={item.link}
                   target="_blank"
                   className="text-[#A58B6F] hover:text-[#8a735b] text-xl md:text-2xl font-medium mb-4 transition-colors duration-300 inline-block"
                 >
                   {item.value}
                 </Link>
 
-                {/* Deskripsi (List) */}
+
                 <div className="text-gray-500 text-sm leading-relaxed space-y-1">
                   {item.description.map((desc, idx) => (
                     <p key={idx}>{desc}</p>

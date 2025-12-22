@@ -50,8 +50,8 @@ export const products = [
     {
         slug: 'paket-lengkap',
         name: 'Paket Lengkap Camping',
-        dbName: 'Paket Lengkap', // Matches Database Name
-        price: 40000, // Matching frontend display logic (though frontend said 40k and 60k in different files, using 40k)
+        dbName: 'Paket Lengkap', 
+        price: 40000, 
         originalPrice: 75000,
         duration: '3 hari',
         status: 'Tersedia',
@@ -66,7 +66,7 @@ export const products = [
     {
         slug: 'tali-pramuka',
         name: 'Tali Pramuka (Tambang)',
-        dbName: 'Tali Pramuka', // Matches Database Name
+        dbName: 'Tali Pramuka', 
         price: 10000,
         originalPrice: 15000,
         duration: '3 hari',

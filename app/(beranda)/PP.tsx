@@ -119,19 +119,19 @@ const PP = () => {
           backgroundImage: "url('/Image/PP.webp')",
         }}
       >
-        {/* Gradient Overlay */}
+
         <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/60"></div>
 
-        {/* Animated Gradient Accent */}
+
         <div className="absolute inset-0 bg-gradient-to-tr from-cyan-900/20 via-transparent to-cyan-900/20 opacity-50"></div>
 
-        {/* Noise Texture */}
+
         <div className="absolute inset-0 opacity-[0.015]" style={{
           backgroundImage: "url(data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E)"
         }}></div>
 
         <div className="relative z-10 max-w-7xl mx-auto">
-          {/* Header */}
+
           <div className={`mb-16 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
 
             <h2 className="text-white text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight ">
@@ -143,7 +143,7 @@ const PP = () => {
             </p>
           </div>
 
-          {/* Cards Grid */}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {cards.map((card, index) => (
               <div
@@ -155,14 +155,14 @@ const PP = () => {
                   boxShadow: 'hover: 0 20px 25px -5px #C9A86A'
                 }}
               >
-                {/* Shimmer Effect on Hover */}
+
                 <div className="absolute inset-0 rounded-2xl shimmer-effect opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                {/* Glow Effect */}
+
                 <div className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-500" style={{ background: 'linear-gradient(to right, #C9A86A, #C9A86A)' }}></div>
 
                 <div className="relative">
-                  {/* Icon Container */}
+
                   <div className="mb-8">
                     <div className="w-16 h-16 flex items-center justify-center rounded-xl bg-white/5 group-hover:bg-white/10 transition-all duration-500 border border-white/10 group-hover:scale-110 group-hover:rotate-3" style={{
                       background: 'linear-gradient(to bottom right, #00afec1a, rgba(0, 175, 236, 0.05))'
@@ -171,15 +171,15 @@ const PP = () => {
                     </div>
                   </div>
 
-                  {/* Title */}
+
                   <h3 className="text-white text-2xl font-bold mb-4 group-hover:transition-colors duration-500" style={{ color: '' }}>
                     {card.title}
                   </h3>
 
-                  {/* Divider */}
+
                   <div className="w-12 h-0.5 rounded-full mb-4 group-hover:w-20 transition-all duration-500" style={{ background: 'linear-gradient(to right, #C9A86A, transparent)' }}></div>
 
-                  {/* Description */}
+
                   <p className="text-gray-400 text-base leading-relaxed group-hover:text-gray-300 transition-colors duration-500 text-justify">
                     {card.description}
                   </p>
@@ -188,7 +188,7 @@ const PP = () => {
             ))}
           </div>
 
-          {/* Bottom Accent Line */}
+
           <div className={`mt-16 h-0.5 bg-gradient-to-r from-transparent via-white/20 to-transparent ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '0.6s' }}></div>
         </div>
       </section>
