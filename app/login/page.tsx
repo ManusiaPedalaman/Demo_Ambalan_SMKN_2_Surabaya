@@ -19,10 +19,6 @@ export default function MasukPage() {
     await signIn('google', { callbackUrl: '/' });
   };
 
-  const handleFacebookLogin = async () => {
-    await signIn('facebook', { callbackUrl: '/' });
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 md:p-8 font-dm-sans">
       <div
@@ -116,23 +112,14 @@ export default function MasukPage() {
               <div className="text-center text-[#7A7A7A] text-sm mt-6">
                 Atau Masuk Cepat Dengan
               </div>
-              <div className="flex justify-center space-x-4 mb-6">
+              <div className="flex justify-center mb-6">
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition duration-200"
+                  className="flex items-center justify-center gap-3 w-full max-w-[280px] py-3 px-4 rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-[#56ABD7] hover:shadow-md transition-all duration-300 group"
                 >
-                  <Image src="/Icon/google.svg" alt="Google" width={24} height={24} />
-                </button>
-                <div className="text-center text-[#7A7A7A] text-sm mt-2 pt-2">
-                  atau
-                </div>
-                <button
-                  type="button"
-                  onClick={handleFacebookLogin}
-                  className="p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition duration-200"
-                >
-                  <Image src="/Icon/facebook.svg" alt="Facebook" width={24} height={24} />
+                  <Image src="/Icon/google.svg" alt="Google" width={24} height={24} className="group-hover:scale-110 transition-transform" />
+                  <span className="text-[#3D3D3D] font-medium">Google</span>
                 </button>
               </div>
 
