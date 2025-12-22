@@ -53,45 +53,14 @@ export async function POST(req: Request) {
         }
 
         if (type === 'verify') {
-            const { email, otp } = await req.json();
-
-            if (!email || !otp) {
-                return NextResponse.json({ message: 'Email and OTP are required' }, { status: 400 });
-            }
-
-            const record = await prisma.verificationToken.findFirst({
-                where: {
-                    identifier: email,
-                    token: otp,
-                },
-            });
-
-            if (!record) {
-                return NextResponse.json({ isValid: false, message: 'Invalid OTP' }, { status: 400 });
-            }
-
-            const now = new Date();
-            if (record.expires < now) {
-                return NextResponse.json({ isValid: false, message: 'OTP Expired' }, { status: 400 });
-            }
-
-            // Optional: Delete token after usage or keep it until expiry? 
-            // Usually better to delete to prevent replay attacks
-            await prisma.verificationToken.deleteMany({
-                where: {
-                    identifier: email,
-                    token: otp
-                }
-            });
-
-            return NextResponse.json({ isValid: true, message: 'OTP Verified' });
+            return NextResponse.json({ message: 'Verification is now handled in /api/register' }, { status: 400 });
         }
 
         return NextResponse.json({ message: 'Invalid type' }, { status: 400 });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('OTP API Error:', error);
-        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ message: error.message || 'Internal server error', error: String(error) }, { status: 500 });
     }
 }
 

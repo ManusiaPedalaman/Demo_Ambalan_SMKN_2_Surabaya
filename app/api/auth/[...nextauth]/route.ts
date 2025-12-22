@@ -124,7 +124,7 @@ const handler = NextAuth({
 
                     if (existingAdmin) {
 
-                        
+
                         return true;
                     }
 
@@ -162,14 +162,14 @@ const handler = NextAuth({
         async jwt({ token, user, account }) {
 
             if (user) {
-                token.role = (user as any).role || 'USER'; 
+                token.role = (user as any).role || 'USER';
 
 
 
 
 
 
-                
+
                 if (account?.provider === 'google' || account?.provider === 'facebook') {
                     const { prisma } = require('@/lib/prisma');
                     const adminCheck = await prisma.dataAdminTerdaftar.findFirst({
@@ -192,6 +192,8 @@ const handler = NextAuth({
     pages: {
         signIn: '/login',
     },
+    debug: process.env.NODE_ENV === 'development',
+    secret: process.env.NEXTAUTH_SECRET || 'changeme',
 });
 
 export { handler as GET, handler as POST };

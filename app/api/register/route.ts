@@ -6,11 +6,35 @@ import { v4 as uuidv4 } from 'uuid';
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { email, password } = body;
+        const { email, password, otp } = body;
 
-        if (!email || !password) {
+        if (!email || !password || !otp) {
             return NextResponse.json({ message: "Data tidak lengkap" }, { status: 400 });
         }
+
+        // 1. Verify OTP
+        const verificationRecord = await prisma.verificationToken.findFirst({
+            where: {
+                identifier: email,
+                token: otp,
+            },
+        });
+
+        if (!verificationRecord) {
+            return NextResponse.json({ message: "OTP Salah" }, { status: 400 });
+        }
+
+        if (verificationRecord.expires < new Date()) {
+            return NextResponse.json({ message: "OTP Kadaluarsa" }, { status: 400 });
+        }
+
+        // 2. Delete used OTP
+        await prisma.verificationToken.deleteMany({
+            where: {
+                identifier: email,
+                token: otp,
+            },
+        });
 
 
         const existingUser = await prisma.dataUserLogin.findFirst({
@@ -22,7 +46,7 @@ export async function POST(req: Request) {
         }
 
 
-        
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
 

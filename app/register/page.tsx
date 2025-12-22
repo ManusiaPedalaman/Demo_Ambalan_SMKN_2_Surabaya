@@ -17,7 +17,7 @@ export default function DaftarPage() {
   const [error, setError] = useState('');
 
   // Registration Flow States
-  const [step, setStep] = useState<'email' | 'otp' | 'details'>('email');
+  const [step, setStep] = useState<'email' | 'otp'>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -59,6 +59,13 @@ export default function DaftarPage() {
 
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+
+    if (!isPasswordValid) return;
+    if (password !== confirmPassword) {
+      setError('Password konfirmasi tidak cocok');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
@@ -83,54 +90,23 @@ export default function DaftarPage() {
     }
   };
 
-  const handleVerifyOtp = async () => {
+  const handleRegister = async () => {
     setIsLoading(true);
     setError('');
     const otpString = otp.join('');
 
     try {
-      const response = await fetch('/api/auth/otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'verify', email, otp: otpString }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.isValid) {
-        setStep('details');
-      } else {
-        setError(data.message || 'OTP Salah atau Kadaluarsa');
-      }
-    } catch (err) {
-      setError('Verifikasi gagal.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isPasswordValid) return;
-
-    if (password !== confirmPassword) {
-      setError('Password konfirmasi tidak cocok');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, confirmPassword }),
+        body: JSON.stringify({ email, password, otp: otpString }),
       });
 
       if (response.ok) {
         router.push('/login');
       } else {
         const data = await response.json();
-        setError(data.message || 'Gagal mendaftar');
+        setError(data.message || 'Registrasi gagal');
       }
     } catch (err) {
       setError('Terjadi kesalahan saat mendaftar.');
@@ -156,6 +132,22 @@ export default function DaftarPage() {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, 6).split('');
+    if (pastedData.every(char => !isNaN(Number(char)))) {
+      const newOtp = [...otp];
+      pastedData.forEach((value, index) => {
+        if (index < 6) newOtp[index] = value;
+      });
+      setOtp(newOtp);
+
+      // Focus the last filled input or the next empty one
+      const focusIndex = Math.min(pastedData.length, 5);
+      document.getElementById(`otp-${focusIndex}`)?.focus();
+    }
   };
 
   return (
@@ -197,12 +189,10 @@ export default function DaftarPage() {
             <h2 className="text-2xl font-semibold text-[#3D3D3D] text-center mb-1">
               {step === 'email' && 'Daftar Sekarang!'}
               {step === 'otp' && 'Verifikasi Email'}
-              {step === 'details' && 'Buat Password'}
             </h2>
             <p className="text-sm text-[#7A7A7A] text-center mb-8">
               {step === 'email' && 'Masukkan email Anda untuk memulai pendaftaran.'}
               {step === 'otp' && `Masukkan 6 digit kode yang dikirim ke ${email}`}
-              {step === 'details' && 'Amankan akun Anda dengan password yang kuat.'}
             </p>
 
             {/* Error Message */}
@@ -226,96 +216,6 @@ export default function DaftarPage() {
                     className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#56ABD7] focus:border-[#56ABD7] transition duration-200 bg-gray-50 text-gray-900 placeholder:text-gray-400"
                   />
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading || !email}
-                  className="w-full py-3 bg-[#6B4D27] text-white font-semibold rounded-lg shadow-lg hover:bg-[#7A5F3D] transition duration-300 transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? 'Mengirim...' : 'Kirim OTP'}
-                </button>
-
-                <div className="text-center text-[#7A7A7A] text-sm mt-6 pt-2">
-                  Atau Daftar Cepat Dengan
-                </div>
-                <div className="flex justify-center space-x-4 mb-6">
-                  <button
-                    type="button"
-                    onClick={() => signIn('google', { callbackUrl: '/' })}
-                    className="p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition duration-200"
-                  >
-                    <Image src="/Icon/google.svg" alt="Google" width={24} height={24} />
-                  </button>
-                  <div className="text-center text-[#7A7A7A] text-sm mt-2 pt-2">
-                    atau
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => signIn('facebook', { callbackUrl: '/' })}
-                    className="p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition duration-200"
-                  >
-                    <Image src="/Icon/facebook.svg" alt="Facebook" width={24} height={24} />
-                  </button>
-                </div>
-
-                <div className="text-center text-[#7A7A7A] text-sm mt-4">
-                  Sudah punya akun? <Link href="/login" className="text-[#56ABD7] hover:text-[#3D3D3D] font-medium transition-colors">Masuk</Link>
-                </div>
-              </form>
-            )}
-
-            {/* Step 2: OTP Input (Modal-like behavior inline) */}
-            {step === 'otp' && (
-              <div className="space-y-6">
-                <div className="flex justify-between gap-2">
-                  {otp.map((digit, index) => (
-                    <input
-                      key={index}
-                      id={`otp-${index}`}
-                      type="text"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      className="w-full h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:border-[#56ABD7] focus:ring-1 focus:ring-[#56ABD7] outline-none transition-all"
-                    />
-                  ))}
-                </div>
-
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">Berlaku selama: <span className="font-bold text-gray-700">{formatTime(timer)}</span></span>
-                  <button
-                    type="button"
-                    onClick={() => handleSendOtp()}
-                    disabled={timer > 540} // Enable resend after 1 min
-                    className="text-[#56ABD7] hover:underline disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-                  >
-                    Kirim Ulang
-                  </button>
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setStep('email')}
-                    className="flex-1 py-3 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition duration-300"
-                  >
-                    Ganti Email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={isLoading || otp.some(d => !d)}
-                    className="flex-1 py-3 bg-[#6B4D27] text-white font-semibold rounded-lg shadow-lg hover:bg-[#7A5F3D] transition duration-300 disabled:opacity-50"
-                  >
-                    {isLoading ? 'Verifikasi...' : 'Verifikasi OTP'}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Password Details */}
-            {step === 'details' && (
-              <form className="space-y-5" onSubmit={handleRegister}>
 
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -379,13 +279,92 @@ export default function DaftarPage() {
 
                 <button
                   type="submit"
-                  disabled={isLoading || !isPasswordValid}
+                  disabled={isLoading || !email || !isPasswordValid || password !== confirmPassword}
                   className="w-full py-3 bg-[#6B4D27] text-white font-semibold rounded-lg shadow-lg hover:bg-[#7A5F3D] transition duration-300 transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Mendaftar...' : 'Selesaikan Pendaftaran'}
+                  {isLoading ? 'Mengirim...' : 'Daftar'}
                 </button>
+
+                <div className="text-center text-[#7A7A7A] text-sm mt-6 pt-2">
+                  Atau Daftar Cepat Dengan
+                </div>
+                <div className="flex justify-center space-x-4 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => signIn('google', { callbackUrl: '/' })}
+                    className="p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition duration-200"
+                  >
+                    <Image src="/Icon/google.svg" alt="Google" width={24} height={24} />
+                  </button>
+                  <div className="text-center text-[#7A7A7A] text-sm mt-2 pt-2">
+                    atau
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => signIn('facebook', { callbackUrl: '/' })}
+                    className="p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition duration-200"
+                  >
+                    <Image src="/Icon/facebook.svg" alt="Facebook" width={24} height={24} />
+                  </button>
+                </div>
+
+                <div className="text-center text-[#7A7A7A] text-sm mt-4">
+                  Sudah punya akun? <Link href="/login" className="text-[#56ABD7] hover:text-[#3D3D3D] font-medium transition-colors">Masuk</Link>
+                </div>
               </form>
             )}
+
+            {/* Step 2: OTP Input (Modal-like behavior inline) */}
+            {step === 'otp' && (
+              <div className="space-y-6">
+                <div className="flex justify-between gap-2">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      type="text"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onPaste={handlePaste}
+                      className="w-full h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:border-[#56ABD7] focus:ring-1 focus:ring-[#56ABD7] outline-none transition-all"
+                    />
+                  ))}
+                </div>
+
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-500">Berlaku selama: <span className="font-bold text-gray-700">{formatTime(timer)}</span></span>
+                  <button
+                    type="button"
+                    onClick={() => handleSendOtp()}
+                    disabled={timer > 540} // Enable resend after 1 min
+                    className="text-[#56ABD7] hover:underline disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    Kirim Ulang
+                  </button>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep('email')}
+                    className="flex-1 py-3 bg-gray-100 text-gray-600 font-semibold rounded-lg hover:bg-gray-200 transition duration-300"
+                  >
+                    Ganti Email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRegister}
+                    disabled={isLoading || otp.some(d => !d)}
+                    className="flex-1 py-3 bg-[#6B4D27] text-white font-semibold rounded-lg shadow-lg hover:bg-[#7A5F3D] transition duration-300 disabled:opacity-50"
+                  >
+                    {isLoading ? 'Verifikasi...' : 'Verifikasi & Daftar'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3 Removed */}
 
           </div>
 
