@@ -77,12 +77,10 @@ export async function POST(req: Request) {
 
             // Optional: Delete token after usage or keep it until expiry? 
             // Usually better to delete to prevent replay attacks
-            await prisma.verificationToken.delete({
+            await prisma.verificationToken.deleteMany({
                 where: {
-                    identifier_token: {
-                        identifier: email,
-                        token: otp
-                    }
+                    identifier: email,
+                    token: otp
                 }
             });
 
