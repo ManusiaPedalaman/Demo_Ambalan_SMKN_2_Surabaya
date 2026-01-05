@@ -162,7 +162,7 @@ Dokumen ini berisi **Outline Slide** (apa yang ditulis di PPT) dan **Teks Presen
 
 **Teks Presentasi:**
 "Kesimpulannya, Website Ambalan ini telah berhasil dibangun dan di-deploy secara online. Sistem ini mampu mejawab permasalahan administrasi manual, menyediakan sarana belajar digital, dan membuka peluang pemasukan kas melalui penyewaan online. Sistem ini siap untuk diimplementasikan sepenuhnya di SMKN 2 Surabaya."
-
+ 
 ---
 
 ## Slide 15: Penutup & QnA

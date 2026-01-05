@@ -145,9 +145,8 @@ const Penjelasan1 = ({
   return (
     <section
 
-      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px]"
+      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px] bg-gradient-to-b from-white to-[#7A5F3D]/5 dark:from-gray-900 dark:to-gray-950 transition-colors duration-500"
       style={{
-        backgroundImage: 'linear-gradient(to bottom, white, rgba(122, 95, 61, 0.05))',
         paddingTop,
         paddingBottom,
         fontFamily: "'DM Sans', sans-serif"

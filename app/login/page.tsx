@@ -77,9 +77,16 @@ export default function MasukPage() {
               if (result?.error) {
                 setError('Email atau password salah, atau akun belum terdaftar.');
               } else {
+                // Manually redirect if successful to avoid full page reload issues or use router
                 window.location.href = '/';
               }
             }}>
+
+              {error && (
+                <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg border border-red-200 text-center">
+                  {error}
+                </div>
+              )}
 
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
