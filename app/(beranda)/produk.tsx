@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DM_Sans } from 'next/font/google';
-import Link from 'next/link'; 
+import Link from 'next/link';
 import Image from 'next/image';
 
 
@@ -19,7 +19,7 @@ interface Product {
   price: string;
   duration: string;
   image: string;
-  slug: string; 
+  slug: string;
 }
 
 const Produk = () => {
@@ -28,6 +28,32 @@ const Produk = () => {
 
 
   const [isVisible, setIsVisible] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextSlide();
+    }
+    if (isRightSwipe) {
+      prevSlide();
+    }
+  };
+
   const sectionRef = useRef<HTMLElement>(null);
 
   const products: Product[] = [
@@ -69,7 +95,7 @@ const Produk = () => {
       price: '10k',
       duration: '3 hari',
       image: '/Image/tali.webp',
-      slug: 'tali-pramuka', 
+      slug: 'tali-pramuka',
     },
 
   ];
@@ -242,6 +268,15 @@ const Produk = () => {
               </Link>
             ))}
           </div>
+
+          {/* Swipe Sensor for Mobile */}
+          <div
+            className="md:hidden absolute inset-0 z-10 pointer-events-none touch-pan-y"
+            style={{ pointerEvents: 'auto' }}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          />
         </div>
 
 
@@ -277,7 +312,7 @@ const Produk = () => {
           </Link>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 

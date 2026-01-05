@@ -11,7 +11,8 @@ import {
     FileText,
     List,
     Code,
-    Box
+    Box,
+    PlayCircle
 } from 'lucide-react';
 import { getMateriById } from '@/app/actions';
 
@@ -121,34 +122,100 @@ export default function MateriDetailPage() {
 
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2">
-                        <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <FileText size={18} className="text-[#9C7C5B]" />
-                            Konten Materi (JSON Content)
-                        </h3>
-                        <div className="bg-[#1E1E1E] text-gray-300 p-6 rounded-2xl font-mono text-sm overflow-x-auto shadow-inner border border-gray-800">
-                            <pre>{JSON.stringify(data.content, null, 2)}</pre>
-                        </div>
-                    </div>
+                    <div className="lg:col-span-3 space-y-6">
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-2 mb-6">
+                                <FileText size={20} className="text-[#9C7C5B]" />
+                                <h3 className="font-bold text-gray-800 text-lg">Struktur Data Materi</h3>
+                            </div>
 
-                    <div className="lg:col-span-1 space-y-4">
-                        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Struktur Data</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Type</h4>
+                                    <div className="flex items-center gap-2 font-bold text-gray-900">
+                                        <Box size={16} className="text-[#9C7C5B]" />
+                                        <span>Interactive Module</span>
+                                    </div>
+                                </div>
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Total Items</h4>
+                                    <div className="flex items-center gap-2 font-bold text-gray-900">
+                                        <List size={16} className="text-[#9C7C5B]" />
+                                        <span>{Array.isArray(data.content) ? data.content.length : '1'} Sections</span>
+                                    </div>
+                                </div>
+                                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Icon ID</h4>
+                                    <div className="flex items-center gap-2 font-bold text-gray-900">
+                                        <Code size={16} className="text-[#9C7C5B]" />
+                                        <span className="truncate">{data.icon || 'default'}</span>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div className="flex items-center gap-3">
-                                        <Box size={16} className="text-[#9C7C5B]" />
-                                        <span className="text-sm font-medium text-gray-700">Type</span>
-                                    </div>
-                                    <span className="text-xs font-bold text-gray-900">Quiz / Module</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div className="flex items-center gap-3">
-                                        <List size={16} className="text-[#9C7C5B]" />
-                                        <span className="text-sm font-medium text-gray-700">Items</span>
-                                    </div>
-                                    <span className="text-xs font-bold text-gray-900">{Array.isArray(data.content) ? data.content.length : '1'} Questions</span>
+                                <h4 className="text-sm font-bold text-gray-800 border-b border-gray-100 pb-2">Pratinjau Konten</h4>
+
+                                <div className="bg-[#F8F9FA] rounded-xl p-4 border border-gray-100 font-mono text-xs text-gray-600 max-h-[400px] overflow-y-auto">
+                                    {/* Render specific fields nicely if possible, else structured generic view */}
+                                    {data.content ? (
+                                        <div className="space-y-6">
+                                            {/* Try to map common fields from the JSON structure if known */}
+                                            {/* Based on Latihan page structure */}
+                                            <div className="grid gap-4">
+                                                {/* Explanation Frames */}
+                                                {data.content.explanationFrames && (
+                                                    <div>
+                                                        <span className="badge bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold mb-2 inline-block">EXPLANATION FRAMES</span>
+                                                        <div className="grid gap-2">
+                                                            {data.content.explanationFrames.map((frame: any, idx: number) => (
+                                                                <div key={idx} className="bg-white p-3 rounded border border-gray-200">
+                                                                    <div className="font-bold text-gray-900 mb-1">{frame.title}</div>
+                                                                    <div className="text-gray-600">{frame.content}</div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Video */}
+                                                {data.content.videoId && (
+                                                    <div>
+                                                        <span className="badge bg-red-100 text-red-700 px-2 py-0.5 rounded text-[10px] font-bold mb-2 inline-block">VIDEO RESOURCE</span>
+                                                        <div className="bg-white p-3 rounded border border-gray-200 break-all">
+                                                            <a href={data.content.videoId} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-2">
+                                                                <PlayCircle size={14} /> {data.content.videoId}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Images */}
+                                                {data.content.imageTutorials && (
+                                                    <div>
+                                                        <span className="badge bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold mb-2 inline-block">IMAGE TUTORIALS</span>
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            {data.content.imageTutorials.map((img: any, idx: number) => (
+                                                                <div key={idx} className="bg-white p-2 rounded border border-gray-200 text-center">
+                                                                    <span className="block text-[10px] bg-gray-100 rounded px-1 mb-1 truncate">{img.title}</span>
+                                                                    <div className="aspect-video bg-gray-100 rounded overflow-hidden relative">
+                                                                        <img src={img.url} alt={img.title} className="w-full h-full object-cover" />
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Fallback for other fields */}
+                                            {!data.content.explanationFrames && !data.content.videoId && (
+                                                <pre className="whitespace-pre-wrap">{JSON.stringify(data.content, null, 2)}</pre>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-400 italic">Tidak ada konten tersedia.</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -15,48 +15,13 @@ const dmSans = DM_Sans({
 });
 
 
-const productsData = [
-  {
-    id: 1,
-    name: 'Tenda Segitiga/Kerucut',
-    price: '30k',
-    duration: '3 hari',
-    image: '/Image/tenda1.webp',
-    slug: 'tenda-segitiga',
-  },
-  {
-    id: 2,
-    name: 'Matras Spons',
-    price: '5k',
-    duration: '1 hari',
-    image: '/Image/matras.webp',
-    slug: 'matras-spons',
-  },
-  {
-    id: 3,
-    name: 'Tongkat Pramuka',
-    price: '3k',
-    duration: '1 hari',
-    image: '/Image/tongkat.webp',
-    slug: 'tongkat-pramuka',
-  },
-  {
-    id: 4,
-    name: 'Paket Lengkap',
-    price: '60k',
-    duration: '3 hari',
-    image: '/Image/paket_lengkap.webp',
-    slug: 'paket-lengkap',
-  },
-  {
-    id: 5,
-    name: 'Tali Pramuka',
-    price: '5k',
-    duration: '1 hari',
-    image: '/Image/tali.webp',
-    slug: 'tali-pramuka',
-  },
-];
+import { products } from '../data/products';
+
+const productsData = products.map((product, index) => ({
+  ...product,
+  id: index + 1,
+  image: product.images[0] // Map first image to 'image' property expected by component
+}));
 
 export default function Produk() {
   const [searchQuery, setSearchQuery] = useState('');

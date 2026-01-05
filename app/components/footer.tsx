@@ -154,15 +154,18 @@ const Footer = () => {
 
 
             <div className="flex flex-col gap-4">
-              {linksRight.map((link, idx) => (
-                <Link
-                  key={idx}
-                  href={link.path}
-                  className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              <Link href="/terms" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
+                Ketentuan Penggunaan
+              </Link>
+              <Link href="/privacy" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
+                Kebijakan Privasi
+              </Link>
+              <Link href="/tentang#faq" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
+                FAQ
+              </Link>
+              <Link href="/kontak" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
+                Kontak
+              </Link>
             </div>
           </div>
         </div>
@@ -174,13 +177,6 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm text-center md:text-left">
             &copy; {currentYear} <span className="font-medium text-gray-600">Ambalan Gajah Mada - Tungga Dewi</span>. All rights reserved.
-          </p>
-
-          <p className="text-gray-400 text-sm flex items-center gap-1.5">
-            Created with <Heart size={14} className="text-red-400 fill-red-400" /> by
-            <span className="font-bold text-[#56ABD7] cursor-pointer hover:underline">
-              Alan Nuklir
-            </span>
           </p>
         </div>
       </div>

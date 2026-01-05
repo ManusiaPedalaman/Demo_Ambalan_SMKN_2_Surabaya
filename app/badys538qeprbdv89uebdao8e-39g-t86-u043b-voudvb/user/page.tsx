@@ -565,7 +565,7 @@ export default function DashboardPage() {
                                     <td className="px-6 py-4 text-gray-600 border border-gray-300">{item.status}</td>
                                     <td className="px-6 py-4 text-gray-600 border border-gray-300">
                                         <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">
-                                            {item.role}
+                                            {item.role === 'Social' ? 'Google' : item.role}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-center border border-gray-300">

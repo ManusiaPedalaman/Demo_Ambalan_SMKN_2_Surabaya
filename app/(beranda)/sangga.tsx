@@ -23,11 +23,36 @@ export default function SanggaComponent() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(3);
   const [isVisible, setIsVisible] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
 
 
   const [tiltValues, setTiltValues] = useState<Record<number, { x: number; y: number }>>({});
 
   const sectionRef = useRef<HTMLElement>(null);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextSlide();
+    }
+    if (isRightSwipe) {
+      prevSlide();
+    }
+  };
 
 
   const sanggas: Sangga[] = [
@@ -104,12 +129,12 @@ export default function SanggaComponent() {
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % sanggas.length);
-    setTiltValues({}); 
+    setTiltValues({});
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + sanggas.length) % sanggas.length);
-    setTiltValues({}); 
+    setTiltValues({});
   };
 
   const getVisibleItems = () => {
@@ -207,7 +232,7 @@ export default function SanggaComponent() {
 
                   <div
                     className="relative w-full aspect-square bg-[#2A2827] p-8 flex items-center justify-center perspective-container cursor-pointer"
-                    style={{ perspective: '1000px' }} 
+                    style={{ perspective: '1000px' }}
                     onMouseMove={(e) => handleMouseMove(e, idx)}
                     onMouseLeave={() => handleMouseLeave(idx)}
                   >
@@ -216,7 +241,7 @@ export default function SanggaComponent() {
                       className="relative w-full h-full shadow-lg"
                       style={{
                         transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.05, 1.05, 1.05)`,
-                        transition: 'transform 0.1s ease-out', 
+                        transition: 'transform 0.1s ease-out',
                         transformStyle: 'preserve-3d',
                       }}
                     >
@@ -234,7 +259,7 @@ export default function SanggaComponent() {
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-contain drop-shadow-2xl"
-                        style={{ transform: 'translateZ(20px)' }} 
+                        style={{ transform: 'translateZ(20px)' }}
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
                         }}
@@ -259,9 +284,16 @@ export default function SanggaComponent() {
             })}
           </div>
 
+          {/* Swipe Area Wrapper for Mobile */}
+          <div
+            className="md:hidden absolute inset-0 z-10"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          />
         </div>
 
       </div>
-    </section>
+    </section >
   );
 }

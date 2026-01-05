@@ -75,7 +75,7 @@ export default function FAQ() {
   };
 
   return (
-    <section className={`w-full bg-white py-20 px-6 md:px-12 lg:px-24 overflow-hidden ${dmSans.className}`}>
+    <section id="faq" className={`w-full bg-white py-20 px-6 md:px-12 lg:px-24 overflow-hidden ${dmSans.className}`}>
       <div className="max-w-5xl mx-auto">
 
         <motion.div
