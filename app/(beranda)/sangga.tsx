@@ -104,12 +104,12 @@ export default function SanggaComponent() {
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % sanggas.length);
-    setTiltValues({}); 
+    setTiltValues({});
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + sanggas.length) % sanggas.length);
-    setTiltValues({}); 
+    setTiltValues({});
   };
 
   const getVisibleItems = () => {
@@ -153,6 +153,33 @@ export default function SanggaComponent() {
     }));
   };
 
+  // Swipe Logic
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) {
+      nextSlide();
+    }
+    if (isRightSwipe) {
+      prevSlide();
+    }
+  };
+
   return (
     <section
       ref={sectionRef}
@@ -173,91 +200,101 @@ export default function SanggaComponent() {
 
         <div className="relative">
 
-          <button
-            onClick={prevSlide}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-20 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'
+          {/* Swipe Wrapper */}
+          <div
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            className="touch-pan-y"
+          >
+
+            <button
+              onClick={prevSlide}
+              className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-20 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
+              <ChevronLeft className="w-6 h-6 text-[#1E1C1B]" />
+            </button>
+
+            <button
+              onClick={nextSlide}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-20 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
+              <ChevronRight className="w-6 h-6 text-[#1E1C1B]" />
+            </button>
+
+
+            <div className={`grid gap-6 transition-all duration-700 delay-300 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
-          >
-            <ChevronLeft className="w-6 h-6 text-[#1E1C1B]" />
-          </button>
+              style={{
+                gridTemplateColumns: `repeat(${itemsPerView}, minmax(0, 1fr))`
+              }}
+            >
+              {visibleSanggas.map((item, idx) => {
+                const tilt = tiltValues[idx] || { x: 0, y: 0 };
 
-          <button
-            onClick={nextSlide}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-20 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'
-              }`}
-          >
-            <ChevronRight className="w-6 h-6 text-[#1E1C1B]" />
-          </button>
-
-
-          <div className={`grid gap-6 transition-all duration-700 delay-300 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-            style={{
-              gridTemplateColumns: `repeat(${itemsPerView}, minmax(0, 1fr))`
-            }}
-          >
-            {visibleSanggas.map((item, idx) => {
-              const tilt = tiltValues[idx] || { x: 0, y: 0 };
-
-              return (
-                <div
-                  key={`${item.id}-${idx}`}
-                  className="group bg-[#252322] rounded-xl overflow-hidden border border-white/5 hover:border-[#C4A484]/50 transition-all duration-300 flex flex-col hover:-translate-y-2 hover:shadow-2xl"
-                >
-
+                return (
                   <div
-                    className="relative w-full aspect-square bg-[#2A2827] p-8 flex items-center justify-center perspective-container cursor-pointer"
-                    style={{ perspective: '1000px' }} 
-                    onMouseMove={(e) => handleMouseMove(e, idx)}
-                    onMouseLeave={() => handleMouseLeave(idx)}
+                    key={`${item.id}-${idx}`}
+                    className="group bg-[#252322] rounded-xl overflow-hidden border border-white/5 hover:border-[#C4A484]/50 transition-all duration-300 flex flex-col hover:-translate-y-2 hover:shadow-2xl"
                   >
 
                     <div
-                      className="relative w-full h-full shadow-lg"
-                      style={{
-                        transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.05, 1.05, 1.05)`,
-                        transition: 'transform 0.1s ease-out', 
-                        transformStyle: 'preserve-3d',
-                      }}
+                      className="relative w-full aspect-square bg-[#2A2827] p-8 flex items-center justify-center perspective-container cursor-pointer"
+                      style={{ perspective: '1000px' }}
+                      onMouseMove={(e) => handleMouseMove(e, idx)}
+                      onMouseLeave={() => handleMouseLeave(idx)}
                     >
 
                       <div
-                        className="absolute inset-0 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        className="relative w-full h-full shadow-lg"
                         style={{
-                          background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)`
+                          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.05, 1.05, 1.05)`,
+                          transition: 'transform 0.1s ease-out',
+                          transformStyle: 'preserve-3d',
                         }}
-                      />
+                      >
 
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-contain drop-shadow-2xl"
-                        style={{ transform: 'translateZ(20px)' }} 
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
+                        <div
+                          className="absolute inset-0 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                          style={{
+                            background: `linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)`
+                          }}
+                        />
+
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-contain drop-shadow-2xl"
+                          style={{ transform: 'translateZ(20px)' }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    </div>
+
+
+                    <div className="p-6 flex flex-col flex-grow relative z-20 bg-[#252322]">
+                      <span className="text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-1 group-hover:text-[#C4A484] transition-colors">
+                        Sangga
+                      </span>
+                      <h3 className="text-2xl font-bold text-white mb-3 tracking-wide">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm leading-relaxed text-justify">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
-
-
-                  <div className="p-6 flex flex-col flex-grow relative z-20 bg-[#252322]">
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-gray-500 mb-1 group-hover:text-[#C4A484] transition-colors">
-                      Sangga
-                    </span>
-                    <h3 className="text-2xl font-bold text-white mb-3 tracking-wide">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm leading-relaxed text-justify">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
+          {/* End Swipe Wrapper */}
 
         </div>
 

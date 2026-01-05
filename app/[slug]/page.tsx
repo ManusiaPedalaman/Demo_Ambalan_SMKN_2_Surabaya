@@ -33,6 +33,7 @@ const dmSans = DM_Sans({
 
 
 import { products } from '../data/products';
+import Skeleton from '../components/Skeleton';
 
 export default function DetailProduct({ params }: { params: Promise<{ slug: string }> }) {
 
@@ -310,25 +311,29 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
           <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{product.name}</h1>
-              <div className={`mt-2 md:mt-0 flex items-center gap-2 px-3 py-1.5 rounded-full border ${dbStatus === 'Tersedia' ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200'
-                }`}>
-                <span className={`font-bold text-sm ${dbStatus === 'Tersedia' ? 'text-green-700' : 'text-red-700'}`}>
-                  {dbStatus}
-                </span>
-                {dbStatus === 'Tersedia' ? (
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                ) : (
-                  <AlertTriangle className="w-4 h-4 text-red-600" />
-                )}
-              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">{product.name}</h1>
+              {dbStatus === 'Memuat...' ? (
+                <Skeleton className="mt-2 md:mt-0 w-32 h-8 rounded-full" />
+              ) : (
+                <div className={`mt-2 md:mt-0 flex flex-shrink-0 items-center gap-2 px-3 py-1.5 rounded-full border ${dbStatus === 'Tersedia' ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200'
+                  }`}>
+                  <span className={`font-bold text-sm ${dbStatus === 'Tersedia' ? 'text-green-700' : 'text-red-700'}`}>
+                    {dbStatus}
+                  </span>
+                  {dbStatus === 'Tersedia' ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className="flex items-baseline gap-3 mb-8">
-              <h2 className="text-3xl font-bold text-gray-800">
-                Rp {product.price.toLocaleString('id-ID')} <span className="text-lg font-medium text-gray-500">/ {product.duration}</span>
+            <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3 mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                Rp {product.price.toLocaleString('id-ID')} <span className="text-lg font-medium text-gray-500 dark:text-gray-400">/ {product.duration}</span>
               </h2>
-              <span className="text-gray-400 line-through font-medium">
+              <span className="text-gray-400 line-through font-medium dark:text-gray-500">
                 Rp {product.originalPrice.toLocaleString('id-ID')}
               </span>
             </div>

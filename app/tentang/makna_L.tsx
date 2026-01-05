@@ -127,6 +127,31 @@ const MaknaL = () => {
                 draggable={false}
               />
             </div>
+            {/* Mobile Buttons */}
+            <div className="absolute bottom-4 right-4 flex gap-2 md:hidden z-20">
+              <button
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = '/Image/LogoAmbalanfull.webp';
+                  link.download = 'Makna-Logo-Ambalan.webp';
+                  link.click();
+                }}
+                className="p-2 bg-white/90 rounded-full shadow-lg text-gray-700 hover:text-[#C9A86A] backdrop-blur-sm"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
+              </button>
+              <button
+                onClick={() => setIsZoomed(!isZoomed)}
+                className="p-2 bg-white/90 rounded-full shadow-lg text-gray-700 hover:text-[#C9A86A] backdrop-blur-sm"
+              >
+                {isZoomed ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3" /><path d="M21 8h-3a2 2 0 0 1-2-2V3" /><path d="M3 16h3a2 2 0 0 1 2 2v3" /><path d="M16 21v-3a2 2 0 0 1 2-2h3" /></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
+                )}
+              </button>
+            </div>
+
           </div>
         </motion.div>
 

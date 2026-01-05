@@ -60,7 +60,7 @@ const Footer = () => {
   const linksRight = [
     { name: 'Ketentuan Penggunaan', path: '/terms' },
     { name: 'Kebijakan Privasi', path: '/privacy' },
-    { name: 'FAQ', path: '/tentang' },
+    { name: 'FAQ', path: '/tentang#faq' },
     { name: 'Kontak', path: '/kontak' },
   ];
 

@@ -9,6 +9,9 @@ import { signIn } from 'next-auth/react';
 
 export default function MasukPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const logoColors = {
     title: "text-[#56ABD7]",
@@ -63,16 +66,19 @@ export default function MasukPage() {
 
             <form className="space-y-5" onSubmit={async (e) => {
               e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const email = formData.get('email');
-              const password = formData.get('password');
+              setError('');
 
               const result = await signIn('credentials', {
                 email,
                 password,
-                redirect: true,
-                callbackUrl: '/'
+                redirect: false,
               });
+
+              if (result?.error) {
+                setError('Email atau password salah, atau akun belum terdaftar.');
+              } else {
+                window.location.href = '/';
+              }
             }}>
 
               <div className="relative">
@@ -82,6 +88,8 @@ export default function MasukPage() {
                   type="email"
                   placeholder="Email Address"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#56ABD7] focus:border-[#56ABD7] transition duration-200 bg-gray-50 text-gray-900 placeholder:text-gray-400"
                 />
               </div>
@@ -93,6 +101,8 @@ export default function MasukPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-12 pr-12 py-3 border border-gray-200 rounded-lg focus:ring-1 focus:ring-[#56ABD7] focus:border-[#56ABD7] transition duration-200 bg-gray-50 text-gray-900 placeholder:text-gray-400"
                 />
                 <button
@@ -108,6 +118,11 @@ export default function MasukPage() {
                 </button>
               </div>
 
+              {error && (
+                <div className="bg-red-50 text-red-500 text-sm p-3 rounded-lg text-center animate-pulse">
+                  {error}
+                </div>
+              )}
 
               <div className="text-center text-[#7A7A7A] text-sm mt-6">
                 Atau Masuk Cepat Dengan
@@ -129,7 +144,11 @@ export default function MasukPage() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-[#6B4D27] text-white font-semibold rounded-lg shadow-lg hover:bg-[#7A5F3D] transition duration-300 transform hover:scale-[1.01]"
+                disabled={!email || !password}
+                className={`w-full py-3 font-semibold rounded-lg shadow-lg transition duration-300 transform 
+                  ${(!email || !password)
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-[#6B4D27] text-white hover:bg-[#7A5F3D] hover:scale-[1.01]'}`}
               >
                 Masuk
               </button>
