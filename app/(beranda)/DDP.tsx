@@ -67,12 +67,12 @@ const DDP: React.FC<DDPProps> = ({
       }}
     >
       <div className="flex-shrink-0 w-8 md:w-10 text-right">
-        <span className="text-2xl md:text-3xl font-bold text-[#1A1A1A] dark:text-white leading-none">
+        <span className="text-2xl md:text-3xl font-bold text-[#1A1A1A] leading-none">
           {item.number}.
         </span>
       </div>
       <div>
-        <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg font-medium leading-snug pt-1">
+        <p className="text-gray-600 text-base md:text-lg font-medium leading-snug pt-1">
           {item.text}
         </p>
       </div>
@@ -82,14 +82,14 @@ const DDP: React.FC<DDPProps> = ({
   return (
     <section
       ref={sectionRef}
-      className={`relative py-20 px-6 md:px-12 lg:px-[150px] overflow-hidden bg-white dark:bg-[#1E1C1B] ${dmSans.className}`}
+      className={`relative py-20 px-6 md:px-12 lg:px-[150px] overflow-hidden bg-white ${dmSans.className}`}
     >
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="/Image/Vector.webp"
           alt="Background Pattern"
           fill
-          className="object-cover opacity-25 dark:opacity-10"
+          className="object-cover opacity-25"
         />
       </div>
 
@@ -99,7 +99,7 @@ const DDP: React.FC<DDPProps> = ({
           className={`text-center mb-16 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
             }`}
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A1A1A] dark:text-white mb-4 tracking-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1A1A1A] mb-4 tracking-tight">
             Dasa Darma Pramuka
           </h2>
           <p className="text-gray-400 text-lg md:text-xl font-medium">

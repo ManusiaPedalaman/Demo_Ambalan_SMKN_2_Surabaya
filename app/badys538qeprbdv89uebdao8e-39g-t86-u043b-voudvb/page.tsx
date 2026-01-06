@@ -132,33 +132,36 @@ export default function DashboardPage() {
             setLoading(true);
             try {
 
-                const counts = await getDashboardStats();
+                const [
+                    counts,
+                    admins,
+                    joins,
+                    bookings,
+                    contacts,
+                    renters,
+                    users,
+                    materi,
+                    products
+                ] = await Promise.all([
+                    getDashboardStats(),
+                    getAdminUsers(),
+                    getJoinsList(),
+                    getBookingsList(),
+                    getContactsList(),
+                    getRentersList(),
+                    getUsersList(),
+                    getMateriList(),
+                    getProductsList()
+                ]);
+
                 setStatsCounts(counts);
-
-
-                const admins = await getAdminUsers();
                 setAdminData(admins);
-
-
-                const joins = await getJoinsList();
                 setJoinsData(joins);
-
-                const bookings = await getBookingsList();
                 setBookingsData(bookings);
-
-                const contacts = await getContactsList();
                 setContactsData(contacts);
-
-                const renters = await getRentersList();
                 setRentersData(renters);
-
-                const users = await getUsersList();
                 setUserData(users);
-
-                const materi = await getMateriList();
                 setMateriData(materi);
-
-                const products = await getProductsList();
                 setProductData(products);
 
             } catch (error) {
@@ -832,7 +835,7 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 6: 
+            case 6:
                 if (adminData.length === 0) {
                     return (
                         <tbody>
@@ -872,7 +875,7 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
-            case 7: 
+            case 7:
                 if (materiData.length === 0) {
                     return (
                         <tbody>

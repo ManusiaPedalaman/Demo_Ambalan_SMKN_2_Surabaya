@@ -82,7 +82,7 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
       </div>
 
 
-      <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4 
+      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4 
         transition-colors duration-300"
         style={{
           color: 'inherit',
@@ -93,8 +93,8 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
       </h3>
 
 
-      <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed max-w-xs md:max-w-none
-        group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors duration-300 text-justify">
+      <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-xs md:max-w-none
+        group-hover:text-gray-700 transition-colors duration-300 text-justify">
         {description}
       </p>
 
@@ -145,7 +145,7 @@ const Penjelasan1 = ({
   return (
     <section
 
-      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px] bg-gradient-to-b from-white to-[#7A5F3D]/5 dark:from-gray-900 dark:to-gray-950 transition-colors duration-500"
+      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px] bg-gradient-to-b from-white to-[#7A5F3D]/5 transition-colors duration-500"
       style={{
         paddingTop,
         paddingBottom,
@@ -165,7 +165,7 @@ const Penjelasan1 = ({
           className={`mb-12 md:mb-16 transition-all duration-1000 ease-out
             ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-8'}`}
         >
-          <h2 className={`text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 md:mb-5 
+          <h2 className={`text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-5 
             leading-tight transition-all duration-700 delay-300
             ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             Kenapa Harus{' '}
@@ -175,7 +175,7 @@ const Penjelasan1 = ({
             </span>
           </h2>
 
-          <p className={`text-gray-600 dark:text-gray-300 text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl
+          <p className={`text-gray-600 text-base md:text-lg lg:text-xl leading-relaxed max-w-4xl
             transition-all duration-700 delay-500
             ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             Karena Pramuka hadir untuk membentuk karakter, keterampilan, dan jiwa kepemimpinan generasi muda.

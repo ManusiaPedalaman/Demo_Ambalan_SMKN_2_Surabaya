@@ -142,16 +142,25 @@ import { prisma } from "@/lib/prisma";
 
 export async function getDashboardStats() {
     try {
-        const adminCount = await prisma.dataAdminTerdaftar.count();
-        const userCount = await prisma.dataUserLogin.count();
-        const productCount = await prisma.dataProdukTersedia.count();
-        const eventCount = await prisma.dataMateriLatihan.count();
-
-
-        const joinsCount = await prisma.dataAnggotaJoin.count();
-        const bookingsCount = await prisma.dataProdukTersewa.count();
-        const contactsCount = await prisma.dataUserHubungi.count();
-        const rentersCount = await prisma.dataCustomerPenyewa.count();
+        const [
+            adminCount,
+            userCount,
+            productCount,
+            eventCount,
+            joinsCount,
+            bookingsCount,
+            contactsCount,
+            rentersCount
+        ] = await Promise.all([
+            prisma.dataAdminTerdaftar.count(),
+            prisma.dataUserLogin.count(),
+            prisma.dataProdukTersedia.count(),
+            prisma.dataMateriLatihan.count(),
+            prisma.dataAnggotaJoin.count(),
+            prisma.dataProdukTersewa.count(),
+            prisma.dataUserHubungi.count(),
+            prisma.dataCustomerPenyewa.count()
+        ]);
 
         return {
             adminCount,
