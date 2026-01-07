@@ -82,7 +82,7 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
       </div>
 
 
-      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4 
+      <h3 className="text-xl md:text-2xl font-bold text-[#1A1A1A] mb-3 md:mb-4 
         transition-colors duration-300"
         style={{
           color: 'inherit',

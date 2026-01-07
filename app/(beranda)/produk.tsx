@@ -59,9 +59,9 @@ const Produk = () => {
   const products: Product[] = [
     {
       id: 1,
-      name: 'Tenda Segitiga/Kerucut',
-      price: '30k',
-      duration: '3 hari',
+      name: 'Tenda Prisma',
+      price: '25k',
+      duration: '1 hari',
       image: '/Image/tenda1.webp',
       slug: 'tenda-segitiga',
     },

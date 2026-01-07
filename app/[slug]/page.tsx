@@ -311,7 +311,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
           <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">{product.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-[#1A1A1A] dark:text-[#1A1A1A] ">{product.name}</h1>
               {dbStatus === 'Memuat...' ? (
                 <Skeleton className="mt-2 md:mt-0 w-32 h-8 rounded-full" />
               ) : (

@@ -1,15 +1,15 @@
 export const products = [
     {
         slug: 'tenda-segitiga',
-        name: 'Tenda Segitiga/Kerucut',
-        dbName: 'Tenda Segitiga/Kerucut',
-        price: 30000,
+        name: 'Tenda Prisma',
+        dbName: 'Tenda Prisma',
+        price: 25000,
         originalPrice: 50000,
-        duration: '3 hari',
+        duration: '1 hari',
         status: 'Tersedia',
         images: ['/Image/tenda1.webp', '/Image/tenda1.webp', '/Image/tenda1.webp'],
-        specs: { berat: '1.5kg', muat: '6 - 8 Orang', dimensi: '200 X 260 X 160 cm', ketahananAir: '2000mm' },
-        description: `Tenda segitiga, atau yang sering disebut tenda ridge, adalah jenis tenda yang memiliki bentuk menyerupai atap rumah dengan bagian atas berbentuk segitiga.`,
+        specs: { berat: '1.5kg', muat: '8 - 10 Orang', dimensi: '200 X 260 X 160 cm', ketahananAir: '2000mm' },
+        description: `Tenda ridge, atau yang sering disebut tenda prisma, adalah jenis tenda yang memiliki bentuk menyerupai atap rumah dengan bagian atas berbentuk segitiga.`,
         features: [
             { title: 'Kapasitas', desc: 'Tersedia dalam berbagai ukuran, mulai dari tenda kecil untuk 1-2 orang.' },
             { title: 'Material', desc: 'D300 Canvas/Terpal.' }
@@ -51,15 +51,15 @@ export const products = [
         slug: 'paket-lengkap',
         name: 'Paket Lengkap Camping',
         dbName: 'Paket Lengkap', 
-        price: 40000, 
+        price: 30000, 
         originalPrice: 75000,
         duration: '3 hari',
         status: 'Tersedia',
         images: ['/Image/paket_lengkap.webp', '/Image/paket_lengkap.webp', '/Image/paket_lengkap.webp'],
-        specs: { berat: '5kg', muat: '4 Orang', dimensi: 'Varies', ketahananAir: 'High' },
-        description: `Paket hemat untuk berkemah. Termasuk tenda, matras, dan alat masak sederhana.`,
+        specs: { berat: '5kg', muat: '8 - 10 Orang', dimensi: 'Varies', ketahananAir: 'High' },
+        description: `Paket hemat untuk berkemah. Termasuk tenda, dan 2 tongkat pramuka.`,
         features: [
-            { title: 'Isi Paket', desc: 'Tenda, Matras, Kompor, Nesting.' },
+            { title: 'Isi Paket', desc: 'Tenda, dan 2 tongkat pramuka.' },
             { title: 'Kelebihan', desc: 'Lebih hemat dan praktis.' }
         ]
     },
@@ -69,7 +69,7 @@ export const products = [
         dbName: 'Tali Pramuka', 
         price: 10000,
         originalPrice: 15000,
-        duration: '3 hari',
+        duration: '1 hari',
         status: 'Tersedia',
         images: ['/Image/tali.webp', '/Image/tali.webp', '/Image/tali.webp'],
         specs: { berat: '0.3kg', muat: '-', dimensi: '10 meter', ketahananAir: '-' },
