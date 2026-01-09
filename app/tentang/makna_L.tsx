@@ -2,9 +2,9 @@
 
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DM_Sans } from 'next/font/google';
-
+import { Maximize2, X, Download } from 'lucide-react';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -15,6 +15,7 @@ const dmSans = DM_Sans({
 const MaknaL = () => {
 
   const [isZoomed, setIsZoomed] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [position, setPosition] = useState({ x: 50, y: 50 });
   const imageRef = useRef<HTMLDivElement>(null);
 
@@ -138,17 +139,13 @@ const MaknaL = () => {
                 }}
                 className="p-2 bg-white/90 rounded-full shadow-lg text-gray-700 hover:text-[#C9A86A] backdrop-blur-sm"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" /></svg>
+                <Download size={20} />
               </button>
               <button
-                onClick={() => setIsZoomed(!isZoomed)}
+                onClick={() => setSelectedImage('/Image/LogoAmbalanfull.webp')}
                 className="p-2 bg-white/90 rounded-full shadow-lg text-gray-700 hover:text-[#C9A86A] backdrop-blur-sm"
               >
-                {isZoomed ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3" /><path d="M21 8h-3a2 2 0 0 1-2-2V3" /><path d="M3 16h3a2 2 0 0 1 2 2v3" /><path d="M16 21v-3a2 2 0 0 1 2-2h3" /></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
-                )}
+                <Maximize2 size={20} />
               </button>
             </div>
 
@@ -160,6 +157,35 @@ const MaknaL = () => {
         </div>
 
       </div>
+
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
+          >
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-4 right-4 md:top-8 md:right-8 text-white/50 hover:text-white transition-colors"
+            >
+              <X size={32} />
+            </button>
+
+            <motion.img
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              src={selectedImage}
+              alt="Fullscreen Preview"
+              className="max-w-full max-h-full rounded-lg shadow-2xl object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

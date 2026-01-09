@@ -23,7 +23,7 @@ export default function Sidebar() {
 
             <button
                 onClick={toggleMobile}
-                className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-white rounded-lg shadow-md text-gray-600 hover:text-[#8B6E4A] transition-colors"
+                className="lg:hidden fixed top-4 left-4 z-[110] p-2 bg-white rounded-lg shadow-md text-gray-600 hover:text-[#8B6E4A] transition-colors"
             >
                 {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -36,7 +36,7 @@ export default function Sidebar() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setIsMobileOpen(false)}
-                        className="fixed inset-0 bg-black/50 z-[40] lg:hidden backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/50 z-[90] lg:hidden backdrop-blur-sm"
                     />
                 )}
             </AnimatePresence>
@@ -88,7 +88,7 @@ export default function Sidebar() {
 
 
             <div className={`
-                fixed top-0 left-0 h-screen bg-white border-r border-gray-100 flex flex-col z-[50] font-dm-sans w-64
+                fixed top-0 left-0 bottom-0 h-[100dvh] bg-white border-r border-gray-100 flex flex-col z-[100] font-dm-sans w-64
                 transform transition-transform duration-300 ease-in-out
                 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
                 lg:translate-x-0

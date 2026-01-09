@@ -33,7 +33,7 @@ const AffiliationSlider = () => {
     >
       <style>{styles}</style>
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-[100px] relative">
+      <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-[10px] relative">
 
 
         <div className="absolute top-0 left-0 z-10 w-20 md:w-32 lg:w-[1000px] h-full bg-gradient-to-r from-[#1a1a1a] to-transparent pointer-events-none" />

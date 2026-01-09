@@ -163,7 +163,7 @@ const Footer = () => {
               <Link href="/tentang#faq" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
                 FAQ
               </Link>
-              <Link href="/kontak" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
+              <Link href="/hubungi_kami#medsos" className="text-gray-500 font-medium hover:text-[#C7A682] hover:translate-x-1 transition-all duration-300 w-fit">
                 Kontak
               </Link>
             </div>

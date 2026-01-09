@@ -353,7 +353,7 @@ export default function Navbar() {
                           className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
                         >
                           <User size={20} className='text-gray-300' />
-                          Edit Profile
+                          Profile
                         </button>
 
 

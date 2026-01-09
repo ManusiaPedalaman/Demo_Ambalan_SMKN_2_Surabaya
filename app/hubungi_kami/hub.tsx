@@ -517,9 +517,9 @@ export default function Hub() {
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">SMKN 2 Surabaya</h3>
                   <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded mt-1 inline-block uppercase tracking-wider">
-                    Markas Ambalan
+                    Camp Ambalan
                     <br />
-                    07.00 - 17.00
+                    Buka : 07.00 - 17.00
                   </span>
                 </div>
                 <div className="bg-gray-100 p-2 rounded-lg">

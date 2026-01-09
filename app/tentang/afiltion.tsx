@@ -13,7 +13,6 @@ const AffiliationSlider = () => {
     '/Icon/Logo.svg',
   ];
 
-
   const styles = `
     @keyframes infinite-scroll {
       from { transform: translateX(0); }
@@ -34,10 +33,12 @@ const AffiliationSlider = () => {
     >
       <style>{styles}</style>
 
-      <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-[315px] relative">
+      <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-[10px] relative">
+
 
         <div className="absolute top-0 left-0 z-10 w-20 md:w-32 lg:w-[1000px] h-full bg-gradient-to-r from-[#1a1a1a] to-transparent pointer-events-none" />
         <div className="absolute top-0 right-0 z-10 w-20 md:w-32 lg:w-[1000px] h-full bg-gradient-to-l from-[#1a1a1a] to-transparent pointer-events-none" />
+
 
         <div className="flex overflow-hidden group cursor-pointer">
 
@@ -61,7 +62,7 @@ const AffiliationSlider = () => {
               <div key={`logo-2-${index}`} className="flex items-center justify-center min-w-[120px] md:min-w-[180px]">
                 <Image
                   src={logo}
-                  alt={`Partner ${index + 1}`}
+                  alt={`Logo Partner ${index + 1} - Ambalan SMKN 2 Surabaya`}
                   width={180}
                   height={60}
                   className="h-10 md:h-14 w-auto object-contain opacity-50 grayscale transition-all duration-300 hover:grayscale-0 hover:opacity-100 hover:scale-110"
