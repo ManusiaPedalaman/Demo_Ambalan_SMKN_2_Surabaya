@@ -330,7 +330,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
             </div>
 
             <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3 mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
+              <h2 className="text-3xl font-bold text-[#1A1A1A] dark:text-[#1A1A1A]">
                 Rp {product.price.toLocaleString('id-ID')} <span className="text-lg font-medium text-gray-500 dark:text-gray-400">/ {product.duration}</span>
               </h2>
               <span className="text-gray-400 line-through font-medium dark:text-gray-500">

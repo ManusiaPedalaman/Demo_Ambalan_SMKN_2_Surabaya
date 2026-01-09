@@ -61,7 +61,7 @@ const Footer = () => {
     { name: 'Ketentuan Penggunaan', path: '/terms' },
     { name: 'Kebijakan Privasi', path: '/privacy' },
     { name: 'FAQ', path: '/tentang#faq' },
-    { name: 'Kontak', path: '/kontak' },
+    { name: 'Kontak', path: '/hubungi_kami#medsos' },
   ];
 
 

@@ -85,7 +85,7 @@ const FeatureCard = ({ icon, title, description, index }: FeatureCardProps) => {
       <h3 className="text-xl md:text-2xl font-bold text-[#1A1A1A] mb-3 md:mb-4 
         transition-colors duration-300"
         style={{
-          color: 'inherit',
+          color: '#1A1A1A',
           '--group-hover-color': '#7A5F3D'
         } as React.CSSProperties & { '--group-hover-color': string }}
       >

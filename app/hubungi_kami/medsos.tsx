@@ -43,8 +43,8 @@ const contactData = [
   {
     id: 3,
     label: "Nomor Whatsapp",
-    value: "(+62) 87855875733",
-    link: "https://wa.me/6287855875733",
+    value: "(+62) 85890407599",
+    link: "https://wa.me/6285890407599",
     description: [
       "Kakak Admin",
       "Ambalan SMKN 2 Surabaya"
