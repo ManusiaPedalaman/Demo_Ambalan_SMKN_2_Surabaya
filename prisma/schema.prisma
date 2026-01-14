@@ -9,83 +9,101 @@ datasource db {
 }
 
 model DataUserLogin {
-  id_login      String  @id
-  email         String
-  password_hash String
-  status        String? @default("Login")
-  created_at    DateTime? @default(now()) @map("created_at")
+  id_login         String          @id
+  email            String
+  password_hash    String
+  status           String?         @default("Login")
+  nama_lengkap     String?
+  no_wa            String?
+  tgl_lahir        DateTime?       @db.Date
+  sekolah_instansi String?
+  kelas            String?
+  jurusan          String?
+  foto             String?
+  created_at       DateTime?       @default(now()) @map("created_at")
+  umkm             DataUmkm[]
+  hasil_kuis       DataHasilKuis[]
 
   @@map("data_user_login")
 }
 
 model DataProdukTersedia {
-  id_produk   String  @id
-  nama_produk String
-  status      String? @default("Tersedia")
+  id_produk           String                @id
+  nama_produk         String
+  status              String?               @default("Tersedia")
+  // Relation removed to avoid non-unique reference error
+  DataProdukTersewa   DataProdukTersewa[]
+  DataCustomerPenyewa DataCustomerPenyewa[]
 
   @@map("data_produk_tersedia")
 }
 
 model DataMateriLatihan {
-  id_materi   String  @id
+  id_materi   String          @id
   nama_materi String
   topik       String?
   icon        String?
   content     Json?
+  hasil_kuis  DataHasilKuis[]
 
   @@map("data_materi_latihan")
 }
 
 model DataUserHubungi {
-  id           BigInt  @id @default(autoincrement())
-  nama_lengkap String?
-  email        String?
-  no_wa        String?
-  pesan        String?
-  status       String? @default("Belum Terjawab")
+  id                  BigInt  @id @default(autoincrement())
+  nama_lengkap        String?
+  email               String?
+  no_wa               String?
+  pesan               String?
+  status              String? @default("Belum Terjawab")
+  telegram_message_id Int?
 
   @@map("data_user_hubungi")
 }
 
 model DataAnggotaJoin {
-  id            BigInt    @id @default(autoincrement())
-  nama_lengkap  String?
-  tanggal_lahir DateTime? @db.Date
-  no_wa         String?
-  asal_sekolah  String?
-  kelas         String?
-  jurusan       String?
-  pesan         String?
-  created_at    DateTime? @default(now()) @map("created_at")
+  id                  BigInt    @id @default(autoincrement())
+  nama_lengkap        String?
+  tanggal_lahir       DateTime? @db.Date
+  no_wa               String?
+  asal_sekolah        String?
+  kelas               String?
+  jurusan             String?
+  pesan               String?
+  created_at          DateTime? @default(now()) @map("created_at")
+  telegram_message_id Int?
 
   @@map("data_anggota_join")
 }
 
 model DataProdukTersewa {
-  id               BigInt    @id @default(autoincrement())
-  id_produk        String?
-  nama_produk      String?
-  tgl_pengambilan  DateTime? @db.Date
-  tgl_pengembalian DateTime? @db.Date
-  jam_sewa         String?
-  jam_kembali      String?
-  jumlah_produk    String?
-  nama_peminjam    String?
-  status_kembali   String?   @default("Belum")
+  id                  BigInt              @id @default(autoincrement())
+  id_produk           String?
+  produk              DataProdukTersedia? @relation(fields: [id_produk], references: [id_produk])
+  nama_produk         String?
+  tgl_pengambilan     DateTime?           @db.Date
+  tgl_pengembalian    DateTime?           @db.Date
+  jam_sewa            String?
+  jam_kembali         String?
+  jumlah_produk       String?
+  nama_peminjam       String?
+  status_kembali      String?             @default("Belum")
+  telegram_message_id Int?
 
   @@map("data_produk_tersewa")
 }
 
 model DataCustomerPenyewa {
-  id               BigInt  @id @default(autoincrement())
+  id               BigInt              @id @default(autoincrement())
   nama_customer    String?
   sekolah_instansi String?
   produk_disewa    String?
+  produk           DataProdukTersedia? @relation(fields: [produk_disewa], references: [id_produk])
   no_wa            String?
   metode_bayar     String?
   jam_pengambilan  String?
   jam_pengembalian String?
-  status_bayar     String? @default("Belum")
+  status_bayar     String?             @default("Belum")
 
   @@map("data_customer_penyewa")
 }
@@ -126,4 +144,49 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model DataUmkm {
+  id           BigInt           @id @default(autoincrement())
+  id_user      String
+  user         DataUserLogin    @relation(fields: [id_user], references: [id_login])
+  nama_umkm    String
+  no_wa        String
+  kelas        String
+  jurusan      String
+  nama_lengkap String
+  status       String           @default("PENDING") // PENDING, APPROVED, REJECTED
+  alasan_tolak String?
+  created_at   DateTime         @default(now())
+  produk       DataProdukUmkm[]
+
+  @@map("data_umkm")
+}
+
+model DataProdukUmkm {
+  id           BigInt   @id @default(autoincrement())
+  id_umkm      BigInt
+  umkm         DataUmkm @relation(fields: [id_umkm], references: [id])
+  nama_produk  String
+  deskripsi    String?
+  harga        String
+  gambar       String?
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  alasan_tolak String?
+  created_at   DateTime @default(now())
+
+  @@map("data_produk_umkm")
+}
+
+model DataHasilKuis {
+  id           BigInt            @id @default(autoincrement())
+  id_user      String
+  user         DataUserLogin     @relation(fields: [id_user], references: [id_login])
+  id_materi    String
+  materi       DataMateriLatihan @relation(fields: [id_materi], references: [id_materi])
+  jawaban_user Json // Menyimpan array jawaban user
+  skor         Int
+  tanggal      DateTime          @default(now())
+
+  @@map("data_hasil_kuis")
 }

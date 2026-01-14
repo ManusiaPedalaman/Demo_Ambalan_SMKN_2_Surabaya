@@ -489,7 +489,7 @@ export default function Navbar() {
                 className="w-full text-left font-medium py-3 transition-all duration-300 text-lg border-b border-gray-100 text-[#3D3D3D]"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
-                Edit Profile
+                Profile
               </button>
 
               {isAdmin && (

@@ -31,3 +31,28 @@ export async function sendTelegramNotification(message: string) {
         console.error('Error sending Telegram message:', error);
     }
 }
+
+
+export async function editTelegramMessage(messageId: number, newText: string) {
+    if (!DEFAULT_CHAT_ID) return;
+
+    try {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: DEFAULT_CHAT_ID,
+                message_id: messageId,
+                text: newText,
+                parse_mode: 'Markdown',
+            }),
+        });
+
+        if (!response.ok) {
+            console.error('Failed to edit Telegram message:', await response.json());
+        }
+    } catch (error) {
+        console.error('Error editing Telegram message:', error);
+    }
+}

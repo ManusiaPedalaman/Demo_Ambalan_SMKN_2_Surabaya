@@ -320,7 +320,8 @@ export default function DashboardPage() {
                 menuItems = [
                     { label: 'Sudah', action: 'status_sudah' },
                     { label: 'Belum', color: 'text-red-600', action: 'status_belum' },
-                    { label: 'Detail', action: 'detail' }
+                    { label: 'Detail', action: 'detail' },
+                    { label: 'Hapus', color: 'text-red-600', action: 'delete' }
                 ];
                 break;
             case 5: 

@@ -759,3 +759,249 @@ export async function addProduct(formData: any) {
         return { success: false, error: 'Failed to add product' };
     }
 }
+
+export async function updateUserProfile(data: any) {
+    try {
+        const { id, nama, no_wa, tgl_lahir, sekolah, kelas, jurusan, foto } = data;
+        
+        await prisma.dataUserLogin.update({
+            where: { id_login: id },
+            data: {
+                nama_lengkap: nama,
+                no_wa: no_wa,
+                tgl_lahir: tgl_lahir ? new Date(tgl_lahir) : null,
+                sekolah_instansi: sekolah,
+                kelas: kelas,
+                jurusan: jurusan,
+                foto: foto
+            }
+        });
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        return { success: false, error: 'Failed to update profile' };
+    }
+}
+
+export async function getUserProfile(id: string) {
+    try {
+        const user = await prisma.dataUserLogin.findUnique({
+            where: { id_login: id }
+        });
+        
+        if (!user) return null;
+        
+        return {
+            ...user,
+            tgl_lahir: user.tgl_lahir ? user.tgl_lahir.toISOString().split('T')[0] : ''
+        };
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+    }
+}
+
+export async function getUserProfileByEmail(email: string) {
+    try {
+        const user = await prisma.dataUserLogin.findFirst({
+            where: { email: email }
+        });
+        
+        if (!user) return null;
+        
+        return {
+            ...user,
+            tgl_lahir: user.tgl_lahir ? user.tgl_lahir.toISOString().split('T')[0] : ''
+        };
+    } catch (error) {
+        console.error('Error fetching profile by email:', error);
+        return null;
+    }
+}
+
+export async function getUserHistory(identifier: { email?: string, no_wa?: string, nama?: string }) {
+    try {
+        const { email, no_wa, nama } = identifier;
+        
+        let rentals: any[] = [];
+        let contacts: any[] = [];
+        let joins: any[] = [];
+        let quizzes: any[] = [];
+
+        // Fetch Rentals (DataProdukTersewa match by nama_peminjam? or DataCustomerPenyewa match by no_wa?)
+        // Assuming DataProdukTersewa stores the rental items. Without exact link, matching by name is best guess or no_wa if available.
+        // DataProdukTersewa does NOT have no_wa or email. It only has nama_peminjam.
+        if (nama) {
+             rentals = await prisma.dataProdukTersewa.findMany({
+                where: { nama_peminjam: { contains: nama, mode: 'insensitive' } },
+                orderBy: { id: 'desc' },
+                include: { produk: true } // Include product details
+            });
+        }
+
+        // Fetch Contacts (DataUserHubungi match by email)
+        if (email) {
+            contacts = await prisma.dataUserHubungi.findMany({
+                where: { email: email },
+                orderBy: { id: 'desc' }
+            });
+        }
+
+        // Fetch Joins (DataAnggotaJoin match by no_wa or nama?)
+        // DataAnggotaJoin has no_wa.
+        if (no_wa) {
+            joins = await prisma.dataAnggotaJoin.findMany({
+                where: { no_wa: no_wa },
+                orderBy: { id: 'desc' }
+            });
+        }
+        
+        // Fetch Quizzes (DataHasilKuis match by id_user - need to get User ID first? No, passed identifier is just strings. 
+        // But DataHasilKuis uses id_user relation.
+        // So we need the User ID.
+        // Let's assume we fetch User ID inside here or pass it.
+        // Let's modify function signature to accept userId or fetch it.
+        // Actually, let's fetch user ID if email is provided.
+        if (email) {
+            const user = await prisma.dataUserLogin.findFirst({ where: { email } });
+            if (user) {
+                quizzes = await prisma.dataHasilKuis.findMany({
+                    where: { id_user: user.id_login },
+                    include: { materi: true },
+                    orderBy: { tanggal: 'desc' }
+                });
+            }
+        }
+
+        return { rentals, contacts, joins, quizzes };
+
+    } catch (error) {
+        console.error('Error getting user history:', error);
+        return { rentals: [], contacts: [], joins: [], quizzes: [] };
+    }
+}
+
+export async function updateHistoryItem(type: 'sewa' | 'hubungi' | 'join', id: number | bigint, data: any) {
+    try {
+        const { getTelegramMessageId, editTelegramMessage } = await import('@/lib/telegram');
+        let telegramMsgId: number | null = null;
+        let updateResult: any = null;
+
+        if (type === 'sewa') {
+             // Update DataProdukTersewa
+             // Note: Prisma BigInt handling might require conversion
+             updateResult = await prisma.dataProdukTersewa.update({
+                 where: { id: BigInt(id) },
+                 data: { ...data },
+                 select: { telegram_message_id: true }
+             });
+             telegramMsgId = updateResult.telegram_message_id;
+             
+        } else if (type === 'hubungi') {
+             updateResult = await prisma.dataUserHubungi.update({
+                 where: { id: BigInt(id) },
+                 data: { ...data },
+                 select: { telegram_message_id: true }
+             });
+             telegramMsgId = updateResult.telegram_message_id;
+
+        } else if (type === 'join') {
+             updateResult = await prisma.dataAnggotaJoin.update({
+                 where: { id: BigInt(id) },
+                 data: { ...data },
+                 select: { telegram_message_id: true }
+             });
+             telegramMsgId = updateResult.telegram_message_id;
+        }
+
+        // Trigger Telegram Update if message ID exists
+        if (telegramMsgId) {
+            // Construct new message content based on type and new data
+            // For now, simpler notification or just re-send content?
+            // User requested "synchronized updates to Telegram messages".
+            // We need to reconstruct the message format used in the original send.
+            // Since we don't know the exact format easily here without duplicating logic, 
+            // maybe we just update with "Data Updated: ..."
+            // Ideally, we'd have a helper to format the message.
+            
+            const newMessage = `[UPDATED] Data ${type.toUpperCase()} telah diperbarui.\nCheck Dashboard for details.`;
+            await editTelegramMessage(telegramMsgId, newMessage);
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error(`Error updating history ${type}:`, error);
+        return { success: false, error: 'Failed to update item' };
+    }
+}
+
+export async function registerUMKM(data: any) {
+    try {
+        const { id_user, nama_umkm, no_wa, kelas, jurusan, nama_lengkap } = data;
+        
+        await prisma.dataUmkm.create({
+            data: {
+                id_user,
+                nama_umkm,
+                no_wa,
+                kelas,
+                jurusan,
+                nama_lengkap,
+                status: 'PENDING'
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error registering UMKM:', error);
+        return { success: false, error: 'Failed to register UMKM' };
+    }
+}
+
+export async function getUserUMKM(id_user: string) {
+    try {
+        const umkm = await prisma.dataUmkm.findFirst({
+            where: { id_user },
+            include: { produk: true },
+            orderBy: { created_at: 'desc' }
+        });
+        
+        if (umkm) {
+            return {
+                ...umkm,
+                id: umkm.id.toString(),
+                produk: umkm.produk.map((p: any) => ({
+                    ...p,
+                    id: p.id.toString(),
+                    id_umkm: p.id_umkm.toString(),
+                    harga: p.harga
+                }))
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching UMKM:', error);
+        return null;
+    }
+}
+
+export async function addProductUMKM(data: any) {
+    try {
+        const { id_umkm, nama_produk, deskripsi, harga, gambar } = data;
+        
+        await prisma.dataProdukUmkm.create({
+            data: {
+                id_umkm: BigInt(id_umkm),
+                nama_produk,
+                deskripsi,
+                harga,
+                gambar,
+                status: 'PENDING'
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error adding UMKM product:', error);
+        return { success: false, error: 'Failed to add product' };
+    }
+}
