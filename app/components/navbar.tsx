@@ -348,13 +348,14 @@ export default function Navbar() {
                       <div className='flex flex-col p-2 pt-0'>
 
 
-                        <button
-                          onClick={handleProfileImageChange}
+                        <Link
+                          href="/dashboard/user"
+                          onClick={() => setIsProfileMenuOpen(false)}
                           className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
                         >
-                          <User size={20} className='text-gray-300' />
-                          Profile
-                        </button>
+                          <LayoutDashboard size={20} className='text-gray-300' />
+                          Dashboard
+                        </Link>
 
 
                         {isAdmin && (
@@ -481,16 +482,14 @@ export default function Navbar() {
           {session ? (
             <>
 
-              <button
-                onClick={() => {
-                  handleProfileImageChange();
-                  setIsMobileMenuOpen(false);
-                }}
+              <Link
+                href="/dashboard/user"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className="w-full text-left font-medium py-3 transition-all duration-300 text-lg border-b border-gray-100 text-[#3D3D3D]"
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
-                Profile
-              </button>
+                Dashboard
+              </Link>
 
               {isAdmin && (
                 <Link

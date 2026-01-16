@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { getUserProfileByEmail, getUserUMKM, addProductUMKM } from '@/app/actions';
-import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
+
 
 export default function UMKMDashboardPage() {
     const { data: session } = useSession();
@@ -180,7 +180,7 @@ export default function UMKMDashboardPage() {
                                 {produk.gambar ? (
                                     <img src={produk.gambar} alt={produk.nama_produk} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400"><Image size={32} /></div> // Needs correct import for icon
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon size={32} /></div> // Needs correct import for icon
                                 )}
                                 <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold
                                     ${produk.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 

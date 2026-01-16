@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Package, Users, FileText, Phone, LogOut, ChevronDown, ChevronRight, Flame, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Users, FileText, Phone, LogOut, ChevronDown, ChevronRight, Flame, Menu, X, Store } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -175,6 +175,36 @@ export default function Sidebar() {
                     </Link>
 
 
+
+                    <div className="pt-4 pb-2">
+                        <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Konfirmasi User</p>
+                    </div>
+
+                    <Link
+                        href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/konfirmasi-umkm"
+                        onClick={() => setIsMobileOpen(false)}
+                        className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group
+                            ${pathname === '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/konfirmasi-umkm'
+                                ? 'bg-[#997B55] text-white shadow-lg shadow-[#997B55]/20'
+                                : 'text-gray-500 hover:bg-gray-50 hover:text-[#997B55]'}
+                        `}
+                    >
+                        <Store size={22} className={pathname === '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/konfirmasi-umkm' ? 'text-white' : 'text-gray-400 group-hover:text-[#997B55]'} strokeWidth={1.5} />
+                        <span className="font-medium text-[15px]">Konfirmasi UMKM</span>
+                    </Link>
+
+                    <Link
+                        href="/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/konfirmasi-produk"
+                        onClick={() => setIsMobileOpen(false)}
+                        className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group
+                            ${pathname === '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/konfirmasi-produk'
+                                ? 'bg-[#997B55] text-white shadow-lg shadow-[#997B55]/20'
+                                : 'text-gray-500 hover:bg-gray-50 hover:text-[#997B55]'}
+                        `}
+                    >
+                        <Package size={22} className={pathname === '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb/konfirmasi-produk' ? 'text-white' : 'text-gray-400 group-hover:text-[#997B55]'} strokeWidth={1.5} />
+                        <span className="font-medium text-[15px]">Konfirmasi Produk</span>
+                    </Link>
                 </nav>
 
 

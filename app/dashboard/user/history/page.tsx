@@ -9,11 +9,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Simple Tabs Component
 const Tabs = ({ children, activeTab, onTabChange }: any) => {
     return <div>{React.Children.map(children, child => 
-        React.cloneElement(child, { activeTab, onTabChange })
+        React.isValidElement(child) 
+            ? React.cloneElement(child, { activeTab, onTabChange } as any) 
+            : child
     )}</div>;
 };
 
-const TabList = ({ children }: any) => <div className="flex gap-4 border-b border-gray-100 mb-6">{children}</div>;
+const TabList = ({ children, activeTab, onTabChange }: any) => (
+    <div className="flex gap-4 border-b border-gray-100 mb-6">
+        {React.Children.map(children, child =>
+            React.isValidElement(child)
+                ? React.cloneElement(child, { activeTab, onTabChange } as any)
+                : child
+        )}
+    </div>
+);
 const TabTrigger = ({ value, activeTab, onTabChange, children }: any) => (
     <button
         onClick={() => onTabChange(value)}
@@ -43,7 +53,7 @@ export default function UserHistoryPage() {
                  const profile = await getUserProfileByEmail(session.user.email);
                  const identifier = {
                      email: session.user.email,
-                     nama: profile?.nama_lengkap || session.user.name || undefined,
+                     nama: profile?.nama_lengkap || undefined,
                      no_wa: profile?.no_wa || undefined
                  };
                  const data = await getUserHistory(identifier);
@@ -89,8 +99,8 @@ export default function UserHistoryPage() {
             const profile = await getUserProfileByEmail(session?.user?.email || '');
             const data = await getUserHistory({
                  email: session?.user?.email || '',
-                 nama: profile?.nama_lengkap, 
-                 no_wa: profile?.no_wa 
+                 nama: profile?.nama_lengkap || undefined, 
+                 no_wa: profile?.no_wa || undefined
             });
             setHistoryData(data);
         } else {

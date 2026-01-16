@@ -832,45 +832,61 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
         // Fetch Rentals (DataProdukTersewa match by nama_peminjam? or DataCustomerPenyewa match by no_wa?)
         // Assuming DataProdukTersewa stores the rental items. Without exact link, matching by name is best guess or no_wa if available.
         // DataProdukTersewa does NOT have no_wa or email. It only has nama_peminjam.
+        // Match by nama for rentals
         if (nama) {
-             rentals = await prisma.dataProdukTersewa.findMany({
+             const rawRentals = await prisma.dataProdukTersewa.findMany({
                 where: { nama_peminjam: { contains: nama, mode: 'insensitive' } },
                 orderBy: { id: 'desc' },
-                include: { produk: true } // Include product details
+                include: { produk: true } 
             });
+            rentals = rawRentals.map(item => ({
+                ...item,
+                id: item.id.toString(),
+                tgl_pengambilan: item.tgl_pengambilan ? item.tgl_pengambilan.toISOString() : null,
+                tgl_pengembalian: item.tgl_pengembalian ? item.tgl_pengembalian.toISOString() : null
+            }));
         }
 
-        // Fetch Contacts (DataUserHubungi match by email)
+        // Match by email for contacts
         if (email) {
-            contacts = await prisma.dataUserHubungi.findMany({
+            const rawContacts = await prisma.dataUserHubungi.findMany({
                 where: { email: email },
                 orderBy: { id: 'desc' }
             });
+            contacts = rawContacts.map(item => ({
+                ...item,
+                id: item.id.toString()
+            }));
         }
 
-        // Fetch Joins (DataAnggotaJoin match by no_wa or nama?)
-        // DataAnggotaJoin has no_wa.
+        // Match by no_wa for joins
         if (no_wa) {
-            joins = await prisma.dataAnggotaJoin.findMany({
+            const rawJoins = await prisma.dataAnggotaJoin.findMany({
                 where: { no_wa: no_wa },
                 orderBy: { id: 'desc' }
             });
+            joins = rawJoins.map(item => ({
+                ...item,
+                id: item.id.toString(),
+                tanggal_lahir: item.tanggal_lahir ? item.tanggal_lahir.toISOString() : null,
+                created_at: item.created_at ? item.created_at.toISOString() : null
+            }));
         }
         
-        // Fetch Quizzes (DataHasilKuis match by id_user - need to get User ID first? No, passed identifier is just strings. 
-        // But DataHasilKuis uses id_user relation.
-        // So we need the User ID.
-        // Let's assume we fetch User ID inside here or pass it.
-        // Let's modify function signature to accept userId or fetch it.
-        // Actually, let's fetch user ID if email is provided.
+        // Match by email->user_id for quizzes
         if (email) {
             const user = await prisma.dataUserLogin.findFirst({ where: { email } });
             if (user) {
-                quizzes = await prisma.dataHasilKuis.findMany({
+                const rawQuizzes = await prisma.dataHasilKuis.findMany({
                     where: { id_user: user.id_login },
                     include: { materi: true },
                     orderBy: { tanggal: 'desc' }
                 });
+                quizzes = rawQuizzes.map(item => ({
+                    ...item,
+                    id: item.id.toString(),
+                    tanggal: item.tanggal.toISOString()
+                }));
             }
         }
 
@@ -882,9 +898,9 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
     }
 }
 
-export async function updateHistoryItem(type: 'sewa' | 'hubungi' | 'join', id: number | bigint, data: any) {
+export async function updateHistoryItem(type: 'sewa' | 'hubungi' | 'join', id: string | number | bigint, data: any) {
     try {
-        const { getTelegramMessageId, editTelegramMessage } = await import('@/lib/telegram');
+        const { editTelegramMessage } = await import('@/lib/telegram');
         let telegramMsgId: number | null = null;
         let updateResult: any = null;
 
