@@ -30,7 +30,7 @@ export default function UserDashboardPage() {
                 const history = await getUserHistory({
                     email: session.user.email,
                     nama: name, 
-                    no_wa: profile?.no_wa
+                    no_wa: profile?.no_wa || undefined
                 });
 
                 // Calculate Stats
