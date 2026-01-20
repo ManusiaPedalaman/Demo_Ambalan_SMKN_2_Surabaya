@@ -92,7 +92,7 @@ export default function DashboardPage() {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
 
-    const [activeCard, setActiveCard] = useState<number>(0);
+    const [activeCard, setActiveCard] = useState<number>(8);
 
     useEffect(() => {
         const savedImage = localStorage.getItem('userAvatar');
@@ -169,6 +169,8 @@ export default function DashboardPage() {
         try {
             let result: any = { success: false, error: '' };
             switch (activeCard) {
+                case 8: // Same as case 4
+                case 4: result = await deleteUser(deleteItemId); if (result.success) setUserData(p => p.filter(i => i.id !== deleteItemId)); break;
                 case 0: result = await deleteJoinMember(deleteItemId); if (result.success) setJoinsData(p => p.filter(i => i.id !== deleteItemId)); break;
                 case 2: result = await deleteContactMessage(deleteItemId); if (result.success) setContactsData(p => p.filter(i => i.id !== deleteItemId)); break;
                 case 4: result = await deleteUser(deleteItemId); if (result.success) setUserData(p => p.filter(i => i.id !== deleteItemId)); break;
@@ -229,6 +231,13 @@ export default function DashboardPage() {
 
     const stats = [
         {
+            id: 8,
+            title: 'Total Profile User',
+            value: `${statsCounts.userCount} Profile`, // Reusing userCount as it is the same table
+            icon: Users, // Using Users icon
+            subText: statsCounts.userCount > 0 ? 'Data Terbaru' : 'Belum ada data'
+        },
+        {
             id: 0,
             title: 'Total Anggota yang Join',
             value: `${statsCounts.joinsCount} Anggota Join`,
@@ -273,7 +282,8 @@ export default function DashboardPage() {
 
         const handleDetail = () => {
             let type = 'join';
-            if (activeCard === 0) type = 'join';
+            if (activeCard === 8) type = 'profile_user';
+            else if (activeCard === 0) type = 'join';
             else if (activeCard === 2) type = 'contact';
             else if (activeCard === 4) type = 'user_login';
             else if (activeCard === 6) type = 'admin';
@@ -283,6 +293,7 @@ export default function DashboardPage() {
 
 
         switch (activeCard) {
+            case 8:
             case 0:
             case 2:
             case 4:
@@ -352,6 +363,19 @@ export default function DashboardPage() {
 
 
         switch (activeCard) {
+            case 8:
+                title = 'Data_Profile_User';
+                formattedData = userData.map(item => ({
+                    'Nama Lengkap': item.nama_lengkap || '-',
+                    'Kelas': item.kelas || '-',
+                    'Jurusan': item.jurusan || '-',
+                    'Sekolah': item.sekolah_instansi || '-',
+                    'No WA': item.no_wa || '-',
+                    'Tanggal Lahir': item.tgl_lahir ? new Date(item.tgl_lahir).toLocaleDateString('id-ID') : '-',
+                    'Email': item.email
+                }));
+                break;
+
             case 0:
                 title = 'Data_Anggota_Join';
                 formattedData = joinsData.map(item => ({
@@ -617,6 +641,61 @@ export default function DashboardPage() {
                         </tbody>
                     </>
                 );
+            case 8: // Data Profile User
+                if (userData.length === 0) {
+                    return (
+                        <tbody>
+                            <tr>
+                                <td colSpan={8} className="p-8 text-center text-gray-400">Belum ada data profile user.</td>
+                            </tr>
+                        </tbody>
+                    );
+                }
+                return (
+                    <>
+                        <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
+                            <tr>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Foto</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Nama Lengkap</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Kelas</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Jurusan</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Sekolah</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">No WA</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Tgl Lahir</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 text-center border border-gray-300">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {userData.map((item, idx) => (
+                                <tr key={idx} className={`${idx % 2 === 0 ? 'bg-[#F6F1EB]' : 'bg-white'} hover:bg-[#EBE5DE] transition-colors border-b border-gray-100/50`}>
+                                    <td className="px-6 py-4 font-medium text-gray-600 border border-gray-300">
+                                        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 relative">
+                                            {item.foto ? (
+                                                <Image src={item.foto} alt={item.nama_lengkap || 'User'} fill className="object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-[#997B55] text-white text-xs font-bold">
+                                                    {item.nama_lengkap ? item.nama_lengkap.substring(0, 2).toUpperCase() : 'US'}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-gray-600 border border-gray-300">{item.nama_lengkap || '-'}</td>
+                                    <td className="px-6 py-4 text-gray-600 border border-gray-300">{item.kelas || '-'}</td>
+                                    <td className="px-6 py-4 text-gray-600 border border-gray-300">{item.jurusan || '-'}</td>
+                                    <td className="px-6 py-4 text-gray-600 border border-gray-300">{item.sekolah_instansi || '-'}</td>
+                                    <td className="px-6 py-4 text-gray-600 border border-gray-300">{item.no_wa || '-'}</td>
+                                    <td className="px-6 py-4 text-gray-600 border border-gray-300">
+                                        {item.tgl_lahir ? new Date(item.tgl_lahir).toLocaleDateString('id-ID') : '-'}
+                                    </td>
+                                    <td className="px-6 py-4 text-center border border-gray-300">
+                                        <ActionButton itemId={item.id} index={idx} totalItems={userData.length} />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </>
+                );
+
             default:
                 return (
                     <tbody>
@@ -694,6 +773,9 @@ export default function DashboardPage() {
             </div>
 
 
+            {activeCard === 8 && (
+                <MonthlyChart data={userChart} label="Profile User" color="#9C7C5B" />
+            )}
             {activeCard === 0 && (
                 <MonthlyChart data={joinsChart} label="Anggota Baru" color="#9C7C5B" />
             )}
@@ -715,7 +797,7 @@ export default function DashboardPage() {
 
                     <div className="flex items-center gap-3">
 
-                        {[1, 3, 5, 7].includes(activeCard) && (
+                        {[8, 1, 3, 5, 7].includes(activeCard) && (
                             <button
                                 onClick={handleExport}
                                 className="flex items-center gap-2 border border-green-500 text-green-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-50 transition-colors"
@@ -750,6 +832,7 @@ export default function DashboardPage() {
                         <div className="bg-[#F2EAE0] text-gray-700 px-2 py-1 rounded">
                             {(() => {
                                 switch (activeCard) {
+                                    case 8: return userData.length;
                                     case 0: return joinsData.length;
                                     case 2: return contactsData.length;
                                     case 4: return userData.length;

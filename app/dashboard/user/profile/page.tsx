@@ -5,12 +5,25 @@ import { useSession } from 'next-auth/react';
 import { updateUserProfile, getUserProfileByEmail } from '@/app/actions';
 import Image from 'next/image';
 import { Camera, Save, Loader2 } from 'lucide-react';
+import AlertModal from '@/app/components/AlertModal';
 
 export default function UserProfilePage() {
     const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+
+    const [alertState, setAlertState] = useState<{
+        isOpen: boolean;
+        type: 'success' | 'error' | 'warning';
+        title: string;
+        message: string;
+    }>({
+        isOpen: false,
+        type: 'success',
+        title: '',
+        message: ''
+    });
 
     const [formData, setFormData] = useState({
         nama: '',
@@ -33,7 +46,7 @@ export default function UserProfilePage() {
                         nama: profile.nama_lengkap || session.user.name || '',
                         email: profile.email || '',
                         no_wa: profile.no_wa || '',
-                        tgl_lahir: profile.tgl_lahir || '',
+                        tgl_lahir: profile.tgl_lahir ? new Date(profile.tgl_lahir).toISOString().split('T')[0] : '',
                         sekolah: profile.sekolah_instansi || '',
                         kelas: profile.kelas || '',
                         jurusan: profile.jurusan || '',
@@ -63,26 +76,38 @@ export default function UserProfilePage() {
         }
     };
 
+    const showAlert = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+        setAlertState({
+            isOpen: true,
+            type,
+            title,
+            message
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
 
         if (!userId) {
-            alert('User ID not found. Please re-login.');
+            showAlert('error', 'Error', 'User ID not found. Please re-login.');
             setSaving(false);
             return;
         }
 
-        const result = await updateUserProfile({
-            id: userId,
-            ...formData
-        });
+        try {
+            const result = await updateUserProfile({
+                id: userId,
+                ...formData
+            });
 
-        if (result.success) {
-            alert('Profil berhasil diperbarui!');
-            // Update local storage or session if needed, but page refresh will fetch new data
-        } else {
-            alert('Gagal memperbarui profil: ' + result.error);
+            if (result.success) {
+                showAlert('success', 'Berhasil', 'Profil berhasil diperbarui!');
+            } else {
+                showAlert('error', 'Gagal', 'Gagal memperbarui profil: ' + result.error);
+            }
+        } catch (error) {
+             showAlert('error', 'Error', 'Terjadi kesalahan sistem.');
         }
         setSaving(false);
     };
@@ -97,6 +122,14 @@ export default function UserProfilePage() {
 
     return (
         <div className="p-8 font-dm-sans">
+            <AlertModal 
+                isOpen={alertState.isOpen}
+                onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+                type={alertState.type}
+                title={alertState.title}
+                message={alertState.message}
+            />
+
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Profil</h1>
 
             <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">

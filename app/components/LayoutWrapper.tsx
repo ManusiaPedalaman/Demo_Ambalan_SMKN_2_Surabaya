@@ -17,7 +17,7 @@ export default function LayoutWrapper({
   const pathname = usePathname();
 
 
-  const noNavRoutes = ['/login', '/register', '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb'];
+  const noNavRoutes = ['/login', '/register', '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb', '/dashboard'];
 
 
   const showNavAndFooter = !noNavRoutes.some((route) => pathname.startsWith(route));
