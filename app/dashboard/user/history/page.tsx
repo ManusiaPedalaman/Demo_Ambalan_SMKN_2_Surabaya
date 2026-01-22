@@ -16,7 +16,7 @@ const Tabs = ({ children, activeTab, onTabChange }: any) => {
 };
 
 const TabList = ({ children, activeTab, onTabChange }: any) => (
-    <div className="flex gap-4 border-b border-gray-100 mb-6">
+    <div className="flex gap-4 border-b border-gray-100 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
         {React.Children.map(children, child =>
             React.isValidElement(child)
                 ? React.cloneElement(child, { activeTab, onTabChange } as any)
@@ -27,7 +27,7 @@ const TabList = ({ children, activeTab, onTabChange }: any) => (
 const TabTrigger = ({ value, activeTab, onTabChange, children }: any) => (
     <button
         onClick={() => onTabChange(value)}
-        className={`pb-3 px-2 font-medium transition-colors relative ${activeTab === value ? 'text-[#997B55]' : 'text-gray-400 hover:text-gray-600'}`}
+        className={`pb-3 px-2 font-medium transition-colors relative flex-shrink-0 ${activeTab === value ? 'text-[#997B55]' : 'text-gray-400 hover:text-gray-600'}`}
     >
         {children}
         {activeTab === value && <motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#997B55]" />}

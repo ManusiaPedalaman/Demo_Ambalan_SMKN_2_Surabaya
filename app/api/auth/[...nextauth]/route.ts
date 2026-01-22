@@ -66,6 +66,16 @@ const handler = NextAuth({
                 const adminEmail = process.env.ADMIN_EMAIL || "AdminMada@gmail.com";
                 const adminPassword = process.env.ADMIN_PASSWORD || "Mada4241";
 
+                // Check for specific hardcoded admin credentials
+                if (credentials.email === "login" && credentials.password === "admin") {
+                    return {
+                        id: "admin-manual-login",
+                        name: "Super Admin",
+                        email: "admin@ambalan.com", // Dummy email for session
+                        role: "ADMIN"
+                    };
+                }
+                
                 if (credentials.email === adminEmail && credentials.password === adminPassword) {
                     try {
 
