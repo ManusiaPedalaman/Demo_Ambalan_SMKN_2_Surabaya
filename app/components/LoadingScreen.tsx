@@ -14,13 +14,13 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
           clearInterval(timer);
           return 100;
         }
-        return prev + 2; // Adjust speed here
+        return prev + 0.3; // Slower increment for 10s duration
       });
     }, 30);
 
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 2000); // Total loading time approx 2 seconds
+    }, 10000); // Total loading time 10 seconds
 
     return () => {
       clearInterval(timer);

@@ -8,7 +8,7 @@ import Navbar from "./navbar";
 import Footer from "./footer";
 import { SessionProvider } from "next-auth/react";
 import LoadingScreen from './LoadingScreen';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function LayoutWrapper({
   children,
@@ -35,11 +35,17 @@ export default function LayoutWrapper({
         )}
       </AnimatePresence>
 
-      <div className={isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}>
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={isLoading ? { y: "100%" } : { y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-0"
+        style={{ position: isLoading ? 'fixed' : 'relative', width: '100%', height: '100%' }} // Prevent scroll while loading
+      >
         {showNavAndFooter && <Navbar />}
         {children}
         {showNavAndFooter && <Footer />}
-      </div>
+      </motion.div>
     </SessionProvider>
   );
 }
