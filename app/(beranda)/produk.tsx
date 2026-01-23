@@ -235,13 +235,13 @@ const Produk = () => {
                   >
                     <div className="absolute inset-0 bg-[#C9826B]/10 group-hover:bg-[#C9826B]/20 transition-colors duration-300 z-10" />
 
-                    <div className="relative w-full h-full p-6">
+                    <div className="relative w-full h-full">
                       <Image
                         src={product.image}
                         alt={product.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-contain transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                        className="object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
                       />
                     </div>
                   </div>
