@@ -3,6 +3,8 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { v4 as uuidv4 } from 'uuid';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 const handler = NextAuth({
     providers: [
@@ -20,10 +22,7 @@ const handler = NextAuth({
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" }
             },
-            async authorize(credentials) {
-
-                const { prisma } = require('@/lib/prisma');
-                const bcrypt = require('bcryptjs');
+    async authorize(credentials) {
 
                 if (!credentials?.email || !credentials?.password) return null;
 
@@ -114,49 +113,51 @@ const handler = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account, profile }) {
-            const { prisma } = require('@/lib/prisma');
-            const bcrypt = require('bcryptjs');
-
-
             if (account?.provider === 'google' || account?.provider === 'facebook') {
-                const email = user.email;
+                const email = user.email?.toLowerCase();
                 if (!email) return false;
 
                 try {
-
-
-
-
-
+                    // Check if Admin
                     const existingAdmin = await prisma.dataAdminTerdaftar.findFirst({
                         where: { email }
                     });
 
                     if (existingAdmin) {
-
-
                         return true;
                     }
 
-
+                    // Check if User exists
                     const existingUser = await prisma.dataUserLogin.findFirst({
                         where: { email }
                     });
 
                     if (!existingUser) {
-
-
-
+                        // Create new user
                         const dummyHash = await bcrypt.hash(uuidv4(), 10);
 
-                        await prisma.dataUserLogin.create({
-                            data: {
-                                id_login: uuidv4(),
-                                email: email,
-                                password_hash: dummyHash,
-                                status: "Login (Social)"
+                        try {
+                            await prisma.dataUserLogin.create({
+                                data: {
+                                    id_login: uuidv4(),
+                                    email: email,
+                                    password_hash: dummyHash,
+                                    status: "Login (Social)",
+                                    nama_lengkap: user.name || email.split('@')[0],
+                                    foto: user.image || null
+                                }
+                            });
+                        } catch (createError) {
+                            // Handle race condition: check if it was created by another request
+                             console.warn("Creation failed, checking race condition:", createError);
+                             const raceCheck = await prisma.dataUserLogin.findFirst({
+                                where: { email }
+                            });
+                            if (!raceCheck) {
+                                // Real error
+                                throw createError;
                             }
-                        });
+                        }
                     }
 
                     return true;
@@ -181,7 +182,6 @@ const handler = NextAuth({
 
 
                 if (account?.provider === 'google' || account?.provider === 'facebook') {
-                    const { prisma } = require('@/lib/prisma');
                     const adminCheck = await prisma.dataAdminTerdaftar.findFirst({
                         where: { email: user.email }
                     });
