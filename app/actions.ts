@@ -1057,3 +1057,40 @@ export async function updateUMKMStatus(id: string, status: 'APPROVED' | 'REJECTE
         return { success: false, error: 'Failed to update status' };
     }
 }
+
+export async function getPendingProductList() {
+    try {
+        const products = await prisma.dataProdukUmkm.findMany({
+            where: { status: 'PENDING' },
+            include: { umkm: true }, // Include UMKM details
+            orderBy: { created_at: 'desc' }
+        });
+        
+        return products.map((item: any) => ({
+            ...item,
+            id: item.id.toString(),
+            id_umkm: item.id_umkm.toString(),
+            created_at: item.created_at.toISOString(),
+            nama_umkm: item.umkm?.nama_umkm || 'Unknown UMKM'
+        }));
+    } catch (error) {
+        console.error('Error fetching pending products:', error);
+        return [];
+    }
+}
+
+export async function updateUMKMProductStatus(id: string, status: 'APPROVED' | 'REJECTED', note?: string) {
+    try {
+        await prisma.dataProdukUmkm.update({
+            where: { id: BigInt(id) },
+            data: { 
+                status: status,
+                alasan_tolak: note || null
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating product status:', error);
+        return { success: false, error: 'Failed to update status' };
+    }
+}

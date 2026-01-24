@@ -182,7 +182,7 @@ export default function UMKMRegisterPage() {
                                     type="file" 
                                     accept="image/png, image/jpeg, image/jpg"
                                     onChange={handleFileChange}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
                                 {formData.kartu_pelajar ? (
                                     <div className="relative w-full h-32 rounded-lg overflow-hidden">
