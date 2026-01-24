@@ -200,7 +200,7 @@ export async function getAdminUsers() {
         });
 
 
-        return adminList.map(admin => ({
+        return adminList.map((admin: any) => ({
             id: admin.id_admin,
             username: admin.nama_lengkap || 'Admin',
             email: admin.email,
@@ -222,7 +222,7 @@ export async function getJoinsList() {
             orderBy: { id: 'desc' }
         });
 
-        return joins.map(item => ({
+        return joins.map((item: any) => ({
             id: item.id.toString(),
             nama: item.nama_lengkap,
             tanggal_lahir: item.tanggal_lahir ? item.tanggal_lahir.toISOString().split('T')[0] : '-',
@@ -246,7 +246,7 @@ export async function getBookingsList() {
             orderBy: { id: 'desc' }
         });
 
-        return bookings.map(item => ({
+        return bookings.map((item: any) => ({
             id: item.id.toString(),
             product_slug: item.nama_produk,
             start_date: item.tgl_pengambilan ? item.tgl_pengambilan.toISOString().split('T')[0] : '-',
@@ -299,7 +299,7 @@ export async function getContactsList() {
             orderBy: { id: 'desc' }
         });
 
-        return contacts.map(item => ({
+        return contacts.map((item: any) => ({
             id: item.id.toString(),
             nama: item.nama_lengkap,
             email: item.email,
@@ -320,7 +320,7 @@ export async function getRentersList() {
             orderBy: { id: 'desc' }
         });
 
-        return renters.map(item => ({
+        return renters.map((item: any) => ({
             id: item.id.toString(),
             nama_customer: item.nama_customer,
             sekolah_instansi: item.sekolah_instansi,
@@ -373,7 +373,7 @@ export async function getUsersList() {
             }
         });
 
-        return users.map(user => ({
+        return users.map((user: any) => ({
             id: user.id_login,
             email: user.email,
             status: user.status,
@@ -393,7 +393,7 @@ export async function getMateriList() {
             orderBy: { id_materi: 'asc' }
         });
 
-        return materi.map(item => ({
+        return materi.map((item: any) => ({
             id: item.id_materi,
             nama: item.nama_materi,
             topik: item.topik ? item.topik.split(',') : [],
@@ -551,7 +551,7 @@ export async function getProductsList() {
             orderBy: { id_produk: 'asc' }
         });
 
-        return products.map(item => ({
+        return products.map((item: any) => ({
             id: item.id_produk,
             nama: item.nama_produk,
             status: item.status || 'Tersedia',
@@ -839,7 +839,7 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
                 orderBy: { id: 'desc' },
                 include: { produk: true } 
             });
-            rentals = rawRentals.map(item => ({
+            rentals = rawRentals.map((item: any) => ({
                 ...item,
                 id: item.id.toString(),
                 tgl_pengambilan: item.tgl_pengambilan ? item.tgl_pengambilan.toISOString() : null,
@@ -853,7 +853,7 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
                 where: { email: email },
                 orderBy: { id: 'desc' }
             });
-            contacts = rawContacts.map(item => ({
+            contacts = rawContacts.map((item: any) => ({
                 ...item,
                 id: item.id.toString()
             }));
@@ -865,7 +865,7 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
                 where: { no_wa: no_wa },
                 orderBy: { id: 'desc' }
             });
-            joins = rawJoins.map(item => ({
+            joins = rawJoins.map((item: any) => ({
                 ...item,
                 id: item.id.toString(),
                 tanggal_lahir: item.tanggal_lahir ? item.tanggal_lahir.toISOString() : null,
@@ -882,7 +882,7 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
                     include: { materi: true },
                     orderBy: { tanggal: 'desc' }
                 });
-                quizzes = rawQuizzes.map(item => ({
+                quizzes = rawQuizzes.map((item: any) => ({
                     ...item,
                     id: item.id.toString(),
                     tanggal: item.tanggal.toISOString()
