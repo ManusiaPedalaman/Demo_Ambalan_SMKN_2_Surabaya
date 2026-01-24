@@ -250,7 +250,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
         <div className="w-full lg:w-[40%] flex flex-col gap-6 lg:sticky lg:top-32 h-fit">
 
-          <div className="w-full aspect-[4/3] bg-[#C9826B]/20 rounded-2xl relative overflow-hidden border border-[#C9826B]/30 p-8 flex items-center justify-center group">
+          <div className="w-full aspect-[4/3] bg-[#C9826B]/20 rounded-2xl relative overflow-hidden border border-[#C9826B]/30 flex items-center justify-center group">
             <div className="absolute inset-0 opacity-10 bg-[url('/Image/Vector.webp')] bg-repeat bg-cover mix-blend-overlay"></div>
 
             <Image
@@ -258,7 +258,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               alt={product.name}
               width={500}
               height={500}
-              className="object-contain w-full h-full drop-shadow-xl transition-transform duration-500 group-hover:scale-105"
+              className="object-cover w-full h-full drop-shadow-xl transition-transform duration-500 group-hover:scale-105"
             />
           </div>
 
@@ -275,7 +275,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                   src={img}
                   alt="thumbnail"
                   fill
-                  className="object-contain p-2"
+                  className="object-cover"
                 />
               </button>
             ))}
@@ -827,7 +827,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                     src={p.images[0]}
                     alt={p.name}
                     fill
-                    className="w-full h-full object-contain p-6 transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
                   />
                 </div>
 
