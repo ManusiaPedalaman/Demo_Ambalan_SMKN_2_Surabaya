@@ -19,7 +19,7 @@
     "lucide-react": "^0.546.0",
     "mongodb": "7.0",
     "mongoose": "^8.20.0",
-    "next": "15.0.5",
+    "next": "^16.1.4",
     "next-auth": "^4.24.13",
     "nodemailer": "^7.0.11",
     "postgres": "^3.4.7",
@@ -37,7 +37,7 @@
     "@types/react-dom": "^18",
     "baseline-browser-mapping": "^2.8.32",
     "eslint": "^9",
-    "eslint-config-next": "15.0.5",
+    "eslint-config-next": "^16.1.4",
     "prisma": "^7.3.0",
     "tailwindcss": "^4",
     "typescript": "^5"

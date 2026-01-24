@@ -51,43 +51,43 @@ export default function LoadingScreen({ onComplete }: { onComplete: () => void }
       }}
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white"
     >
-      <div className="relative w-40 h-40 mb-8 flex items-center justify-center">
-        {/* Glowing Rotating Pentagon Background */}
+      <div className="relative w-48 h-48 mb-8 flex items-center justify-center">
+        {/* Rotating Shadow / Glow Effect */}
         <motion.div
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute inset-0 z-0"
+           animate={{ rotate: 360 }}
+           transition={{
+             duration: 8,
+             repeat: Infinity,
+             ease: "linear",
+           }}
+           className="absolute inset-0 z-0 flex items-center justify-center"
         >
-          <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_0_15px_rgba(205,92,8,0.8)]">
-            <polygon 
-              points="50,5 95,35 80,90 20,90 5,35" 
-              fill="none" 
-              stroke="#CD5C08" 
-              strokeWidth="2"
-              className="filter blur-[1px]"
-            />
-             <polygon 
-              points="50,5 95,35 80,90 20,90 5,35" 
-              fill="rgba(205,92,8,0.1)" 
-              stroke="none" 
-            />
-          </svg>
+           {/* Pentagon Shape for Shadow */}
+           <div 
+             className="w-32 h-32 bg-transparent"
+             style={{
+               clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)",
+               boxShadow: "0 0 40px 10px rgba(205, 92, 8, 0.6)",
+               filter: "drop-shadow(0 0 20px rgba(205, 92, 8, 0.8))",
+             }}
+           >
+             {/* Inner gradient border effect */}
+             <div className="w-full h-full bg-gradient-to-tr from-[#CD5C08] to-transparent opacity-50" 
+                  style={{ clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)" }} 
+             />
+           </div>
         </motion.div>
 
-        {/* Static Logo */}
-        <div className="relative z-10 w-24 h-24">
-          <Image
-            src="/Logo/LogoAmbalan.svg"
-            alt="Loading Logo"
-            fill
-            className="object-contain drop-shadow-lg"
-            priority
-          />
-        </div>
+         {/* Static Logo */}
+         <div className="relative z-10 w-32 h-32">
+           <Image
+             src="/Logo/LogoAmbalan.svg"
+             alt="Loading Logo"
+             fill
+             className="object-contain drop-shadow-2xl"
+             priority
+           />
+         </div>
       </div>
 
       {/* Loading Bar Container */}

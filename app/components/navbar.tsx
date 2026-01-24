@@ -348,14 +348,24 @@ export default function Navbar() {
                       <div className='flex flex-col p-2 pt-0'>
 
 
-                        <Link
-                          href="/dashboard/user"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
-                        >
-                          <LayoutDashboard size={20} className='text-gray-300' />
-                          Dashboard
-                        </Link>
+                        {isAdmin ? (
+                          <button
+                            onClick={handleProfileImageChange}
+                            className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
+                          >
+                            <User size={20} className='text-gray-300' />
+                            Edit Profil
+                          </button>
+                        ) : (
+                          <Link
+                            href="/dashboard/user"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="flex items-center gap-3 w-full text-left px-3 py-3 text-lg font-medium text-white hover:bg-[#4a4a4a] rounded-lg transition-colors"
+                          >
+                            <LayoutDashboard size={20} className='text-gray-300' />
+                            Dashboard
+                          </Link>
+                        )}
 
 
                         {isAdmin && (

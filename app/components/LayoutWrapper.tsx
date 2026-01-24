@@ -18,6 +18,17 @@ export default function LayoutWrapper({
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true);
 
+  // Check session storage on mount to show loading screen only once
+  useEffect(() => {
+    const hasLoaded = sessionStorage.getItem('hasVisited');
+    if (hasLoaded) {
+      setIsLoading(false);
+    } else {
+      // Allow loading screen to show, it will call onComplete when done
+      setIsLoading(true);
+    }
+  }, []);
+
   // Determine if we should show the nav/footer
   const noNavRoutes = ['/login', '/register', '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb', '/dashboard', '/umkm-register'];
   const showNavAndFooter = !noNavRoutes.some((route) => pathname.startsWith(route));
@@ -25,6 +36,7 @@ export default function LayoutWrapper({
   // Handle loading state completion
   const handleLoadingComplete = () => {
     setIsLoading(false);
+    sessionStorage.setItem('hasVisited', 'true');
   };
 
   return (
