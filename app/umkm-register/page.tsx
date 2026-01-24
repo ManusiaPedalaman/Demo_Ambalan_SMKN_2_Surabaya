@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { getUserProfileByEmail, registerUMKM, getUserUMKM } from '@/app/actions';
 import Image from 'next/image';
-import { Store, Loader2, ArrowLeft } from 'lucide-react';
+import { Store, Loader2, ArrowLeft, ImagePlus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function UMKMRegisterPage() {
@@ -20,7 +20,8 @@ export default function UMKMRegisterPage() {
         nama_lengkap: '', // Owner name
         no_wa: '',
         kelas: '',
-        jurusan: ''
+        jurusan: '',
+        kartu_pelajar: ''
     });
 
     useEffect(() => {
@@ -53,6 +54,24 @@ export default function UMKMRegisterPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+             // 5MB Limit Check
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Ukuran gambar maksimal 5MB. Silakan kompres gambar terlebih dahulu.");
+                e.target.value = ''; // Reset input
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, kartu_pelajar: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -152,6 +171,35 @@ export default function UMKMRegisterPage() {
                                     onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#997B55] focus:outline-none"
                                 />
+                            </div>
+                        </div>
+
+                        {/* Kartu Pelajar Upload */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700">Unggah Kartu Pelajar</label>
+                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 transition-colors relative">
+                                <input 
+                                    type="file" 
+                                    accept="image/png, image/jpeg, image/jpg"
+                                    onChange={handleFileChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                />
+                                {formData.kartu_pelajar ? (
+                                    <div className="relative w-full h-32 rounded-lg overflow-hidden">
+                                        <img src={formData.kartu_pelajar} alt="Preview" className="w-full h-full object-contain" />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                            <p className="text-white font-bold text-sm">Ganti Gambar</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="w-12 h-12 bg-[#997B55]/10 rounded-full flex items-center justify-center text-[#997B55] mb-2">
+                                            <ImagePlus size={24} />
+                                        </div>
+                                        <p className="text-sm font-medium text-gray-600">Klik untuk unggah gambar</p>
+                                        <p className="text-xs text-gray-400 mt-1">Format JPG, JPEG, atau PNG. Ukuran Max: 5 MB</p>
+                                    </>
+                                )}
                             </div>
                         </div>
 

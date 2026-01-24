@@ -8,7 +8,7 @@ import { Camera, Save, Loader2 } from 'lucide-react';
 import AlertModal from '@/app/components/AlertModal';
 
 export default function UserProfilePage() {
-    const { data: session } = useSession();
+    const { data: session, update } = useSession();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
@@ -102,6 +102,7 @@ export default function UserProfilePage() {
             });
 
             if (result.success) {
+                await update({ image: formData.foto, name: formData.nama });
                 showAlert('success', 'Berhasil', 'Profil berhasil diperbarui!');
             } else {
                 showAlert('error', 'Gagal', 'Gagal memperbarui profil: ' + result.error);

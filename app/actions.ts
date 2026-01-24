@@ -954,7 +954,7 @@ export async function updateHistoryItem(type: 'sewa' | 'hubungi' | 'join', id: s
 
 export async function registerUMKM(data: any) {
     try {
-        const { id_user, nama_umkm, no_wa, kelas, jurusan, nama_lengkap } = data;
+        const { id_user, nama_umkm, no_wa, kelas, jurusan, nama_lengkap, kartu_pelajar } = data;
         
         await prisma.dataUmkm.create({
             data: {
@@ -964,6 +964,7 @@ export async function registerUMKM(data: any) {
                 kelas,
                 jurusan,
                 nama_lengkap,
+                kartu_pelajar,
                 status: 'PENDING'
             }
         });
@@ -1019,5 +1020,40 @@ export async function addProductUMKM(data: any) {
     } catch (error) {
         console.error('Error adding UMKM product:', error);
         return { success: false, error: 'Failed to add product' };
+    }
+}
+
+export async function getPendingUMKMList() {
+    try {
+        const umkms = await prisma.dataUmkm.findMany({
+            where: { status: 'PENDING' },
+            orderBy: { created_at: 'desc' }
+        });
+        
+        return umkms.map((item: any) => ({
+            ...item,
+            id: item.id.toString(),
+            id_umkm: item.id.toString(), // consistency
+            created_at: item.created_at.toISOString()
+        }));
+    } catch (error) {
+        console.error('Error fetching pending UMKMs:', error);
+        return [];
+    }
+}
+
+export async function updateUMKMStatus(id: string, status: 'APPROVED' | 'REJECTED', note?: string) {
+    try {
+        await prisma.dataUmkm.update({
+            where: { id: BigInt(id) },
+            data: { 
+                status: status,
+                alasan_tolak: note || null
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating UMKM status:', error);
+        return { success: false, error: 'Failed to update status' };
     }
 }

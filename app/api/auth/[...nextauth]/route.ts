@@ -39,7 +39,8 @@ const handler = NextAuth({
                             id: adminUser.id_admin,
                             name: adminUser.nama_lengkap || "Admin",
                             email: adminUser.email,
-                            role: "ADMIN"
+                            role: "ADMIN",
+                            image: adminUser.foto
                         };
                     }
                 }
@@ -54,9 +55,10 @@ const handler = NextAuth({
                     if (isValid) {
                         return {
                             id: user.id_login,
-                            name: user.email.split('@')[0],
+                            name: user.nama_lengkap || user.email.split('@')[0],
                             email: user.email,
-                            role: "USER"
+                            role: "USER",
+                            image: user.foto
                         };
                     }
                 }
@@ -71,7 +73,8 @@ const handler = NextAuth({
                         id: "admin-manual-login",
                         name: "Super Admin",
                         email: "admin@ambalan.com", // Dummy email for session
-                        role: "ADMIN"
+                        role: "ADMIN",
+                        image: null
                     };
                 }
                 
@@ -85,7 +88,8 @@ const handler = NextAuth({
                                 nama_lengkap: "Master Admin",
                                 email: adminEmail,
                                 password_hash: hashedPassword,
-                                status: "Login"
+                                status: "Login",
+                                foto: null
                             }
                         });
 
@@ -93,7 +97,8 @@ const handler = NextAuth({
                             id: newAdmin.id_admin,
                             name: newAdmin.nama_lengkap,
                             email: newAdmin.email,
-                            role: "ADMIN"
+                            role: "ADMIN",
+                            image: newAdmin.foto
                         };
                     } catch (error) {
                         console.error("Auto-seed admin error:", error);
@@ -102,7 +107,8 @@ const handler = NextAuth({
                             id: "admin-master",
                             name: "Master Admin",
                             email: adminEmail,
-                            role: "ADMIN"
+                            role: "ADMIN",
+                            image: null
                         };
                     }
                 }
@@ -170,16 +176,11 @@ const handler = NextAuth({
 
             return true;
         },
-        async jwt({ token, user, account }) {
+        async jwt({ token, user, account, trigger, session }) {
 
             if (user) {
                 token.role = (user as any).role || 'USER';
-
-
-
-
-
-
+                token.picture = user.image;
 
                 if (account?.provider === 'google' || account?.provider === 'facebook') {
                     const adminCheck = await prisma.dataAdminTerdaftar.findFirst({
@@ -187,14 +188,25 @@ const handler = NextAuth({
                     });
                     if (adminCheck) {
                         token.role = 'ADMIN';
+                        token.picture = adminCheck.foto || user.image;
                     }
                 }
             }
+
+            // Handle session update
+            if (trigger === "update") {
+                if (session?.image) token.picture = session.image;
+                if (session?.name) token.name = session.name;
+            }
+
             return token;
         },
         async session({ session, token }) {
             if (session?.user) {
                 (session.user as any).role = token.role;
+                if (token.picture) {
+                    session.user.image = token.picture;
+                }
             }
             return session;
         }

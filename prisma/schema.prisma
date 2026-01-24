@@ -113,6 +113,7 @@ model DataAdminTerdaftar {
   nama_lengkap  String?
   email         String?
   password_hash String
+  foto          String?
   status        String? @default("Login")
 
   @@map("data_admin_terdaftar")
@@ -157,6 +158,7 @@ model DataUmkm {
   nama_lengkap String
   status       String           @default("PENDING") // PENDING, APPROVED, REJECTED
   alasan_tolak String?
+  kartu_pelajar String?
   created_at   DateTime         @default(now())
   produk       DataProdukUmkm[]
 

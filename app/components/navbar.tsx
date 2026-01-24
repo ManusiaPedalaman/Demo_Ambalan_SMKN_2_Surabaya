@@ -9,7 +9,7 @@ import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -24,16 +24,22 @@ export default function Navbar() {
   const isTransparentPage = pathname === '/' || pathname === '/tentang';
 
 
-  const handleFileSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelection = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64String = reader.result as string;
         setPreviewImage(base64String);
 
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('userAvatar', base64String);
+        if (session?.user?.email) {
+           try {
+             const { updateAdminProfileImage } = await import('@/app/actions/admin');
+             await updateAdminProfileImage(session.user.email, base64String);
+             await update({ image: base64String });
+           } catch (error) {
+             console.error("Failed to update profile image:", error);
+           }
         }
       };
       reader.readAsDataURL(file);
@@ -68,14 +74,7 @@ export default function Navbar() {
   }, []);
 
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedAvatar = localStorage.getItem('userAvatar');
-      if (storedAvatar) {
-        setPreviewImage(storedAvatar);
-      }
-    }
-  }, []);
+
 
 
   useEffect(() => {
