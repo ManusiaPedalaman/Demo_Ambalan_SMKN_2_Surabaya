@@ -1094,3 +1094,61 @@ export async function updateUMKMProductStatus(id: string, status: 'APPROVED' | '
         return { success: false, error: 'Failed to update status' };
     }
 }
+
+export async function updateProductUMKM(data: any) {
+    try {
+        const { id, nama_produk, deskripsi, harga, gambar } = data;
+        
+        await prisma.dataProdukUmkm.update({
+            where: { id: BigInt(id) },
+            data: {
+                nama_produk,
+                deskripsi,
+                harga,
+                gambar,
+                status: 'PENDING', // Reset status to PENDING on edit
+                alasan_tolak: null // Clear rejection reason
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating product:', error);
+        return { success: false, error: 'Failed to update product' };
+    }
+}
+
+export async function deleteProductUMKM(id: string) {
+    try {
+        await prisma.dataProdukUmkm.delete({
+            where: { id: BigInt(id) }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        return { success: false, error: 'Failed to delete product' };
+    }
+}
+
+export async function updateUMKMData(data: any) {
+    try {
+        const { id, nama_umkm, nama_lengkap, no_wa, kelas, jurusan, kartu_pelajar } = data;
+        
+        await prisma.dataUmkm.update({
+            where: { id: BigInt(id) },
+            data: {
+                nama_umkm,
+                nama_lengkap,
+                no_wa,
+                kelas,
+                jurusan,
+                kartu_pelajar,
+                status: 'PENDING', // Reset status to PENDING
+                alasan_tolak: null // Clear rejection reason
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating UMKM:', error);
+        return { success: false, error: 'Failed to update UMKM' };
+    }
+}

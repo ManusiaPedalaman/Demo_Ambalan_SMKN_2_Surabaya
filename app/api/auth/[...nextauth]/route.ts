@@ -40,7 +40,7 @@ const handler = NextAuth({
                             name: adminUser.nama_lengkap || "Admin",
                             email: adminUser.email,
                             role: "ADMIN",
-                            image: adminUser.foto
+                            image: adminUser.foto && adminUser.foto.startsWith('data:') ? null : adminUser.foto
                         };
                     }
                 }
@@ -58,7 +58,7 @@ const handler = NextAuth({
                             name: user.nama_lengkap || user.email.split('@')[0],
                             email: user.email,
                             role: "USER",
-                            image: user.foto
+                            image: user.foto && user.foto.startsWith('data:') ? null : user.foto
                         };
                     }
                 }
@@ -98,7 +98,7 @@ const handler = NextAuth({
                             name: newAdmin.nama_lengkap,
                             email: newAdmin.email,
                             role: "ADMIN",
-                            image: newAdmin.foto
+                            image: null // Admin master doesn't need image
                         };
                     } catch (error) {
                         console.error("Auto-seed admin error:", error);
@@ -150,7 +150,8 @@ const handler = NextAuth({
                                     password_hash: dummyHash,
                                     status: "Login (Social)",
                                     nama_lengkap: user.name || email.split('@')[0],
-                                    foto: user.image || null
+                                    // Don't store large image in DB instantly if it causes issues, or strictly allow URL
+                                    foto: user.image 
                                 }
                             });
                         } catch (createError) {
@@ -188,14 +189,16 @@ const handler = NextAuth({
                     });
                     if (adminCheck) {
                         token.role = 'ADMIN';
-                        token.picture = adminCheck.foto || user.image;
+                        const dbFoto = adminCheck.foto;
+                        // Avoid base64 in token
+                        token.picture = (dbFoto && dbFoto.startsWith('data:')) ? null : (dbFoto || user.image);
                     }
                 }
             }
 
             // Handle session update
             if (trigger === "update") {
-                if (session?.image) token.picture = session.image;
+                if (session?.image && !session.image.startsWith('data:')) token.picture = session.image;
                 if (session?.name) token.name = session.name;
             }
 
