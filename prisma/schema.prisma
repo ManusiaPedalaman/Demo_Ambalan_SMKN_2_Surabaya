@@ -173,6 +173,10 @@ model DataProdukUmkm {
   deskripsi    String?
   harga        String
   gambar       String?
+  foto_produk  String[] // Array of image URLs
+  spesifikasi  Json?    // Array of {label, value}
+  is_draft     Boolean  @default(false)
+  is_published Boolean  @default(false)
   status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
   alasan_tolak String?
   created_at   DateTime @default(now())

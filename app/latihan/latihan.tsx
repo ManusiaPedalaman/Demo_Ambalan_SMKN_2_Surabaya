@@ -12,6 +12,8 @@ import {
 
 
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { saveQuizResult, getUserProfileByEmail } from '@/app/actions';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -32,6 +34,8 @@ export default function Latihan() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [scoreCount, setScoreCount] = useState(0);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [userAnswers, setUserAnswers] = useState<any[]>([]);
+  const { data: session } = useSession();
 
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -47,6 +51,7 @@ export default function Latihan() {
     setSelectedOption(null);
     setScoreCount(0);
     setIsQuizFinished(false);
+    setUserAnswers([]);
   };
 
 
@@ -70,15 +75,52 @@ export default function Latihan() {
 
 
 
-  const handleNextQuestion = () => {
-    if (selectedOption === currentQuizData[quizStep].correct) {
+  const handleNextQuestion = async () => {
+    // Calculate correct status for current question
+    const currentQ = currentQuizData[quizStep];
+    const isCorrect = selectedOption === currentQ.correct;
+    
+    // Update local score var for immediate use
+    let newScore = scoreCount;
+    if (isCorrect) {
+      newScore = scoreCount + 1;
       setScoreCount(prev => prev + 1);
     }
+
+    // Track answer
+    const newAnswer = {
+        question: currentQ.question,
+        selected: currentQ.options[selectedOption!],
+        correct: currentQ.options[currentQ.correct],
+        isCorrect
+    };
+    const updatedAnswers = [...userAnswers, newAnswer];
+    setUserAnswers(updatedAnswers);
+
     if (quizStep < currentQuizData.length - 1) {
       setQuizStep(prev => prev + 1);
       setSelectedOption(null);
     } else {
       setIsQuizFinished(true);
+      
+      // Save result to DB
+      if (session?.user?.email) {
+          try {
+              const profile = await getUserProfileByEmail(session.user.email);
+              if (profile) {
+                  const finalScoreCalc = Math.round((newScore / currentQuizData.length) * 100);
+                  await saveQuizResult({
+                      id_user: profile.id_login,
+                      id_materi: activeSubCatId, // Using subCat ID as match
+                      nama_materi: activeSubCategory.title,
+                      skor: finalScoreCalc,
+                      jawaban_user: updatedAnswers
+                  });
+              }
+          } catch (e) {
+              console.error("Failed to save quiz", e);
+          }
+      }
     }
   };
 

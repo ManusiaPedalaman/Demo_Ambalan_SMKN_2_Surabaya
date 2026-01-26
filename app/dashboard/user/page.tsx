@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { getUserProfileByEmail, getUserHistory } from '@/app/actions';
-import { LayoutDashboard, ShoppingBag, MessageSquare, Flame, Clock } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, MessageSquare, Flame, Clock, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function UserDashboardPage() {
@@ -50,10 +50,9 @@ export default function UserDashboardPage() {
                 const allActivity = [
                     ...history.rentals.map((r: any) => ({ ...r, type: 'rental', date: new Date(r.tgl_pengambilan || r.createdAt) })),
                     ...history.quizzes.map((q: any) => ({ ...q, type: 'quiz', date: new Date(q.tanggal) })),
-                    ...history.contacts.map((c: any) => ({ ...c, type: 'contact', date: new Date(c.created_at || new Date()) })) // assuming contact has date, if not use current? Contact usually has id only in list, detailed has date?
-                    // Note: getContactsList returns id, nama, email, phone, pesan, status. No date returned in getContactsList/getUserHistory for contacts currently. 
-                    // Let's assume most recent ID is most recent.
-                ].sort((a: any, b: any) => (b.id - a.id) || (b.date - a.date)); // Sort by ID descending as proxy for date if date missing, or date.
+                    ...history.contacts.map((c: any) => ({ ...c, type: 'contact', date: new Date(c.created_at || new Date()) })),
+                    ...history.joins.map((j: any) => ({ ...j, type: 'join', date: new Date(j.created_at || new Date()) }))
+                ].sort((a: any, b: any) => (b.id - a.id) || (b.date - a.date)); 
 
                 setRecentActivity(allActivity.slice(0, 5));
             }
@@ -148,17 +147,20 @@ export default function UserDashboardPage() {
                                         {item.type === 'rental' && <div className="p-2 rounded-lg bg-blue-50 text-blue-600"><ShoppingBag size={18} /></div>}
                                         {item.type === 'quiz' && <div className="p-2 rounded-lg bg-orange-50 text-orange-600"><Flame size={18} /></div>}
                                         {item.type === 'contact' && <div className="p-2 rounded-lg bg-green-50 text-green-600"><MessageSquare size={18} /></div>}
+                                        {item.type === 'join' && <div className="p-2 rounded-lg bg-purple-50 text-purple-600"><UserPlus size={18} /></div>}
                                         
                                         <span>
                                             {item.type === 'rental' && 'Penyewaan Barang'}
                                             {item.type === 'quiz' && 'Mengerjakan Kuis'}
                                             {item.type === 'contact' && 'Mengirim Pesan'}
+                                            {item.type === 'join' && 'Permintaan Join'}
                                         </span>
                                     </td>
                                     <td className="p-4">
                                         {item.type === 'rental' && (item.nama_produk || item.produk?.nama_produk || 'Produk')}
                                         {item.type === 'quiz' && (item.materi?.nama_materi || 'Materi Kuis')}
                                         {item.type === 'contact' && (item.pesan ? `"${item.pesan.substring(0, 20)}..."` : 'Pesan')}
+                                        {item.type === 'join' && (item.pesan ? `"${item.pesan.substring(0, 20)}..."` : 'Keanggotaan')}
                                     </td>
                                     <td className="p-4">
                                         {item.type === 'rental' && (
@@ -168,6 +170,7 @@ export default function UserDashboardPage() {
                                         )}
                                         {item.type === 'quiz' && <span className="font-bold text-[#997B55]">{item.skor} Poin</span>}
                                         {item.type === 'contact' && <span className="text-gray-400 text-xs">{item.status || 'Terkirim'}</span>}
+                                        {item.type === 'join' && <span className="text-gray-400 text-xs text-purple-600 font-medium">Terkirim</span>}
                                     </td>
                                     <td className="p-4 text-gray-400 text-xs">#{item.id}</td>
                                 </tr>

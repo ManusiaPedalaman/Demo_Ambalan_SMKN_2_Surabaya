@@ -835,7 +835,15 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
         // Match by nama for rentals
         if (nama) {
              const rawRentals = await prisma.dataProdukTersewa.findMany({
-                where: { nama_peminjam: { contains: nama, mode: 'insensitive' } },
+                where: { 
+                    OR: [
+                        { nama_peminjam: { contains: nama, mode: 'insensitive' } },
+                        // Try matching by no_wa if possible, but schema says DataProdukTersewa has no no_wa? 
+                        // Wait, Step 71 schema: DataProdukTersewa DOES NOT have no_wa. DataCustomerPenyewa DOES.
+                        // But we want rental history which is usually itemized in ProdukTersewa.
+                        // We'll stick to name for now, maybe loosely.
+                    ]
+                },
                 orderBy: { id: 'desc' },
                 include: { produk: true } 
             });
@@ -847,10 +855,16 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
             }));
         }
 
-        // Match by email for contacts
-        if (email) {
+        // Match by email OR name (if available) for contacts
+        // DataUserHubungi has nama_lengkap
+        if (email || nama) {
             const rawContacts = await prisma.dataUserHubungi.findMany({
-                where: { email: email },
+                where: {
+                    OR: [
+                         { email: email || undefined },
+                         { nama_lengkap: { contains: nama, mode: 'insensitive' } }
+                    ]
+                },
                 orderBy: { id: 'desc' }
             });
             contacts = rawContacts.map((item: any) => ({
@@ -859,10 +873,15 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
             }));
         }
 
-        // Match by no_wa for joins
-        if (no_wa) {
+        // Match by no_wa OR name for joins
+        if (no_wa || nama) {
             const rawJoins = await prisma.dataAnggotaJoin.findMany({
-                where: { no_wa: no_wa },
+                where: {
+                    OR: [
+                        { no_wa: no_wa || undefined },
+                        { nama_lengkap: { contains: nama, mode: 'insensitive' } }
+                    ]
+                },
                 orderBy: { id: 'desc' }
             });
             joins = rawJoins.map((item: any) => ({
@@ -991,7 +1010,11 @@ export async function getUserUMKM(id_user: string) {
                     ...p,
                     id: p.id.toString(),
                     id_umkm: p.id_umkm.toString(),
-                    harga: p.harga
+                    harga: p.harga,
+                    foto_produk: p.foto_produk || (p.gambar ? [p.gambar] : []), // Fallback
+                    spesifikasi: p.spesifikasi || [],
+                    is_draft: p.is_draft,
+                    is_published: p.is_published
                 }))
             };
         }
@@ -1004,7 +1027,7 @@ export async function getUserUMKM(id_user: string) {
 
 export async function addProductUMKM(data: any) {
     try {
-        const { id_umkm, nama_produk, deskripsi, harga, gambar } = data;
+        const { id_umkm, nama_produk, deskripsi, harga, gambar, foto_produk, spesifikasi, is_draft } = data;
         
         await prisma.dataProdukUmkm.create({
             data: {
@@ -1012,8 +1035,12 @@ export async function addProductUMKM(data: any) {
                 nama_produk,
                 deskripsi,
                 harga,
-                gambar,
-                status: 'PENDING'
+                gambar: gambar || (foto_produk && foto_produk.length > 0 ? foto_produk[0] : null), // Primary image
+                foto_produk: foto_produk || [],
+                spesifikasi: spesifikasi || [],
+                is_draft: is_draft || false,
+                is_published: false,
+                status: is_draft ? 'PENDING' : 'PENDING' // Drafts are pending submission, but technically 'draft' state. Let's keep status PENDING but rely on is_draft flag.
             }
         });
         return { success: true };
@@ -1097,23 +1124,80 @@ export async function updateUMKMProductStatus(id: string, status: 'APPROVED' | '
 
 export async function updateProductUMKM(data: any) {
     try {
-        const { id, nama_produk, deskripsi, harga, gambar } = data;
+        const { id, nama_produk, deskripsi, harga, gambar, foto_produk, spesifikasi, is_draft } = data;
         
-        await prisma.dataProdukUmkm.update({
-            where: { id: BigInt(id) },
-            data: {
+        const updateData: any = {
                 nama_produk,
                 deskripsi,
                 harga,
-                gambar,
-                status: 'PENDING', // Reset status to PENDING on edit
-                alasan_tolak: null // Clear rejection reason
-            }
+                gambar: gambar || (foto_produk && foto_produk.length > 0 ? foto_produk[0] : null),
+                foto_produk: foto_produk || [],
+                spesifikasi: spesifikasi || [],
+                is_draft: is_draft // Update draft status if passed
+        };
+
+        // Only reset status and rejection if NOT draft (submitting)
+        if (is_draft === false) {
+             updateData.status = 'PENDING';
+             updateData.alasan_tolak = null;
+        }
+        // If draft, we might keep status as is or set to PENDING? 
+        // Logic: Draft edits don't trigger admin review until submitted (is_draft=false).
+        
+        await prisma.dataProdukUmkm.update({
+            where: { id: BigInt(id) },
+            data: updateData
         });
         return { success: true };
     } catch (error) {
         console.error('Error updating product:', error);
         return { success: false, error: 'Failed to update product' };
+    }
+}
+
+export async function publishProductUMKM(id: string, is_published: boolean) {
+    try {
+        // Validation: Verify it is APPROVED before publishing
+        const product = await prisma.dataProdukUmkm.findUnique({ where: { id: BigInt(id) } });
+        if (!product || product.status !== 'APPROVED') {
+             return { success: false, error: 'Product must be APPROVED to publish.' };
+        }
+
+        await prisma.dataProdukUmkm.update({
+            where: { id: BigInt(id) },
+            data: { is_published }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error publishing product:', error);
+        return { success: false, error: 'Failed to publish product' };
+    }
+}
+
+export async function getPublicProducts() {
+    try {
+        const products = await prisma.dataProdukUmkm.findMany({
+            where: { 
+                status: 'APPROVED',
+                is_published: true,
+                is_draft: false 
+            },
+            include: { umkm: true },
+            orderBy: { created_at: 'desc' }
+        });
+        
+        return products.map((item: any) => ({
+            ...item,
+            id: item.id.toString(),
+            id_umkm: item.id_umkm.toString(),
+            created_at: item.created_at.toISOString(),
+            nama_umkm: item.umkm?.nama_umkm || 'Unknown UMKM',
+            foto_produk: item.foto_produk || (item.gambar ? [item.gambar] : []),
+            spesifikasi: item.spesifikasi || []
+        }));
+    } catch (error) {
+         console.error('Error fetching public products:', error);
+         return [];
     }
 }
 
@@ -1150,5 +1234,49 @@ export async function updateUMKMData(data: any) {
     } catch (error) {
         console.error('Error updating UMKM:', error);
         return { success: false, error: 'Failed to update UMKM' };
+    }
+}
+
+export async function saveQuizResult(data: { 
+    id_user: string, 
+    id_materi: string, 
+    nama_materi: string, 
+    skor: number, 
+    jawaban_user: any 
+}) {
+    try {
+        const { id_user, id_materi, nama_materi, skor, jawaban_user } = data;
+
+        // Ensure user exists
+        const user = await prisma.dataUserLogin.findUnique({ where: { id_login: id_user } });
+        if (!user) return { success: false, error: 'User not found' };
+
+        // Ensure materi exists, if not create it (auto-seed)
+        let materi = await prisma.dataMateriLatihan.findUnique({ where: { id_materi: id_materi } });
+        if (!materi) {
+             await prisma.dataMateriLatihan.create({
+                 data: {
+                     id_materi,
+                     nama_materi,
+                     topik: 'Auto-generated',
+                     content: {}, 
+                 }
+             });
+        }
+
+        await prisma.dataHasilKuis.create({
+            data: {
+                id_user,
+                id_materi,
+                skor,
+                jawaban_user,
+                tanggal: new Date()
+            }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving quiz result:', error);
+        return { success: false, error: 'Failed to save quiz result' };
     }
 }

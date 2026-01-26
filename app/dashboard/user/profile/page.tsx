@@ -6,12 +6,15 @@ import { updateUserProfile, getUserProfileByEmail } from '@/app/actions';
 import Image from 'next/image';
 import { Camera, Save, Loader2 } from 'lucide-react';
 import AlertModal from '@/app/components/AlertModal';
+import SuccessPopup from '@/app/components/SuccessPopup';
 
 export default function UserProfilePage() {
     const { data: session, update } = useSession();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const [alertState, setAlertState] = useState<{
         isOpen: boolean;
@@ -102,8 +105,12 @@ export default function UserProfilePage() {
             });
 
             if (result.success) {
-                await update({ image: formData.foto, name: formData.nama });
-                showAlert('success', 'Berhasil', 'Profil berhasil diperbarui!');
+                // Update session to reflect changes in Navbar immediately
+                await update({ 
+                    image: formData.foto, 
+                    name: formData.nama 
+                });
+                setShowSuccessPopup(true);
             } else {
                 showAlert('error', 'Gagal', 'Gagal memperbarui profil: ' + result.error);
             }
@@ -131,18 +138,24 @@ export default function UserProfilePage() {
                 message={alertState.message}
             />
 
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Profil</h1>
+            <SuccessPopup 
+                isOpen={showSuccessPopup}
+                onClose={() => setShowSuccessPopup(false)}
+            />
 
-            <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Profil</h1>
+
+
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm p-8 border border-gray-100 dark:border-zinc-800">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Foto Profil */}
                     <div className="flex flex-col items-center mb-8">
                         <div className="relative group">
-                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100">
+                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 dark:border-zinc-800">
                                 {formData.foto ? (
                                     <img src={formData.foto} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                                    <div className="w-full h-full bg-gray-200 dark:bg-zinc-800 flex items-center justify-center text-gray-400">
                                         <Camera size={40} />
                                     </div>
                                 )}
@@ -152,95 +165,95 @@ export default function UserProfilePage() {
                                 <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                             </label>
                         </div>
-                        <p className="text-sm text-gray-500 mt-2">Klik ikon kamera untuk mengganti foto</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Klik ikon kamera untuk mengganti foto</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Nama Lengkap */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Nama Lengkap</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Nama Lengkap</label>
                             <input
                                 type="text"
                                 name="nama"
                                 value={formData.nama}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Masukkan nama lengkap"
                             />
                         </div>
 
                         {/* Email (Read only) */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Email</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email</label>
                             <input
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 disabled
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-400 cursor-not-allowed"
                             />
                         </div>
 
                         {/* No WA */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Nomor WhatsApp</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Nomor WhatsApp</label>
                             <input
                                 type="text"
                                 name="no_wa"
                                 value={formData.no_wa}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Contoh: 81234567890"
                             />
                         </div>
 
                         {/* Tanggal Lahir */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Tanggal Lahir</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tanggal Lahir</label>
                             <input
                                 type="date"
                                 name="tgl_lahir"
                                 value={formData.tgl_lahir}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                             />
                         </div>
 
                         {/* Sekolah / Instansi */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Sekolah / Instansi</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Sekolah / Instansi</label>
                             <input
                                 type="text"
                                 name="sekolah"
                                 value={formData.sekolah}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Nama Sekolah"
                             />
                         </div>
 
                         {/* Kelas (Optional) */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Kelas</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Kelas</label>
                             <input
                                 type="text"
                                 name="kelas"
                                 value={formData.kelas}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Contoh: XII"
                             />
                         </div>
 
                         {/* Jurusan (Optional) */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Jurusan</label>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Jurusan</label>
                             <input
                                 type="text"
                                 name="jurusan"
                                 value={formData.jurusan}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Contoh: RPL"
                             />
                         </div>
