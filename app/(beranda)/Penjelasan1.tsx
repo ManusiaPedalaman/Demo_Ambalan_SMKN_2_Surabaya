@@ -145,7 +145,7 @@ const Penjelasan1 = ({
   return (
     <section
 
-      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px] bg-gradient-to-b from-white to-[#7A5F3D]/5 transition-colors duration-500"
+      className="w-full relative overflow-hidden px-6 md:px-12 lg:px-[100px] bg-white bg-gradient-to-b from-white to-[#7A5F3D]/5 transition-colors duration-500"
       style={{
         paddingTop,
         paddingBottom,
