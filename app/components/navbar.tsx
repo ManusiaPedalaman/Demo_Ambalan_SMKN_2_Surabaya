@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { getUserProfileByEmail } from '@/app/actions';
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -57,6 +58,8 @@ export default function Navbar() {
 
 
 
+
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && event.target instanceof Node) {
@@ -72,6 +75,19 @@ export default function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside as EventListener);
     };
   }, []);
+
+  // Sync profile image from DB
+  useEffect(() => {
+    const syncProfileImage = async () => {
+        if (session?.user?.email) {
+            const profile = await getUserProfileByEmail(session.user.email);
+            if (profile?.foto) {
+                setPreviewImage(profile.foto);
+            }
+        }
+    };
+    syncProfileImage();
+  }, [session]);
 
 
 

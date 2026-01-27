@@ -106,10 +106,16 @@ export default function UserProfilePage() {
 
             if (result.success) {
                 // Update session to reflect changes in Navbar immediately
-                await update({ 
-                    image: formData.foto, 
-                    name: formData.nama 
-                });
+                try {
+                    await update({ 
+                        image: formData.foto, 
+                        name: formData.nama 
+                    });
+                } catch (sessionError) {
+                    console.warn("Session update failed (likely due to image size), but DB updated:", sessionError);
+                }
+                
+                // Show success popup regardless of session update status
                 setShowSuccessPopup(true);
             } else {
                 showAlert('error', 'Gagal', 'Gagal memperbarui profil: ' + result.error);
@@ -146,19 +152,19 @@ export default function UserProfilePage() {
                 }}
             />
 
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Profil</h1>
+            <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Profil</h1>
 
 
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm p-8 border border-gray-100 dark:border-zinc-800">
+            <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Foto Profil */}
                     <div className="flex flex-col items-center mb-8">
                         <div className="relative group">
-                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 dark:border-zinc-800">
+                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100">
                                 {formData.foto ? (
                                     <img src={formData.foto} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full bg-gray-200 dark:bg-zinc-800 flex items-center justify-center text-gray-400">
+                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
                                         <Camera size={40} />
                                     </div>
                                 )}
@@ -168,13 +174,13 @@ export default function UserProfilePage() {
                                 <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                             </label>
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Klik ikon kamera untuk mengganti foto</p>
+                        <p className="text-sm text-gray-500 mt-2">Klik ikon kamera untuk mengganti foto</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Nama Lengkap */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Nama Lengkap</label>
+                            <label className="text-sm font-semibold text-gray-700">Nama Lengkap</label>
                             <input
                                 type="text"
                                 name="nama"
@@ -187,7 +193,7 @@ export default function UserProfilePage() {
 
                         {/* Email (Read only) */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Email</label>
+                            <label className="text-sm font-semibold text-gray-700">Email</label>
                             <input
                                 type="email"
                                 name="email"
@@ -199,7 +205,7 @@ export default function UserProfilePage() {
 
                         {/* No WA */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Nomor WhatsApp</label>
+                            <label className="text-sm font-semibold text-gray-700">Nomor WhatsApp</label>
                             <input
                                 type="text"
                                 name="no_wa"
@@ -212,7 +218,7 @@ export default function UserProfilePage() {
 
                         {/* Tanggal Lahir */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tanggal Lahir</label>
+                            <label className="text-sm font-semibold text-gray-700">Tanggal Lahir</label>
                             <input
                                 type="date"
                                 name="tgl_lahir"
@@ -224,7 +230,7 @@ export default function UserProfilePage() {
 
                         {/* Sekolah / Instansi */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Sekolah / Instansi</label>
+                            <label className="text-sm font-semibold text-gray-700">Sekolah / Instansi</label>
                             <input
                                 type="text"
                                 name="sekolah"
@@ -237,7 +243,7 @@ export default function UserProfilePage() {
 
                         {/* Kelas (Optional) */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Kelas</label>
+                            <label className="text-sm font-semibold text-gray-700">Kelas</label>
                             <input
                                 type="text"
                                 name="kelas"
@@ -250,7 +256,7 @@ export default function UserProfilePage() {
 
                         {/* Jurusan (Optional) */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Jurusan</label>
+                            <label className="text-sm font-semibold text-gray-700">Jurusan</label>
                             <input
                                 type="text"
                                 name="jurusan"
