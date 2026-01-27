@@ -2,8 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { getUserProfileByEmail, getUserHistory, updateHistoryItem } from '@/app/actions';
-import { Loader2, Edit, Save, X, Eye } from 'lucide-react';
+import { 
+    getUserProfileByEmail, 
+    getUserHistory, 
+    updateHistoryItem,
+    deleteBooking,
+    deleteContactMessage,
+    deleteJoinMember,
+    deleteQuizResult
+} from '@/app/actions';
+import { Loader2, Edit, Save, X, Eye, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Simple Tabs Component
@@ -46,23 +54,28 @@ export default function UserHistoryPage() {
     const [editItem, setEditItem] = useState<any>(null); // Item being edited
     const [editType, setEditType] = useState<string>('');
     const [showDetailModal, setShowDetailModal] = useState<any>(null); // For Quiz detail
+    
+    // Delete State
+    const [deleteItem, setDeleteItem] = useState<{ id: string, type: string } | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
-        const loadHistory = async () => {
-             if (session?.user?.email) {
-                 const profile = await getUserProfileByEmail(session.user.email);
-                 const identifier = {
-                     email: session.user.email,
-                     nama: profile?.nama_lengkap || undefined,
-                     no_wa: profile?.no_wa || undefined
-                 };
-                 const data = await getUserHistory(identifier);
-                 setHistoryData(data);
-             }
-             setLoading(false);
-        };
         loadHistory();
     }, [session]);
+
+    const loadHistory = async () => {
+        if (session?.user?.email) {
+            const profile = await getUserProfileByEmail(session.user.email);
+            const identifier = {
+                email: session.user.email,
+                nama: profile?.nama_lengkap || undefined,
+                no_wa: profile?.no_wa || undefined
+            };
+            const data = await getUserHistory(identifier);
+            setHistoryData(data);
+        }
+        setLoading(false);
+    };
 
     const handleEdit = (type: string, item: any) => {
         setEditType(type);
@@ -72,10 +85,6 @@ export default function UserHistoryPage() {
     const handleSaveEdit = async () => {
         if (!editItem) return;
         
-        // Prepare data for update (remove non-editable fields if necessary)
-        // For simplicity, passing everything, but action should filter or we filter here.
-        // We only allowing editing specific fields? User requirement: "most data".
-        
         let updateData: any = {};
         if (editType === 'sewa') {
              updateData = { 
@@ -83,7 +92,6 @@ export default function UserHistoryPage() {
                  jumlah_produk: editItem.jumlah_produk,
                  tgl_pengambilan: new Date(editItem.tgl_pengambilan),
                  tgl_pengembalian: new Date(editItem.tgl_pengembalian)
-                 // status keys usually admin only
              };
         } else if (editType === 'hubungi') {
              updateData = { pesan: editItem.pesan, no_wa: editItem.no_wa };
@@ -95,16 +103,52 @@ export default function UserHistoryPage() {
         if (res.success) {
             alert('Data berhasil diperbarui!');
             setEditItem(null);
-            // Reload data
-            const profile = await getUserProfileByEmail(session?.user?.email || '');
-            const data = await getUserHistory({
-                 email: session?.user?.email || '',
-                 nama: profile?.nama_lengkap || undefined, 
-                 no_wa: profile?.no_wa || undefined
-            });
-            setHistoryData(data);
+            loadHistory();
         } else {
             alert('Gagal update: ' + res.error);
+        }
+    };
+
+    const confirmDelete = (type: string, id: string) => {
+        setDeleteItem({ id, type });
+    };
+
+    const executeDelete = async () => {
+        if (!deleteItem) return;
+        setIsDeleting(true);
+
+        try {
+            let res: any = { success: false };
+            
+            switch (deleteItem.type) {
+                case 'sewa': res = await deleteBooking(deleteItem.id); break;
+                case 'hubungi': res = await deleteContactMessage(deleteItem.id); break;
+                case 'join': res = await deleteJoinMember(deleteItem.id); break;
+                case 'kuis': res = await deleteQuizResult(deleteItem.id); break;
+            }
+
+            if (res.success) {
+                // Remove from local state immediately for snappy feel, then reload to be sure
+                setHistoryData((prev: any) => {
+                    const keyMap: any = { 'sewa': 'rentals', 'hubungi': 'contacts', 'join': 'joins', 'kuis': 'quizzes' };
+                    const key = keyMap[deleteItem.type];
+                    return {
+                        ...prev,
+                        [key]: prev[key].filter((i: any) => i.id !== deleteItem.id)
+                    };
+                });
+                
+                // Also trigger reload to sync background things if needed
+                loadHistory(); 
+                setDeleteItem(null);
+            } else {
+                alert('Gagal menghapus data: ' + res.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Terjadi kesalahan saat menghapus data.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -137,7 +181,7 @@ export default function UserHistoryPage() {
                                             <th className="p-3">Barang</th>
                                             <th className="p-3">Tgl Ambil</th>
                                             <th className="p-3">Status</th>
-                                            <th className="p-3">Aksi</th>
+                                            <th className="p-3 text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -151,9 +195,12 @@ export default function UserHistoryPage() {
                                                         {item.status_kembali || 'Belum'}
                                                     </span>
                                                 </td>
-                                                <td className="p-3">
-                                                    <button onClick={() => handleEdit('sewa', item)} className="p-1.5 hover:bg-[#997B55]/10 text-[#997B55] rounded-lg transition-colors">
+                                                <td className="p-3 flex justify-center gap-2">
+                                                    <button onClick={() => handleEdit('sewa', item)} className="p-1.5 hover:bg-[#997B55]/10 text-[#997B55] rounded-lg transition-colors" title="Edit">
                                                         <Edit size={16} />
+                                                    </button>
+                                                    <button onClick={() => confirmDelete('sewa', item.id)} className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors" title="Hapus">
+                                                        <Trash2 size={16} />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -174,9 +221,14 @@ export default function UserHistoryPage() {
                                             <p className="text-gray-600 line-clamp-2">{item.pesan}</p>
                                             <span className="text-xs text-gray-400 mt-2 block">Status: {item.status}</span>
                                         </div>
-                                        <button onClick={() => handleEdit('hubungi', item)} className="text-[#997B55] hover:underline text-sm flex items-center gap-1">
-                                            <Edit size={14} /> Edit
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleEdit('hubungi', item)} className="text-[#997B55] hover:underline text-sm flex items-center gap-1">
+                                                <Edit size={14} /> Edit
+                                            </button>
+                                            <button onClick={() => confirmDelete('hubungi', item.id)} className="text-red-500 hover:underline text-sm flex items-center gap-1">
+                                                <Trash2 size={14} /> Hapus
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                              </div>
@@ -194,9 +246,14 @@ export default function UserHistoryPage() {
                                             <p className="text-gray-600 mt-2 text-sm">"{item.pesan}"</p>
                                             <span className="text-xs text-gray-400 mt-2 block">Dibuat: {formatDate(item.created_at)}</span>
                                         </div>
-                                        <button onClick={() => handleEdit('join', item)} className="text-[#997B55] hover:underline text-sm flex items-center gap-1">
-                                            <Edit size={14} /> Edit
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleEdit('join', item)} className="text-[#997B55] hover:underline text-sm flex items-center gap-1">
+                                                <Edit size={14} /> Edit
+                                            </button>
+                                            <button onClick={() => confirmDelete('join', item.id)} className="text-red-500 hover:underline text-sm flex items-center gap-1">
+                                                <Trash2 size={14} /> Hapus
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                              </div>
@@ -207,10 +264,18 @@ export default function UserHistoryPage() {
                          {historyData.quizzes.length === 0 ? <p className="text-gray-400 text-center py-10">Belum ada data history.</p> : (
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {historyData.quizzes.map((item: any) => (
-                                    <div key={item.id} className="p-4 border rounded-xl hover:shadow-md transition-shadow">
+                                    <div key={item.id} className="p-4 border rounded-xl hover:shadow-md transition-shadow relative group">
+                                         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); confirmDelete('kuis', item.id); }}
+                                                className="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                         <div className="flex justify-between items-center mb-2">
                                             <h3 className="font-bold text-gray-800">{item.materi?.nama_materi || 'Materi'}</h3>
-                                            <span className="text-lg font-bold text-[#997B55]">{item.skor} Poin</span>
+                                            <span className="text-lg font-bold text-[#997B55] pr-8">{item.skor} Poin</span>
                                         </div>
                                         <p className="text-xs text-gray-500 mb-4">Tanggal: {formatDate(item.tanggal)}</p>
                                         <button 
@@ -268,6 +333,51 @@ export default function UserHistoryPage() {
                                 <button onClick={() => setEditItem(null)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">Batal</button>
                                 <button onClick={handleSaveEdit} className="px-4 py-2 text-white bg-[#997B55] rounded-lg hover:bg-[#8B6E4A] flex items-center gap-2">
                                     <Save size={18} /> Simpan
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {deleteItem && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }} 
+                        className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm"
+                        onClick={() => !isDeleting && setDeleteItem(null)}
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }} 
+                            animate={{ scale: 1, opacity: 1 }} 
+                            exit={{ scale: 0.9, opacity: 0 }} 
+                            className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <AlertTriangle size={32} className="text-red-600" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800 mb-2">Konfirmasi Hapus</h3>
+                            <p className="text-gray-500 mb-6">
+                                Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => setDeleteItem(null)} 
+                                    disabled={isDeleting}
+                                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                                >
+                                    Batal
+                                </button>
+                                <button 
+                                    onClick={executeDelete} 
+                                    disabled={isDeleting}
+                                    className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {isDeleting ? <Loader2 className="animate-spin" size={18} /> : 'Hapus'}
                                 </button>
                             </div>
                         </motion.div>

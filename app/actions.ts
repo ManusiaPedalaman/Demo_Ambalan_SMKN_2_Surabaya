@@ -137,6 +137,34 @@ Message: ${data.message || '-'}
     }
 }
 
+export async function getUserDashboardData(email: string) {
+    try {
+        // 1. Fetch Profile
+        const profile = await getUserProfileByEmail(email);
+        const name = profile?.nama_lengkap || 'User';
+        const no_wa = profile?.no_wa;
+
+        // 2. Fetch History using profile data
+        const history = await getUserHistory({
+            email: email,
+            nama: name,
+            no_wa: no_wa || undefined
+        });
+
+        // 3. Return aggregated data
+        return {
+            profile,
+            history
+        };
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        return {
+            profile: null,
+            history: { rentals: [], quizzes: [], contacts: [], joins: [] }
+        };
+    }
+}
+
 
 import { prisma } from "@/lib/prisma";
 
@@ -1278,5 +1306,15 @@ export async function saveQuizResult(data: {
     } catch (error) {
         console.error('Error saving quiz result:', error);
         return { success: false, error: 'Failed to save quiz result' };
+    }
+}
+
+export async function deleteQuizResult(id: string) {
+    try {
+        await prisma.dataHasilKuis.delete({ where: { id: BigInt(id) } });
+        return { success: true };
+    } catch (e) {
+        console.error(e);
+        return { success: false, error: 'Failed to delete quiz result' };
     }
 }

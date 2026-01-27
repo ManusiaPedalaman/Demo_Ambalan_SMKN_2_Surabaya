@@ -45,7 +45,7 @@ export default function SuccessPopup({
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl relative z-10 max-w-sm w-full text-center flex flex-col items-center"
+                        className="bg-white rounded-3xl p-8 shadow-2xl relative z-10 max-w-sm w-full text-center flex flex-col items-center"
                     >
                         <div className="w-20 h-20 bg-[#997B55] rounded-full flex items-center justify-center mb-6 shadow-lg shadow-[#997B55]/30">
                             <motion.div
@@ -57,17 +57,17 @@ export default function SuccessPopup({
                             </motion.div>
                         </div>
 
-                        <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2 font-poppins">
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2 font-poppins">
                             {title}
                         </h3>
                         
-                        <p className="text-gray-500 dark:text-gray-400 mb-8 font-dm-sans">
+                        <p className="text-gray-500 mb-8 font-dm-sans">
                             {message}
                         </p>
 
                         <button
                             onClick={onClose}
-                            className="w-full py-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-200 rounded-xl font-bold transition-all"
+                            className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-all"
                         >
                             Tutup
                         </button>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { getUserProfileByEmail, getUserHistory } from '@/app/actions';
+import { getUserDashboardData } from '@/app/actions';
 import { LayoutDashboard, ShoppingBag, MessageSquare, Flame, Clock, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
@@ -21,40 +21,38 @@ export default function UserDashboardPage() {
     useEffect(() => {
         const loadData = async () => {
             if (session?.user?.email) {
-                // Get Profile Name
-                const profile = await getUserProfileByEmail(session.user.email);
-                const name = profile?.nama_lengkap || session.user.name || 'User';
-                setUserName(name);
+                try {
+                    // Fetch all dashboard data in one server action
+                    const { profile, history } = await getUserDashboardData(session.user.email);
+                    
+                    const name = profile?.nama_lengkap || session.user.name || 'User';
+                    setUserName(name);
 
-                // Get History Data
-                const history = await getUserHistory({
-                    email: session.user.email,
-                    nama: name, 
-                    no_wa: profile?.no_wa || undefined
-                });
+                    // Calculate Stats
+                    const activeRentals = history.rentals.filter((r: any) => r.status_kembali === 'Belum').length;
+                    const totalRentals = history.rentals.length;
+                    const totalQuizzes = history.quizzes.length;
+                    const totalMessages = history.contacts.length;
 
-                // Calculate Stats
-                const activeRentals = history.rentals.filter((r: any) => r.status_kembali === 'Belum').length;
-                const totalRentals = history.rentals.length;
-                const totalQuizzes = history.quizzes.length;
-                const totalMessages = history.contacts.length; // messages sent
+                    setStats({
+                        rentals: totalRentals,
+                        quizzes: totalQuizzes,
+                        messages: totalMessages,
+                        activeRentals: activeRentals
+                    });
 
-                setStats({
-                    rentals: totalRentals,
-                    quizzes: totalQuizzes,
-                    messages: totalMessages,
-                    activeRentals: activeRentals
-                });
+                    // Combine and Sort Recent Activity
+                    const allActivity = [
+                        ...history.rentals.map((r: any) => ({ ...r, type: 'rental', date: new Date(r.tgl_pengambilan || r.createdAt) })),
+                        ...history.quizzes.map((q: any) => ({ ...q, type: 'quiz', date: new Date(q.tanggal) })),
+                        ...history.contacts.map((c: any) => ({ ...c, type: 'contact', date: new Date(c.created_at || new Date()) })),
+                        ...history.joins.map((j: any) => ({ ...j, type: 'join', date: new Date(j.created_at || new Date()) }))
+                    ].sort((a: any, b: any) => (b.date - a.date)); 
 
-                // Combine and Sort Recent Activity
-                const allActivity = [
-                    ...history.rentals.map((r: any) => ({ ...r, type: 'rental', date: new Date(r.tgl_pengambilan || r.createdAt) })),
-                    ...history.quizzes.map((q: any) => ({ ...q, type: 'quiz', date: new Date(q.tanggal) })),
-                    ...history.contacts.map((c: any) => ({ ...c, type: 'contact', date: new Date(c.created_at || new Date()) })),
-                    ...history.joins.map((j: any) => ({ ...j, type: 'join', date: new Date(j.created_at || new Date()) }))
-                ].sort((a: any, b: any) => (b.id - a.id) || (b.date - a.date)); 
-
-                setRecentActivity(allActivity.slice(0, 5));
+                    setRecentActivity(allActivity.slice(0, 5));
+                } catch (error) {
+                    console.error("Dashboard load error:", error);
+                }
             }
             setLoading(false);
         };

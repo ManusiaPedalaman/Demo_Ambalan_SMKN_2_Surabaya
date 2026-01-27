@@ -8,13 +8,13 @@ export default function UserDashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <AdminGuard>
-            <div className="flex min-h-screen bg-[#F5F6FA]">
-                <UserSidebar />
-                <main className="flex-1 w-full min-w-0 lg:ml-64 bg-[#F8FAFC]">
+        <div className="flex min-h-screen bg-[#F5F6FA]">
+            <UserSidebar />
+            <main className="flex-1 w-full min-w-0 lg:ml-64 bg-[#F8FAFC]">
+                <AdminGuard>
                     {children}
-                </main>
-            </div>
-        </AdminGuard>
+                </AdminGuard>
+            </main>
+        </div>
     );
 }
