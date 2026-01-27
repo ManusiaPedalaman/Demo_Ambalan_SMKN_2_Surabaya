@@ -140,7 +140,10 @@ export default function UserProfilePage() {
 
             <SuccessPopup 
                 isOpen={showSuccessPopup}
-                onClose={() => setShowSuccessPopup(false)}
+                onClose={() => {
+                    setShowSuccessPopup(false);
+                    window.location.reload();
+                }}
             />
 
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Profil</h1>
@@ -177,7 +180,7 @@ export default function UserProfilePage() {
                                 name="nama"
                                 value={formData.nama}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Masukkan nama lengkap"
                             />
                         </div>
@@ -190,7 +193,7 @@ export default function UserProfilePage() {
                                 name="email"
                                 value={formData.email}
                                 disabled
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-gray-400 cursor-not-allowed"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
                             />
                         </div>
 
@@ -202,7 +205,7 @@ export default function UserProfilePage() {
                                 name="no_wa"
                                 value={formData.no_wa}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Contoh: 81234567890"
                             />
                         </div>
@@ -215,7 +218,7 @@ export default function UserProfilePage() {
                                 name="tgl_lahir"
                                 value={formData.tgl_lahir}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                             />
                         </div>
 
@@ -227,7 +230,7 @@ export default function UserProfilePage() {
                                 name="sekolah"
                                 value={formData.sekolah}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Nama Sekolah"
                             />
                         </div>
@@ -240,7 +243,7 @@ export default function UserProfilePage() {
                                 name="kelas"
                                 value={formData.kelas}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Contoh: XII"
                             />
                         </div>
@@ -253,7 +256,7 @@ export default function UserProfilePage() {
                                 name="jurusan"
                                 value={formData.jurusan}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#997B55]/20 focus:border-[#997B55] transition-all"
                                 placeholder="Contoh: RPL"
                             />
                         </div>

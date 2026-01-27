@@ -250,7 +250,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
         <div className="w-full lg:w-[40%] flex flex-col gap-6 lg:sticky lg:top-32 h-fit">
 
-          <div className="w-full aspect-[4/3] bg-[#C9826B]/20 rounded-2xl relative overflow-hidden border border-[#C9826B]/30 flex items-center justify-center group">
+          <div className="w-full aspect-square bg-[#C9826B]/20 rounded-2xl relative overflow-hidden border border-[#C9826B]/30 flex items-center justify-center group">
             <div className="absolute inset-0 opacity-10 bg-[url('/Image/Vector.webp')] bg-repeat bg-cover mix-blend-overlay"></div>
 
             <Image
