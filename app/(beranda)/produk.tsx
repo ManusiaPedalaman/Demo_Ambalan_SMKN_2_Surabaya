@@ -7,6 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 
+import { getPublicProducts } from '@/app/actions';
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
@@ -20,6 +22,7 @@ interface Product {
   duration: string;
   image: string;
   slug: string;
+  type?: string;
 }
 
 const Produk = () => {
@@ -54,7 +57,28 @@ const Produk = () => {
     }
   };
 
+  // Fetch UMKM products
+  const [umkmProducts, setUmkmProducts] = useState<Product[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    const fetchUmkm = async () => {
+      const res = await getPublicProducts();
+      if (res) {
+          const normalized: Product[] = res.map((p: any) => ({
+              id: p.id,
+              name: p.nama_produk,
+              price: 'Rp ' + p.harga, // Format price
+              duration: 'item', // or 'beli'
+              image: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk[0] : (p.gambar || ''),
+              slug: p.slug || p.id, // Use slug or id
+              type: 'umkm'
+          }));
+          setUmkmProducts(normalized);
+      }
+    };
+    fetchUmkm();
+  }, []);
 
   const products: Product[] = [
     {
@@ -64,6 +88,7 @@ const Produk = () => {
       duration: '1 hari',
       image: '/Image/tenda1.webp',
       slug: 'tenda-segitiga',
+      type: 'rental'
     },
     {
       id: 2,
@@ -72,6 +97,7 @@ const Produk = () => {
       duration: '1 hari',
       image: '/Image/matras.webp',
       slug: 'matras-spons',
+      type: 'rental'
     },
     {
       id: 3,
@@ -80,6 +106,7 @@ const Produk = () => {
       duration: '1 hari',
       image: '/Image/tongkat.webp',
       slug: 'tongkat-pramuka',
+      type: 'rental'
     },
     {
       id: 4,
@@ -88,6 +115,7 @@ const Produk = () => {
       duration: '3 hari',
       image: '/Image/paket_lengkap.webp',
       slug: 'paket-lengkap',
+      type: 'rental'
     },
     {
       id: 5,
@@ -96,10 +124,12 @@ const Produk = () => {
       duration: '3 hari',
       image: '/Image/tali.webp',
       slug: 'tali-pramuka',
+      type: 'rental'
     },
-
   ];
 
+  // Combine products
+  const allProducts = [...products, ...umkmProducts];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -138,7 +168,7 @@ const Produk = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const totalSlides = Math.ceil(products.length / itemsPerView);
+  const totalSlides = Math.ceil(allProducts.length / itemsPerView);
 
   useEffect(() => {
     setCurrentSlide(0);
@@ -156,7 +186,7 @@ const Produk = () => {
     setCurrentSlide(index);
   };
 
-  const visibleProducts = products.slice(
+  const visibleProducts = allProducts.slice(
     currentSlide * itemsPerView,
     currentSlide * itemsPerView + itemsPerView
   );
@@ -222,7 +252,7 @@ const Produk = () => {
             >
               {visibleProducts.map((product, index) => (
                 <Link
-                  href={`/${product.slug}`}
+                  href={product.type === 'umkm' ? `/produk-siswa/${product.slug}` : `/${product.slug}`}
                   key={product.id}
 
                   style={{ transitionDelay: `${index * 150}ms` }}

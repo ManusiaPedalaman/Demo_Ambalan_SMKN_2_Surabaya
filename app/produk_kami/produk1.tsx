@@ -93,7 +93,7 @@ export default function Produk() {
       variants={cardVariants}
       className="group h-full"
     >
-      <Link href={`/${product.slug}`} className="block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
+      <Link href={product.type === 'umkm' ? `/produk-siswa/${product.slug}` : `/${product.slug}`} className="block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
         <div className="relative w-full aspect-square bg-[#F2E6D8] overflow-hidden">
           <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
           {product.images.length > 0 ? (

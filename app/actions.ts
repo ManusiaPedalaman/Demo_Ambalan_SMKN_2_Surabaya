@@ -1227,7 +1227,48 @@ export async function getPublicProducts() {
          console.error('Error fetching public products:', error);
          return [];
     }
+
+export async function getPublicProductById(slugOrId: string) {
+    try {
+        let product = null;
+
+        // Validasi input: jika numeric, coba cari by ID
+        const isNumeric = /^\d+$/.test(slugOrId);
+        if (isNumeric) {
+             product = await prisma.dataProdukUmkm.findUnique({
+                where: { id: BigInt(slugOrId) },
+                include: { umkm: true }
+            });
+        }
+
+        // Jika tidak ketemu by ID (atau bukan numeric), cari by Slug
+        if (!product) {
+            product = await prisma.dataProdukUmkm.findFirst({
+                where: { slug: slugOrId },
+                include: { umkm: true }
+            });
+        }
+
+        if (!product || product.status !== 'APPROVED' || !product.is_published) {
+             return null;
+        }
+        
+        return {
+            ...product,
+            id: product.id.toString(),
+            id_umkm: product.id_umkm.toString(),
+            created_at: product.created_at.toISOString(),
+            nama_umkm: product.umkm?.nama_umkm || 'Unknown UMKM',
+            no_wa: product.umkm?.no_wa || '',
+            foto_produk: product.foto_produk || (product.gambar ? [product.gambar] : []),
+            spesifikasi: product.spesifikasi || []
+        };
+    } catch (error) {
+         console.error('Error fetching public product by id/slug:', error);
+         return null;
+    }
 }
+
 
 export async function deleteProductUMKM(id: string) {
     try {
