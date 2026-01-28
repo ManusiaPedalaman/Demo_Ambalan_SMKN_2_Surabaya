@@ -11,7 +11,6 @@ import {
   ShoppingCart,
   BadgeCheck,
   ArrowLeft,
-  ArrowLeft,
   AlertTriangle,
   ChevronLeft,
   ChevronRight
@@ -56,7 +55,7 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(4);
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = React.useRef<HTMLElement>(null);
+  const sectionRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     async function fetchUmkm() {
