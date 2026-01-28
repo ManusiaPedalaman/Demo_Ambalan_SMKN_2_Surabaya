@@ -5,6 +5,7 @@ import { getPendingUMKMList, updateUMKMStatus } from '@/app/actions';
 import { Store, CheckCircle, XCircle, Loader2, Eye, X } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmationPopup from '@/app/components/ConfirmationPopup';
 
 export default function AdminConfirmUMKMPage() {
     const [loading, setLoading] = useState(true);
@@ -13,6 +14,9 @@ export default function AdminConfirmUMKMPage() {
     const [rejectReason, setRejectReason] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    
+    // Approval Confirmation Modal
+    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null });
 
     const loadData = async () => {
         setLoading(true);
@@ -25,14 +29,22 @@ export default function AdminConfirmUMKMPage() {
         loadData();
     }, []);
 
-    const handleApprove = async (id: string) => {
-        if (!confirm('Setujui pendaftaran UMKM ini?')) return;
+    const handleApproveClick = (id: string) => {
+        setConfirmModal({ isOpen: true, id });
+    };
+
+    const executeApprove = async () => {
+        if (!confirmModal.id) return;
+        const id = confirmModal.id;
         setProcessingId(id);
+        
         const res = await updateUMKMStatus(id, 'APPROVED');
         if (res.success) {
             setUmkmList(prev => prev.filter(item => item.id !== id));
+            setConfirmModal({ isOpen: false, id: null });
         } else {
             alert('Gagal menyetujui: ' + res.error);
+            setConfirmModal({ isOpen: false, id: null });
         }
         setProcessingId(null);
     };
@@ -134,7 +146,7 @@ export default function AdminConfirmUMKMPage() {
                                         <td className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button
-                                                    onClick={() => handleApprove(item.id)}
+                                                    onClick={() => handleApproveClick(item.id)}
                                                     disabled={processingId === item.id}
                                                     className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50"
                                                     title="Terima"
@@ -205,6 +217,19 @@ export default function AdminConfirmUMKMPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+            
+            {/* Approval Confirmation Popup */}
+            <ConfirmationPopup
+                isOpen={confirmModal.isOpen}
+                title="Setujui Pendaftaran UMKM?"
+                message="UMKM ini akan terdaftar sebagai penjual resmi. Pemilik akan mendapatkan akses dashboard UMKM."
+                confirmText="Setujui"
+                confirmColor="bg-green-600"
+                icon="check"
+                onConfirm={executeApprove}
+                onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+                isLoading={!!processingId && processingId === confirmModal.id}
+            />
         </div>
     );
 }

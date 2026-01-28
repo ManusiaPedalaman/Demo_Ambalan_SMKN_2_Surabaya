@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { 
-    getUserProfileByEmail, 
-    getUserHistory, 
     updateHistoryItem,
     deleteBooking,
     deleteContactMessage,
@@ -13,6 +11,7 @@ import {
 } from '@/app/actions';
 import { Loader2, Edit, Save, X, Eye, Trash2, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUserDashboard } from '../UserContext';
 
 // Simple Tabs Component
 const Tabs = ({ children, activeTab, onTabChange }: any) => {
@@ -47,10 +46,10 @@ const TabContent = ({ value, activeTab, children }: any) => {
 };
 
 export default function UserHistoryPage() {
-    const { data: session } = useSession();
+    const { history: historyData, loading, refreshData } = useUserDashboard();
     const [activeTab, setActiveTab] = useState('sewa');
-    const [loading, setLoading] = useState(true);
-    const [historyData, setHistoryData] = useState<any>({ rentals: [], contacts: [], joins: [], quizzes: [] });
+    // const [loading, setLoading] = useState(true); // Handled by context
+    // const [historyData, setHistoryData] = useState<any>({ rentals: [], contacts: [], joins: [], quizzes: [] }); // Handled by context
     const [editItem, setEditItem] = useState<any>(null); // Item being edited
     const [editType, setEditType] = useState<string>('');
     const [showDetailModal, setShowDetailModal] = useState<any>(null); // For Quiz detail
@@ -59,23 +58,7 @@ export default function UserHistoryPage() {
     const [deleteItem, setDeleteItem] = useState<{ id: string, type: string } | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    useEffect(() => {
-        loadHistory();
-    }, [session]);
-
-    const loadHistory = async () => {
-        if (session?.user?.email) {
-            const profile = await getUserProfileByEmail(session.user.email);
-            const identifier = {
-                email: session.user.email,
-                nama: profile?.nama_lengkap || undefined,
-                no_wa: profile?.no_wa || undefined
-            };
-            const data = await getUserHistory(identifier);
-            setHistoryData(data);
-        }
-        setLoading(false);
-    };
+    // Initial load handled by Context Provider
 
     const handleEdit = (type: string, item: any) => {
         setEditType(type);
@@ -103,7 +86,7 @@ export default function UserHistoryPage() {
         if (res.success) {
             alert('Data berhasil diperbarui!');
             setEditItem(null);
-            loadHistory();
+            refreshData(); // Reload data via context
         } else {
             alert('Gagal update: ' + res.error);
         }
@@ -128,18 +111,11 @@ export default function UserHistoryPage() {
             }
 
             if (res.success) {
-                // Remove from local state immediately for snappy feel, then reload to be sure
-                setHistoryData((prev: any) => {
-                    const keyMap: any = { 'sewa': 'rentals', 'hubungi': 'contacts', 'join': 'joins', 'kuis': 'quizzes' };
-                    const key = keyMap[deleteItem.type];
-                    return {
-                        ...prev,
-                        [key]: prev[key].filter((i: any) => i.id !== deleteItem.id)
-                    };
-                });
+                // Remove from local state immediately? No, rely on refresh for consistency or do optimistic update?
+                // For simplicity and correctness with context, just refresh. But to make it snappy, we could optimistic update context? 
+                // Context doesn't expose setHistory. So just await refresh.
                 
-                // Also trigger reload to sync background things if needed
-                loadHistory(); 
+                await refreshData();
                 setDeleteItem(null);
             } else {
                 alert('Gagal menghapus data: ' + res.error);
@@ -306,25 +282,25 @@ export default function UserHistoryPage() {
                                 {editType === 'sewa' && (
                                     <>
                                         <div>
-                                            <label className="text-sm font-semibold">Nama Peminjam</label>
-                                            <input type="text" value={editItem.nama_peminjam || ''} onChange={(e) => setEditItem({...editItem, nama_peminjam: e.target.value})} className="w-full border rounded-lg p-2" />
+                                            <label className="text-sm font-semibold text-gray-700">Nama Peminjam</label>
+                                            <input type="text" value={editItem.nama_peminjam || ''} onChange={(e) => setEditItem({...editItem, nama_peminjam: e.target.value})} className="w-full border rounded-lg p-2 text-gray-900 bg-white" />
                                         </div>
                                         <div>
-                                            <label className="text-sm font-semibold">Jumlah Produk</label>
-                                            <input type="text" value={editItem.jumlah_produk || ''} onChange={(e) => setEditItem({...editItem, jumlah_produk: e.target.value})} className="w-full border rounded-lg p-2" />
+                                            <label className="text-sm font-semibold text-gray-700">Jumlah Produk</label>
+                                            <input type="text" value={editItem.jumlah_produk || ''} onChange={(e) => setEditItem({...editItem, jumlah_produk: e.target.value})} className="w-full border rounded-lg p-2 text-gray-900 bg-white" />
                                         </div>
                                     </>
                                 )}
                                 {(editType === 'hubungi' || editType === 'join') && (
                                     <div>
-                                        <label className="text-sm font-semibold">Pesan</label>
-                                        <textarea value={editItem.pesan || ''} onChange={(e) => setEditItem({...editItem, pesan: e.target.value})} className="w-full border rounded-lg p-2 h-24" />
+                                        <label className="text-sm font-semibold text-gray-700">Pesan</label>
+                                        <textarea value={editItem.pesan || ''} onChange={(e) => setEditItem({...editItem, pesan: e.target.value})} className="w-full border rounded-lg p-2 h-24 text-gray-900 bg-white" />
                                     </div>
                                 )}
                                 {editType === 'join' && (
                                     <div>
-                                        <label className="text-sm font-semibold">Asal Sekolah</label>
-                                        <input type="text" value={editItem.asal_sekolah || ''} onChange={(e) => setEditItem({...editItem, asal_sekolah: e.target.value})} className="w-full border rounded-lg p-2" />
+                                        <label className="text-sm font-semibold text-gray-700">Asal Sekolah</label>
+                                        <input type="text" value={editItem.asal_sekolah || ''} onChange={(e) => setEditItem({...editItem, asal_sekolah: e.target.value})} className="w-full border rounded-lg p-2 text-gray-900 bg-white" />
                                     </div>
                                 )}
                             </div>

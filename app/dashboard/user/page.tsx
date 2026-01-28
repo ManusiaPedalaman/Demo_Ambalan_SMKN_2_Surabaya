@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { getUserDashboardData } from '@/app/actions';
 import { LayoutDashboard, ShoppingBag, MessageSquare, Flame, Clock, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useUserDashboard } from './UserContext';
 
 export default function UserDashboardPage() {
     const { data: session } = useSession();
+    const { profile, history, loading } = useUserDashboard();
     const [stats, setStats] = useState({
         rentals: 0,
         quizzes: 0,
@@ -15,50 +16,37 @@ export default function UserDashboardPage() {
         activeRentals: 0
     });
     const [recentActivity, setRecentActivity] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
     const [userName, setUserName] = useState('');
 
     useEffect(() => {
-        const loadData = async () => {
-            if (session?.user?.email) {
-                try {
-                    // Fetch all dashboard data in one server action
-                    const { profile, history } = await getUserDashboardData(session.user.email);
-                    
-                    const name = profile?.nama_lengkap || session.user.name || 'User';
-                    setUserName(name);
+        if (loading) return;
 
-                    // Calculate Stats
-                    const activeRentals = history.rentals.filter((r: any) => r.status_kembali === 'Belum').length;
-                    const totalRentals = history.rentals.length;
-                    const totalQuizzes = history.quizzes.length;
-                    const totalMessages = history.contacts.length;
+        const name = profile?.nama_lengkap || session?.user?.name || 'User';
+        setUserName(name);
 
-                    setStats({
-                        rentals: totalRentals,
-                        quizzes: totalQuizzes,
-                        messages: totalMessages,
-                        activeRentals: activeRentals
-                    });
+        // Calculate Stats
+        const activeRentals = history.rentals.filter((r: any) => r.status_kembali === 'Belum').length;
+        const totalRentals = history.rentals.length;
+        const totalQuizzes = history.quizzes.length;
+        const totalMessages = history.contacts.length;
 
-                    // Combine and Sort Recent Activity
-                    const allActivity = [
-                        ...history.rentals.map((r: any) => ({ ...r, type: 'rental', date: new Date(r.tgl_pengambilan || r.createdAt) })),
-                        ...history.quizzes.map((q: any) => ({ ...q, type: 'quiz', date: new Date(q.tanggal) })),
-                        ...history.contacts.map((c: any) => ({ ...c, type: 'contact', date: new Date(c.created_at || new Date()) })),
-                        ...history.joins.map((j: any) => ({ ...j, type: 'join', date: new Date(j.created_at || new Date()) }))
-                    ].sort((a: any, b: any) => (b.date - a.date)); 
+        setStats({
+            rentals: totalRentals,
+            quizzes: totalQuizzes,
+            messages: totalMessages,
+            activeRentals: activeRentals
+        });
 
-                    setRecentActivity(allActivity.slice(0, 5));
-                } catch (error) {
-                    console.error("Dashboard load error:", error);
-                }
-            }
-            setLoading(false);
-        };
+        // Combine and Sort Recent Activity
+        const allActivity = [
+            ...history.rentals.map((r: any) => ({ ...r, type: 'rental', date: new Date(r.tgl_pengambilan || r.createdAt) })),
+            ...history.quizzes.map((q: any) => ({ ...q, type: 'quiz', date: new Date(q.tanggal) })),
+            ...history.contacts.map((c: any) => ({ ...c, type: 'contact', date: new Date(c.created_at || new Date()) })),
+            ...history.joins.map((j: any) => ({ ...j, type: 'join', date: new Date(j.created_at || new Date()) }))
+        ].sort((a: any, b: any) => (b.date - a.date)); 
 
-        loadData();
-    }, [session]);
+        setRecentActivity(allActivity.slice(0, 5));
+    }, [profile, history, loading, session]);
 
     const statCards = [
         {

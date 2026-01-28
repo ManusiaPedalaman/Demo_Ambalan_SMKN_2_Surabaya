@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { getPendingProductList, updateUMKMProductStatus } from '@/app/actions';
 import { Package, CheckCircle, XCircle, Loader2, Eye, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ConfirmationPopup from '@/app/components/ConfirmationPopup';
 
 export default function AdminConfirmProductPage() {
     const [loading, setLoading] = useState(true);
@@ -12,6 +13,9 @@ export default function AdminConfirmProductPage() {
     const [rejectReason, setRejectReason] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    
+    // Approval Confirmation Modal State
+    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id: string | null }>({ isOpen: false, id: null });
 
     const loadData = async () => {
         setLoading(true);
@@ -24,14 +28,32 @@ export default function AdminConfirmProductPage() {
         loadData();
     }, []);
 
-    const handleApprove = async (id: string) => {
-        if (!confirm('Setujui produk ini?')) return;
+    const handleApproveClick = (id: string) => {
+        setConfirmModal({ isOpen: true, id });
+    };
+
+    const executeApprove = async () => {
+        if (!confirmModal.id) return;
+        
+        const id = confirmModal.id;
         setProcessingId(id);
+        
+        // Close modal immediately or keep open with loading? 
+        // Better to keep open with loading state if ConfirmationPopup supports it, 
+        // but here we might want to just show global processing or rely on the button spinner inside modal.
+        // My ConfirmationPopup has isLoading prop. Let's use it.
+        // Note: I need to manage loading state specifically for the modal action if I want the spinner THERE.
+        // But processingId is mostly used for the table button.
+        // Let's rely on processingId to indicate loading, but I need to pass it to the popup.
+        
         const res = await updateUMKMProductStatus(id, 'APPROVED');
+        
         if (res.success) {
             setProductList(prev => prev.filter(item => item.id !== id));
+            setConfirmModal({ isOpen: false, id: null });
         } else {
             alert('Gagal menyetujui: ' + res.error);
+            setConfirmModal({ isOpen: false, id: null });
         }
         setProcessingId(null);
     };
@@ -134,7 +156,7 @@ export default function AdminConfirmProductPage() {
                                         <td className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button
-                                                    onClick={() => handleApprove(item.id)}
+                                                    onClick={() => handleApproveClick(item.id)}
                                                     disabled={processingId === item.id}
                                                     className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50"
                                                     title="Terima"
@@ -205,6 +227,19 @@ export default function AdminConfirmProductPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Approve Confirmation Popup */}
+            <ConfirmationPopup 
+                isOpen={confirmModal.isOpen}
+                title="Setujui Produk?"
+                message="Produk akan ditampilkan di katalog UMKM utama. Pastikan data produk sudah sesuai."
+                confirmText="Setujui"
+                confirmColor="bg-green-600"
+                icon="check"
+                onConfirm={executeApprove}
+                onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+                isLoading={!!processingId && processingId === confirmModal.id}
+            />
         </div>
     );
 }

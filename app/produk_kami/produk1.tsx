@@ -57,15 +57,19 @@ export default function Produk() {
       fetchProducts();
   }, []);
 
-  // Merge static and real
-  const allProducts = [
-      ...realProducts.map(p => normalizeProduct(p)),
-      ...products.map((p, i) => normalizeProduct({ ...p, id: i }, true))
-  ];
+  // Separate static (rental) and real (UMKM) products
+  const rentalProducts = products.map((p, i) => normalizeProduct({ ...p, id: i }, true));
+  const umkmProducts = realProducts.map(p => normalizeProduct(p));
 
-  const filteredProducts = searchQuery.trim() === ''
-    ? allProducts
-    : allProducts.filter((product) =>
+  const filteredRental = searchQuery.trim() === ''
+    ? rentalProducts
+    : rentalProducts.filter((product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+    );
+
+  const filteredUmkm = searchQuery.trim() === ''
+    ? umkmProducts
+    : umkmProducts.filter((product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
     );
 
@@ -81,6 +85,57 @@ export default function Produk() {
       },
     }),
   };
+
+  const renderProductCard = (product: any, index: number) => (
+    <motion.div
+      key={product.id}
+      custom={index}
+      variants={cardVariants}
+      className="group h-full"
+    >
+      <Link href={`/${product.slug}`} className="block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
+        <div className="relative w-full aspect-square bg-[#F2E6D8] overflow-hidden">
+          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
+          {product.images.length > 0 ? (
+              <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-cover transform group-hover:scale-110 transition-transform duration-500"
+              />
+          ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+          )}
+        </div>
+
+        <div className="p-5 flex flex-col flex-grow justify-between bg-white relative z-20">
+          <div>
+            {product.umkm_name && <p className="text-xs text-[#C9A86A] font-bold uppercase mb-1">{product.umkm_name}</p>}
+            <h3 className="text-gray-900 font-bold text-lg md:text-xl mb-1 line-clamp-2 leading-tight">
+              {product.name}
+            </h3>
+            <div className="w-12 h-1 bg-[#E07D5F] rounded-full mb-3 opacity-50 group-hover:w-24 transition-all duration-500" />
+          </div>
+
+          <div className="flex items-end justify-between mt-3">
+            <div className="flex flex-col">
+              <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">
+                Harga {product.type === 'static' ? 'Sewa' : ''}
+              </span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-[#E07D5F] text-xl md:text-2xl font-bold">
+                  {product.price}
+                </span>
+                <span className="text-gray-400 text-sm font-medium">
+                  {product.type === 'static' ? `/ ${product.duration}` : ''}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
 
   return (
     <section className={`w-full min-h-screen bg-white py-24 px-4 md:px-8 lg:px-12 ${dmSans.className}`}>
@@ -103,69 +158,51 @@ export default function Produk() {
           </form>
         </div>
 
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                custom={index}
-                variants={cardVariants}
-                className="group h-full"
-              >
-                <Link href={`/${product.slug}`} className="block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
-                  <div className="relative w-full aspect-square bg-[#F2E6D8] overflow-hidden">
-                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" />
-                    {product.images.length > 0 ? (
-                        <Image
-                        src={product.images[0]}
-                        alt={product.name}
-                        fill
-                        className="object-cover transform group-hover:scale-110 transition-transform duration-500"
-                        />
+        {/* SECTION 1: PRODUK SEWA */}
+        <div className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-[#E07D5F] pl-4">Produk Sewa</h2>
+            <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            >
+            {filteredRental.length > 0 ? (
+                filteredRental.map((product, index) => renderProductCard(product, index))
+            ) : (
+                <div className="col-span-full py-8 text-gray-500 italic">
+                {searchQuery ? `Tidak ada produk sewa dengan nama "${searchQuery}"` : "Belum ada produk sewa."}
+                </div>
+            )}
+            </motion.div>
+        </div>
+
+        {/* SECTION 2: PRODUK SISWA */}
+        {(filteredUmkm.length > 0 || (searchQuery && umkmProducts.length > 0)) && (
+            <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-[#C9A86A] pl-4">Produk Siswa/i SMKN 2 Surabaya</h2>
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.1 }}
+                >
+                    {filteredUmkm.length > 0 ? (
+                        filteredUmkm.map((product, index) => renderProductCard(product, index))
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
-                    )}
-                  </div>
-
-                  <div className="p-5 flex flex-col flex-grow justify-between bg-white relative z-20">
-                    <div>
-                      {product.umkm_name && <p className="text-xs text-[#C9A86A] font-bold uppercase mb-1">{product.umkm_name}</p>}
-                      <h3 className="text-gray-900 font-bold text-lg md:text-xl mb-1 line-clamp-2 leading-tight">
-                        {product.name}
-                      </h3>
-                      <div className="w-12 h-1 bg-[#E07D5F] rounded-full mb-3 opacity-50 group-hover:w-24 transition-all duration-500" />
-                    </div>
-
-                    <div className="flex items-end justify-between mt-3">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">
-                          Harga {product.type === 'static' ? 'Sewa' : ''}
-                        </span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-[#E07D5F] text-xl md:text-2xl font-bold">
-                            {product.price}
-                          </span>
-                          <span className="text-gray-400 text-sm font-medium">
-                            {product.type === 'static' ? `/ ${product.duration}` : ''}
-                          </span>
+                        <div className="col-span-full py-8 text-gray-500 italic">
+                            {searchQuery ? `Tidak ada produk siswa dengan nama "${searchQuery}"` : "Belum ada produk siswa."}
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-20">
-              <p className="text-gray-500 text-lg">Produk &quot;{searchQuery}&quot; tidak ditemukan.</p>
+                    )}
+                </motion.div>
             </div>
-          )}
-        </motion.div>
+        )}
+
+        {filteredRental.length === 0 && filteredUmkm.length === 0 && searchQuery && (
+             <div className="text-center py-20">
+               <p className="text-gray-500 text-lg">Produk &quot;{searchQuery}&quot; tidak ditemukan di kategori manapun.</p>
+             </div>
+        )}
       </div>
     </section>
   );

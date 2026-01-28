@@ -1,6 +1,7 @@
 import React from 'react';
 import UserSidebar from '@/app/components/UserSidebar';
 import AdminGuard from '@/app/components/AdminGuard';
+import { UserDashboardProvider } from './UserContext';
 
 export default function UserDashboardLayout({
     children,
@@ -12,7 +13,9 @@ export default function UserDashboardLayout({
             <UserSidebar />
             <main className="flex-1 w-full min-w-0 lg:ml-64 bg-[#F8FAFC]">
                 <AdminGuard>
-                    {children}
+                    <UserDashboardProvider>
+                        {children}
+                    </UserDashboardProvider>
                 </AdminGuard>
             </main>
         </div>
