@@ -1227,6 +1227,7 @@ export async function getPublicProducts() {
          console.error('Error fetching public products:', error);
          return [];
     }
+}
 
 export async function getPublicProductById(slugOrId: string) {
     try {
@@ -1242,9 +1243,18 @@ export async function getPublicProductById(slugOrId: string) {
         }
 
         // Jika tidak ketemu by ID (atau bukan numeric), cari by Slug
+        // Jika tidak ketemu by ID (atau bukan numeric), cari by nama_produk (assuming slug handles spaces or match exact)
         if (!product) {
+            // Try matching by name (converting dashes to spaces is common for slugs, but let's try direct first or assume simple slug)
+            // Ideally we should have a slug column. Fallback to name.
+            const nameFromSlug = slugOrId.replace(/-/g, ' '); // Simple de-slugify guess
             product = await prisma.dataProdukUmkm.findFirst({
-                where: { slug: slugOrId },
+                where: { 
+                    OR: [
+                        { nama_produk: slugOrId },
+                        { nama_produk: { equals: nameFromSlug, mode: 'insensitive' } }
+                    ]
+                 },
                 include: { umkm: true }
             });
         }
