@@ -11,9 +11,14 @@ import {
   ShoppingCart,
   BadgeCheck,
   ArrowLeft,
-  AlertTriangle
+  ArrowLeft,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { products } from '@/app/data/products';
+import { getPublicProducts } from '@/app/actions';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -45,6 +50,66 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
     }
     fetchProduct();
   }, [slug]);
+
+  // Slider Logic
+  const [allProducts, setAllProducts] = useState<any[]>(products.map(p => ({ ...p, type: 'rental' })));
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [itemsPerView, setItemsPerView] = useState(4);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = React.useRef<HTMLElement>(null);
+
+  React.useEffect(() => {
+    async function fetchUmkm() {
+      const res = await getPublicProducts();
+      if (res) {
+        const normalized = res.map((p: any) => ({
+          id: p.id,
+          name: p.nama_produk,
+          price: 'Rp ' + p.harga,
+          duration: 'item',
+          images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
+          slug: p.slug || p.id,
+          type: 'umkm'
+        }));
+        setAllProducts(prev => [...prev, ...normalized]);
+      }
+    }
+    fetchUmkm();
+  }, []);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => { if (sectionRef.current) observer.disconnect(); };
+  }, []);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 640) setItemsPerView(1);
+        else if (window.innerWidth < 1024) setItemsPerView(2);
+        else setItemsPerView(4);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const totalSlides = Math.ceil(allProducts.length / itemsPerView);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  const goToSlide = (idx: number) => setCurrentSlide(idx);
+
+  const visibleProducts = allProducts.slice(
+    currentSlide * itemsPerView,
+    currentSlide * itemsPerView + itemsPerView
+  );
 
   if (loading) {
     return (
@@ -213,6 +278,107 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
 
         </div>
       </div >
+
+      <div ref={sectionRef} className="max-w-7xl mx-auto mt-20 pt-12 border-t border-dashed border-gray-300">
+        <div className={`text-center mb-12 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Produk Lainnya</h2>
+          <p className="text-gray-500">Cari perlengkapan lain yang kamu butuhkan</p>
+        </div>
+
+        <div className="relative w-full">
+
+          <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full flex justify-between pointer-events-none z-10 px-2 md:-px-4">
+            <button
+              onClick={prevSlide}
+              className={`pointer-events-auto w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 text-gray-800 transition-all transform hover:scale-110 border border-gray-100 duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+                }`}
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className={`pointer-events-auto w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 text-gray-800 transition-all transform hover:scale-110 border border-gray-100 duration-500 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
+                }`}
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div
+            className="grid gap-4 md:gap-6 px-4 md:px-12 py-4"
+            style={{
+              gridTemplateColumns: `repeat(${itemsPerView}, minmax(0, 1fr))`,
+            }}
+          >
+            {visibleProducts.map((p, index) => (
+              <Link
+                href={p.type === 'umkm' ? `/produk-siswa/${p.slug}` : `/${p.slug}`}
+                key={index}
+                style={{ transitionDelay: `${index * 150}ms` }}
+                className={`group block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-700 ease-out border border-gray-100 flex flex-col transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+                  }`}
+              >
+                <div className="relative w-full aspect-square overflow-hidden bg-[#F2E6D8]">
+                  <div className="absolute inset-0 bg-[#C9826B]/10 group-hover:bg-[#C9826B]/20 transition-colors duration-300" />
+                   {p.images && p.images.length > 0 ? (
+                    <Image
+                        src={p.images[0]}
+                        alt={p.name}
+                        fill
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                    />
+                   ) : (
+                       <Image
+                        src={p.image || ''} // Fallback for static (sometimes 'image' not 'images' in normalized data if confused, but my normalization uses 'images')
+                        alt={p.name}
+                        fill
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out" 
+                       />
+                   )}
+                </div>
+
+                <div className="p-5 flex flex-col flex-grow justify-between bg-white relative z-20">
+                  <div>
+                    <h3 className="text-gray-900 font-bold text-lg md:text-xl mb-1 line-clamp-1 tracking-tight" title={p.name}>
+                      {p.name}
+                    </h3>
+                    <div className="w-12 h-1 bg-[#E07D5F] rounded-full mb-3 opacity-50 group-hover:w-full transition-all duration-500 ease-in-out" />
+                  </div>
+
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">{p.type === 'umkm' ? 'Harga' : 'Harga Sewa'}</span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : `Rp ${(p.price).toLocaleString('id-ID')}`}</span>
+                        {p.type === 'rental' && <span className="text-gray-400 text-sm font-medium">/ {p.duration}</span>}
+                      </div>
+                    </div>
+                    {/* Only show 'Sewa' button for rental, or specific action for UMKM if needed. Hiding or standardizing button */}
+                     <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shadow-lg transition-all duration-300 ease-out cursor-pointer opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0">
+                      {p.type === 'umkm' ? 'Lihat' : 'Sewa'}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {totalSlides > 1 && (
+          <div className={`flex justify-center gap-2 mt-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            {Array.from({ length: totalSlides }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`transition-all duration-300 rounded-full ${currentSlide === index
+                  ? 'bg-[#E07D5F] w-8 h-2'
+                  : 'bg-gray-300 w-2 h-2 hover:bg-gray-400'
+                  }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

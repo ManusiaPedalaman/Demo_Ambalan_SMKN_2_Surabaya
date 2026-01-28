@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DM_Sans } from 'next/font/google';
 import { useSession } from 'next-auth/react';
-import { submitBookingForm, getProductStatusByName } from '../actions';
+import { submitBookingForm, getProductStatusByName, getPublicProducts } from '../actions';
 import {
   Calendar,
   Clock,
@@ -234,12 +234,33 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const totalSlides = Math.ceil(products.length / itemsPerView);
+  const [allProducts, setAllProducts] = useState<any[]>(products.map(p => ({ ...p, type: 'rental' })));
+
+  React.useEffect(() => {
+    async function fetchUmkm() {
+      const res = await getPublicProducts();
+      if (res) {
+        const normalized = res.map((p: any) => ({
+          id: p.id, // Keep as string or whatever fetch returns
+          name: p.nama_produk,
+          price: 'Rp ' + p.harga,
+          duration: 'item',
+          images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
+          slug: p.slug || p.id,
+          type: 'umkm'
+        }));
+        setAllProducts(prev => [...prev, ...normalized]);
+      }
+    }
+    fetchUmkm();
+  }, []);
+
+  const totalSlides = Math.ceil(allProducts.length / itemsPerView);
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   const goToSlide = (idx: number) => setCurrentSlide(idx);
 
-  const visibleProducts = products.slice(
+  const visibleProducts = allProducts.slice(
     currentSlide * itemsPerView,
     currentSlide * itemsPerView + itemsPerView
   );
@@ -815,7 +836,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
           >
             {visibleProducts.map((p, index) => (
               <Link
-                href={`/${p.slug}`}
+                href={p.type === 'umkm' ? `/produk-siswa/${p.slug}` : `/${p.slug}`}
                 key={index}
                 style={{ transitionDelay: `${index * 150}ms` }}
                 className={`group block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-700 ease-out border border-gray-100 flex flex-col transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
