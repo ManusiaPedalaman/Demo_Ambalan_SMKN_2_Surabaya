@@ -116,15 +116,37 @@ export default function DaftarPage() {
   };
 
   const handleOtpChange = (index: number, value: string) => {
-    if (isNaN(Number(value))) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+    // Only allow numbers
+    if (value && !/^\d+$/.test(value)) return;
 
-    // Auto-focus next input
-    if (value && index < 5) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
-      nextInput?.focus();
+    const newOtp = [...otp];
+    // If user typed a single digit
+    if (value.length <= 1) {
+      newOtp[index] = value;
+      setOtp(newOtp);
+      
+      // Auto-focus move forward if value is entered
+      if (value && index < 5) {
+        const nextInput = document.getElementById(`otp-${index + 1}`);
+        nextInput?.focus();
+      }
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      if (!otp[index] && index > 0) {
+        // If current is empty, focus previous
+        e.preventDefault();
+        const prevInput = document.getElementById(`otp-${index - 1}`);
+        prevInput?.focus();
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      e.preventDefault();
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      e.preventDefault();
+      document.getElementById(`otp-${index + 1}`)?.focus();
     }
   };
 
@@ -137,17 +159,24 @@ export default function DaftarPage() {
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').slice(0, 6).split('');
-    if (pastedData.every(char => !isNaN(Number(char)))) {
-      const newOtp = [...otp];
-      pastedData.forEach((value, index) => {
-        if (index < 6) newOtp[index] = value;
-      });
-      setOtp(newOtp);
+    const newOtp = [...otp];
+    let lastFilledIndex = 0;
 
-      // Focus the last filled input or the next empty one
-      const focusIndex = Math.min(pastedData.length, 5);
-      document.getElementById(`otp-${focusIndex}`)?.focus();
-    }
+    pastedData.forEach((value, i) => {
+      if (/^\d$/.test(value)) {
+        if (i < 6) {
+          newOtp[i] = value;
+          lastFilledIndex = i;
+        }
+      }
+    });
+    
+    setOtp(newOtp);
+    const focusIndex = Math.min(lastFilledIndex + 1, 5);
+    // Use setTimeout to ensure render update before focus if needed, standard usually ok
+    setTimeout(() => {
+        document.getElementById(`otp-${Math.min(pastedData.length, 5)}`)?.focus();
+    }, 0);
   };
 
   return (
@@ -317,8 +346,9 @@ export default function DaftarPage() {
                       maxLength={1}
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
                       onPaste={handlePaste}
-                      className="w-full h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:border-[#56ABD7] focus:ring-1 focus:ring-[#56ABD7] outline-none transition-all"
+                      className="w-full h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:border-[#56ABD7] focus:ring-1 focus:ring-[#56ABD7] outline-none transition-all text-gray-900 bg-white"
                     />
                   ))}
                 </div>

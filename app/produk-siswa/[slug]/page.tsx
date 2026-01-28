@@ -25,20 +25,44 @@ const dmSans = DM_Sans({
   variable: '--font-dm-sans',
 });
 
-// Helper to format currency
-const formatRupiah = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    }).format(price);
-};
+
 
 export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params); // slug here serves as ID
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [pesan, setPesan] = useState('');
+
+  const formatRupiah = (value: any) => {
+      const num = Number(value);
+      return new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+      }).format(isNaN(num) ? 0 : num);
+  };
+
+  const handleContactSeller = () => {
+    const total = Number(product.harga) * quantity;
+    const formattedTotal = formatRupiah(total);
+    
+    const message = `Halo, saya ingin membeli:
+Produk: ${product.nama_produk}
+Jumlah: ${quantity}
+Harga Satuan: ${formatRupiah(product.harga)}
+Total: ${formattedTotal}
+Pesan: ${pesan || '-'}
+
+Apakah masih tersedia?`;
+
+    const phoneNumber = product.no_wa || '6281234567890'; 
+    const formattedPhone = phoneNumber.startsWith('0') ? '62' + phoneNumber.slice(1) : phoneNumber;
+    
+    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, '_blank');
+  };
 
   React.useEffect(() => {
     async function fetchProduct() {
@@ -64,7 +88,7 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
         const normalized = res.map((p: any) => ({
           id: p.id,
           name: p.nama_produk,
-          price: 'Rp ' + p.harga,
+          price: Number(p.harga),
           duration: 'item',
           images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
           slug: p.slug || p.id,
@@ -126,15 +150,6 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
         </div>
     );
   }
-
-  const handleContactSeller = () => {
-    const message = `Halo, saya tertarik dengan produk ${product.nama_produk}. Apakah masih tersedia?`;
-    const phoneNumber = product.no_wa || '6281234567890'; // Default fallback if missing
-    // Ensure phone number format for WhatsApp link (remove leading 0 if present, add 62)
-    const formattedPhone = phoneNumber.startsWith('0') ? '62' + phoneNumber.slice(1) : phoneNumber;
-    
-    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, '_blank');
-  };
 
   return (
     <section className={`min-h-screen bg-[#FDF8F3] py-32 px-4 md:px-8 lg:px-12 ${dmSans.className}`}>
@@ -221,30 +236,43 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
             </div>
 
             <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3 mb-8">
-              <h2 className="text-3xl font-bold text-[#8A6A4B]">
+              <h2 className="text-3xl font-bold text-[#1A1A1A]">
                 {formatRupiah(product.harga)}
               </h2>
             </div>
 
-            {/* Spesifikasi if available */}
-             {product.spesifikasi && product.spesifikasi.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-6 border-y border-gray-100 mb-8">
-                     {/* Adapting specificasi structure if it's an array of strings or objects. 
-                         The action normalization returns array. Assuming simple list for now or adapt based on data shape.
-                         If it's free text array:
-                     */}
-                     {product.spesifikasi.map((spec: any, idx: number) => (
-                         <div key={idx} className="flex gap-2 items-center">
-                             <div className="w-2 h-2 rounded-full bg-[#C9A86A]"></div>
-                             <p className="text-gray-700">{typeof spec === 'string' ? spec : JSON.stringify(spec)}</p>
-                         </div>
-                     ))}
+            {/* Spesifikasi - Styled like Rental Page Grid */}
+            {product.spesifikasi && product.spesifikasi.length > 0 && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 py-6 border-y border-gray-100 mb-8">
+                     {product.spesifikasi.map((spec: any, idx: number) => {
+                         // Attempt to parse if string looking like JSON or just display
+                         // For now, assuming simple string array or object. 
+                         // If it's an object like {label: 'Berat', value: '20g'}, use that.
+                         // If it's a string, just display it.
+                         const isString = typeof spec === 'string';
+                         let label = 'Info';
+                         let value = spec;
+                         
+                         if (isString && spec.includes(':')) {
+                             [label, value] = spec.split(':');
+                         } else if (!isString && spec.label && spec.value) {
+                             label = spec.label;
+                             value = spec.value;
+                         }
+
+                         return (
+                            <div key={idx} className={idx > 1 ? "col-span-2 lg:col-span-1" : ""}>
+                                <p className="text-xs text-gray-500 font-bold uppercase mb-1">{label.replace(/"/g, '').trim()}</p>
+                                <p className="font-medium text-gray-800">{String(value).replace(/"/g, '').trim()}</p>
+                            </div>
+                         );
+                     })}
                 </div>
              )}
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-[#C9A86A]">
-                <h3 className="font-bold text-lg">Deskripsi Produk</h3>
+               <h3 className="font-bold text-lg">Deskripsi Produk</h3>
               </div>
 
               <div className="space-y-4 text-gray-600 text-sm leading-relaxed text-justify whitespace-pre-line">
@@ -253,26 +281,74 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm border-t-4 border-t-[#25D366]">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="bg-[#E7FCEB] p-2 rounded-lg">
-                <ShoppingCart className="w-6 h-6 text-[#25D366]" />
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm border-t-4 border-t-[#8A6A4B]">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="bg-[#FAF8F5] p-2 rounded-lg">
+                <ShoppingCart className="w-6 h-6 text-[#8A6A4B]" />
               </div>
-              <h2 className="text-2xl font-bold text-[#25D366]">Tertarik Membeli?</h2>
+              <h2 className="text-2xl font-bold text-[#8A6A4B]">Check Out</h2>
             </div>
-            
-            <p className="text-gray-600 mb-6">
-                Klik tombol di bawah untuk menghubungi penjual langsung via WhatsApp dan melakukan pemesanan.
-            </p>
 
-            <button
-                onClick={handleContactSeller}
-                className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-3"
-            >
-                <Image src="/Icon/wa.png" alt="WhatsApp" width={24} height={24} className="invert brightness-0 grayscale-0 filter-none" /> 
-                {/* Assuming wa icon exists or use generic icon */}
-                Hubungi Penjual
-            </button>
+            <div className="space-y-6">
+                {/* Quantity Input */}
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Jumlah Produk</label>
+                  <div className="flex items-center justify-between border-2 border-[#8A6A4B] rounded-full px-4 py-2 w-[140px] text-[#8A6A4B] font-bold bg-[#FAF8F5]">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-6 h-6 flex items-center justify-center hover:bg-[#8A6A4B] hover:text-white rounded-full transition-colors pb-0.5"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setQuantity(isNaN(val) || val < 1 ? 1 : val);
+                      }}
+                       className="w-12 text-center text-gray-900 text-base font-bold bg-transparent outline-none border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                     <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-6 h-6 flex items-center justify-center hover:bg-[#8A6A4B] hover:text-white rounded-full transition-colors pb-0.5"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Message Input */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Pesan (Opsional)</label>
+                    <textarea
+                        rows={3}
+                        placeholder="Contoh: Saya ingin ukuran L / Warna h..."
+                        className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-[#C9A86A] outline-none resize-none transition-all"
+                        value={pesan}
+                        onChange={(e) => setPesan(e.target.value)}
+                    ></textarea>
+                </div>
+
+                {/* Total & Button */}
+                 <div className="pt-6 border-t border-dashed border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="text-center md:text-left">
+                      <p className="text-sm text-gray-500 font-bold">Total Harga</p>
+                      <h3 className="text-3xl font-bold text-gray-800">
+                         {formatRupiah(Number(product.harga) * quantity)}
+                      </h3>
+                    </div>
+                    
+                    <button
+                        onClick={handleContactSeller}
+                        className="w-full md:w-auto px-8 py-3 bg-[#322F2D] hover:bg-[#1E1C1B] text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                    >
+                         <ShoppingCart className="w-5 h-5" />
+                        Checkout
+                    </button>
+                </div>
+            </div>
           </div>
 
         </div>
