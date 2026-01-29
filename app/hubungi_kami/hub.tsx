@@ -4,10 +4,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { DM_Sans } from 'next/font/google';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import { Navigation, Send, Loader2, CheckCircle2, X, LogIn, UserPlus, AlertTriangle, MessageCircle } from 'lucide-react';
+import { Navigation, Send, LogIn, UserPlus } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { submitContactForm } from '../actions';
+import Modal from '@/components/ui/Modal';
 
 
 const dmSans = DM_Sans({
@@ -43,11 +44,7 @@ const rightSideVariants: Variants = {
   },
 };
 
-const modalVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 25 } },
-  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
-};
+// modalVariants removed
 
 
 interface InputProps {
@@ -171,9 +168,10 @@ export default function Hub() {
   const router = useRouter();
 
 
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState<'confirmation' | 'login_required'>('confirmation');
+    const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<'confirmation' | 'login_required' | 'success' | 'error'>('confirmation');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
 
   /* Auto-fill from session */
@@ -266,151 +264,98 @@ export default function Hub() {
 
   const handleFinalSubmit = async () => {
     setStatus('loading');
+    const res = await submitContactForm(formData);
 
-
-    await submitContactForm(formData);
-
-
-    setStatus('success');
-    // Reset Form
-    setFormData({ nama: '', email: '', phone: '', pesan: '' });
+    if (res.success) {
+        setStatus('success');
+        setModalType('success');
+        setFormData({ nama: '', email: '', phone: '', pesan: '' });
+    } else {
+        setStatus('idle');
+        setModalType('error');
+        setErrorMessage(res.error || 'Gagal mengirim pesan.');
+    }
   };
 
   return (
     <section id="contact-form" className={`w-full min-h-screen bg-white overflow-hidden ${dmSans.className}`}>
 
 
-      <AnimatePresence>
-        {showModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-          >
-            <motion.div
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden relative"
-            >
-
-              {status !== 'loading' && (
-                <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10">
-                  <X size={24} />
+<Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title={
+            modalType === 'login_required' ? 'Login Diperlukan' : 
+            modalType === 'success' ? 'Terima Kasih!' :
+            modalType === 'error' ? 'Gagal Mengirim' :
+            'Konfirmasi Masukan'
+        }
+        type={
+            modalType === 'login_required' ? 'warning' :
+            modalType === 'success' ? 'success' :
+            modalType === 'error' ? 'error' :
+            'warning'
+        }
+        message={
+            modalType === 'login_required' ? 'Anda harus masuk atau mendaftar terlebih dahulu untuk mengirim pesan kepada kami.' :
+            modalType === 'success' ? 'Pesan Anda telah berhasil diproses oleh sistem.' :
+            modalType === 'error' ? errorMessage :
+            undefined
+        }
+        primaryAction={
+            modalType === 'confirmation' ? {
+                label: 'Selesai',
+                onClick: handleFinalSubmit,
+                isLoading: status === 'loading',
+                variant: 'success'
+            } : modalType === 'success' || modalType === 'error' ? {
+                label: 'Tutup',
+                onClick: () => setShowModal(false),
+                variant: modalType === 'error' ? 'danger' : 'success'
+            } : undefined
+        }
+      >
+        {modalType === 'login_required' && (
+            <div className="flex flex-col gap-3 w-full mt-4">
+                <button
+                onClick={() => router.push('/login')}
+                className="w-full py-3 bg-[#9C7C5B] hover:bg-[#8A6A4B] text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                <LogIn size={18} /> Masuk
                 </button>
-              )}
-
-              <div className="p-8 flex flex-col items-center text-center">
-
-
-                {modalType === 'login_required' ? (
-                  <div className="flex flex-col items-center py-2">
-                    <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                      <LogIn size={40} className="text-[#9C7C5B]" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Login Diperlukan</h3>
-                    <p className="text-gray-500 text-sm mb-8">
-                      Anda harus masuk atau mendaftar terlebih dahulu untuk mengirim pesan kepada kami.
-                    </p>
-
-                    <div className="flex flex-col gap-3 w-full">
-                      <button
-                        onClick={() => router.push('/login')}
-                        className="w-full py-3 bg-[#9C7C5B] hover:bg-[#8A6A4B] text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-                      >
-                        <LogIn size={18} /> Masuk
-                      </button>
-                      <button
-                        onClick={() => router.push('/register')}
-                        className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-                      >
-                        <UserPlus size={18} /> Daftar
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-
-                  <>
-
-                    {status === 'success' ? (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center py-6"
-                      >
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                          <CheckCircle2 size={40} className="text-green-600" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-2">Terima Kasih!</h3>
-                        <p className="text-gray-500 text-sm mb-6">
-                          Pesan Anda telah berhasil diproses oleh sistem.
-                        </p>
-                        <button
-                          onClick={() => setShowModal(false)}
-                          className="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors"
-                        >
-                          Tutup
-                        </button>
-                      </motion.div>
-                    ) : (
-
-                      <>
-                        <div className="flex flex-col items-center mb-6 w-full">
-                          <div className="flex items-center gap-2 text-red-600 mb-2">
-                            <AlertTriangle size={24} fill="none" className="stroke-current" />
-                            <h3 className="font-bold text-lg tracking-wide">DISCLAIMER!!!</h3>
-                          </div>
-                          <p className="text-red-500 text-xs md:text-sm leading-relaxed px-2">
-                            "Pastikan data yang Anda masukkan adalah data yang valid dan benar.
-                            Kesalahan penulisan data dapat menghambat proses komunikasi."
-                          </p>
-                        </div>
-
-                        <div className="w-full h-px bg-gray-200 mb-6"></div>
-
-                        <div className="flex flex-col items-center mb-8 w-full">
-                          <div className="flex items-center gap-2 text-green-600 mb-3">
-                            <MessageCircle size={24} className="stroke-current" />
-                            <h3 className="font-bold text-lg tracking-wide">PEMBERITAHUAN</h3>
-                          </div>
-                          <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-2">
-                            Data Anda akan diproses secara otomatis oleh <b>(Sistem Mada)</b> dan dikirimkan langsung ke WhatsApp Admin.
-                          </p>
-                          <p className="text-green-700 font-medium text-xs md:text-sm">
-                            "Mohon tunggu hingga proses pengiriman data selesai."
-                          </p>
-                        </div>
-
-                        <button
-                          onClick={handleFinalSubmit}
-                          disabled={status === 'loading'}
-                          className={`w-full py-3.5 rounded-xl shadow-lg transition-all duration-300 transform font-bold text-white flex items-center justify-center gap-2
-                                ${status === 'loading'
-                              ? 'bg-gray-400 cursor-not-allowed'
-                              : 'bg-[#008000] hover:bg-[#006400] active:scale-95'
-                            }`}
-                        >
-                          {status === 'loading' ? (
-                            <>
-                              <Loader2 size={20} className="animate-spin" />
-                              Mengirim Data ke Sistem...
-                            </>
-                          ) : (
-                            "Selesai"
-                          )}
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-
-              </div>
-            </motion.div>
-          </motion.div>
+                <button
+                onClick={() => router.push('/register')}
+                className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                <UserPlus size={18} /> Daftar
+                </button>
+            </div>
         )}
-      </AnimatePresence>
+
+        {modalType === 'confirmation' && (
+             <div className="w-full text-left mt-2">
+                <div className="flex flex-col items-center mb-6 w-full text-center">
+                    <p className="text-red-500 font-bold text-sm mb-1">DISCLAIMER!!!</p>
+                    <p className="text-red-500 text-xs leading-relaxed">
+                    "Pastikan data yang Anda masukkan adalah data yang valid dan benar.
+                    Kesalahan penulisan data dapat menghambat proses komunikasi."
+                    </p>
+                </div>
+
+                <div className="w-full h-px bg-gray-200 mb-6"></div>
+
+                <div className="flex flex-col items-center mb-4 w-full text-center">
+                    <p className="text-green-600 font-bold text-sm mb-1">PEMBERITAHUAN</p>
+                    <p className="text-gray-600 text-xs leading-relaxed mb-2">
+                    Data Anda akan diproses secara otomatis oleh <b>(Sistem Mada)</b> dan dikirimkan langsung ke WhatsApp Admin.
+                    </p>
+                    <p className="text-green-700 font-medium text-xs">
+                    "Mohon tunggu hingga proses pengiriman data selesai."
+                    </p>
+                </div>
+            </div>
+        )}
+      </Modal>
 
       <div className="flex flex-col lg:flex-row w-full min-h-screen">
 

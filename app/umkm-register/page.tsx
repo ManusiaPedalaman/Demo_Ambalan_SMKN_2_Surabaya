@@ -7,6 +7,7 @@ import { getUserProfileByEmail, registerUMKM, getUserUMKM } from '@/app/actions'
 import Image from 'next/image';
 import { Store, Loader2, ArrowLeft, ImagePlus } from 'lucide-react';
 import Link from 'next/link';
+import Modal, { ModalType } from '@/components/ui/Modal';
 
 export default function UMKMRegisterPage() {
     const { data: session } = useSession();
@@ -14,6 +15,17 @@ export default function UMKMRegisterPage() {
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(true);
     const [userId, setUserId] = useState<string | null>(null);
+
+    const [modalData, setModalData] = useState<{isOpen: boolean, type: ModalType, title: string, message: string}>({
+        isOpen: false,
+        type: 'info',
+        title: '',
+        message: ''
+    });
+
+    const showModal = (title: string, message: string, type: ModalType = 'info') => {
+        setModalData({ isOpen: true, title, message, type });
+    };
 
     const [formData, setFormData] = useState({
         nama_umkm: '',
@@ -61,7 +73,7 @@ export default function UMKMRegisterPage() {
         if (file) {
              // 5MB Limit Check
             if (file.size > 5 * 1024 * 1024) {
-                alert("Ukuran gambar maksimal 5MB. Silakan kompres gambar terlebih dahulu.");
+                showModal("Ukuran Terlalu Besar", "Ukuran gambar maksimal 5MB. Silakan kompres gambar terlebih dahulu.", 'warning');
                 e.target.value = ''; // Reset input
                 return;
             }
@@ -79,7 +91,7 @@ export default function UMKMRegisterPage() {
         setLoading(true);
 
         if (!userId) {
-            alert('User session not found');
+            showModal("Sesi Berakhir", "Sesi pengguna tidak ditemukan. Silakan login ulang.", 'error');
             setLoading(false);
             return;
         }
@@ -92,7 +104,7 @@ export default function UMKMRegisterPage() {
         if (res.success) {
             router.push('/dashboard/user/umkm');
         } else {
-            alert('Gagal mendaftar: ' + res.error);
+            showModal("Gagal Mendaftar", 'Terjadi kesalahan: ' + res.error, 'error');
         }
         setLoading(false);
     };
@@ -214,6 +226,19 @@ export default function UMKMRegisterPage() {
                     </form>
                 </div>
              </div>
+
+             
+             <Modal
+                isOpen={modalData.isOpen}
+                onClose={() => setModalData(prev => ({ ...prev, isOpen: false }))}
+                title={modalData.title}
+                type={modalData.type}
+                message={modalData.message}
+                primaryAction={{
+                    label: 'Tutup',
+                    onClick: () => setModalData(prev => ({ ...prev, isOpen: false }))
+                }}
+             />
         </div>
     );
 }

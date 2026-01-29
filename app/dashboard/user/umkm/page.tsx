@@ -7,6 +7,7 @@ import { getUserProfileByEmail, getUserUMKM, addProductUMKM, updateProductUMKM, 
 import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image as ImageIcon, Pencil, Trash2, X, Globe, Save } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import Modal, { ModalType } from '@/components/ui/Modal';
 
 export default function UMKMDashboardPage() {
     const { data: session } = useSession();
@@ -19,9 +20,20 @@ export default function UMKMDashboardPage() {
     const [isEditing, setIsEditing] = useState(false); 
     const [editId, setEditId] = useState<string | null>(null);
 
+    // Alert Modal
+    const [alertModal, setAlertModal] = useState<{isOpen: boolean, type: ModalType, title: string, message: string}>({
+        isOpen: false, type: 'info', title: '', message: ''
+    });
+    const showAlert = (title: string, message: string, type: ModalType = 'info') => {
+        setAlertModal({ isOpen: true, title, message, type });
+    };
+
     // Delete Confirmation
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; type: 'PRODUCT' | 'UMKM'; id: string | null }>({ isOpen: false, type: 'PRODUCT', id: null });
     const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
+
+    // Publish Confirmation
+    const [publishModal, setPublishModal] = useState<{ isOpen: boolean, id: string | null, status: boolean }>({ isOpen: false, id: null, status: false });
 
     // Spec Modal
     const [showSpecModal, setShowSpecModal] = useState(false);
@@ -84,25 +96,28 @@ export default function UMKMDashboardPage() {
         }
 
         if (res.success) {
-            alert(isDraft ? 'Draf berhasil disimpan!' : (isEditing ? 'Produk berhasil diperbarui!' : 'Produk berhasil diajukan!'));
+            showAlert('Berhasil', isDraft ? 'Draf berhasil disimpan!' : (isEditing ? 'Produk berhasil diperbarui!' : 'Produk berhasil diajukan!'), 'success');
             resetProductForm();
             init();
         } else {
-            alert('Gagal: ' + res.error);
+            showAlert('Gagal', res.error || 'Terjadi kesalahan saat menyimpan produk', 'error');
         }
         setLoading(false);
     };
 
-    const handlePublish = async (id: string, currentStatus: boolean) => {
-        // Toggle publish
-        if (!confirm(currentStatus ? "Sembunyikan produk ini dari publik?" : "Tampilkan produk ini ke publik?")) return;
-        
-        setLoading(true);
-        const res = await publishProductUMKM(id, !currentStatus);
+    const handlePublishClick = (id: string, currentStatus: boolean) => {
+        setPublishModal({ isOpen: true, id, status: currentStatus });
+    };
+
+    const confirmPublish = async () => {
+        if (!publishModal.id) return;
+        setLoading(true); // Or usage specific loading state
+        const res = await publishProductUMKM(publishModal.id, !publishModal.status);
         if (res.success) {
             init();
+            setPublishModal({ isOpen: false, id: null, status: false });
         } else {
-            alert('Gagal mengubah status: ' + res.error);
+            showAlert('Gagal', 'Gagal mengubah status: ' + res.error, 'error');
         }
         setLoading(false);
     };
@@ -133,8 +148,8 @@ export default function UMKMDashboardPage() {
     };
 
     const handleSpecAdd = () => {
-        if (productForm.spesifikasi.length >= 5) return alert("Maksimal 5 spesifikasi.");
-        if (!tempSpec.value) return alert("Nilai spesifikasi harus diisi.");
+        if (productForm.spesifikasi.length >= 5) return showAlert("Batas Tercapai", "Maksimal 5 spesifikasi.", 'warning');
+        if (!tempSpec.value) return showAlert("Input Kosong", "Nilai spesifikasi harus diisi.", 'warning');
         
         setProductForm(prev => ({
             ...prev,
@@ -155,7 +170,7 @@ export default function UMKMDashboardPage() {
         const files = e.target.files;
         if (files) {
             if (productForm.foto_produk.length + files.length > 10) {
-                return alert("Maksimal 10 foto.");
+                return showAlert("Batas Tercapai", "Maksimal 10 foto.", 'warning');
             }
             
             Array.from(files).forEach(file => {
@@ -202,11 +217,11 @@ export default function UMKMDashboardPage() {
         const res = await updateUMKMData({ id: umkmData.id, ...umkmForm });
 
         if (res.success) {
-            alert('Data UMKM berhasil diperbarui dan diajukan ulang!');
+            showAlert("Berhasil", 'Data UMKM berhasil diperbarui dan diajukan ulang!', 'success');
             setView('LIST');
             init();
         } else {
-            alert('Gagal update UMKM: ' + res.error);
+            showAlert("Gagal", 'Gagal update UMKM: ' + res.error, 'error');
         }
         setLoading(false);
     };
@@ -226,7 +241,7 @@ export default function UMKMDashboardPage() {
              setDeleteModal({ isOpen: false, type: 'PRODUCT', id: null });
              init();
         } else {
-            alert('Gagal menghapus: ' + res.error);
+            showAlert("Gagal", 'Gagal menghapus: ' + res.error, 'error');
         }
         setLoading(false);
     };
@@ -342,20 +357,69 @@ export default function UMKMDashboardPage() {
                 )}
             </AnimatePresence>
 
-            {/* DELETE MODAL */}
-            {deleteModal.isOpen && (
-                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                     {/* Same delete modal */}
-                    <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl">
-                         <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Hapus Produk?</h3>
-                         <input value={deleteConfirmationText} onChange={(e) => setDeleteConfirmationText(e.target.value)} className="w-full border rounded-lg px-4 py-2 mb-4 text-center" placeholder='Ketik "hapus"' />
-                         <div className="flex gap-3">
-                             <button onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })} className="flex-1 py-3 bg-gray-100 rounded-xl font-bold">Batal</button>
-                             <button onClick={executeDelete} disabled={deleteConfirmationText !== 'hapus'} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold disabled:opacity-50">Hapus</button>
-                         </div>
-                    </div>
+            {/* DELETE MODAL USES REUSABLE MODAL */}
+            <Modal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+                title="Hapus Produk?"
+                type="error"
+                primaryAction={{
+                    label: 'Hapus',
+                    onClick: executeDelete,
+                    isLoading: loading,
+                    variant: 'danger'
+                }}
+                secondaryAction={{
+                    label: 'Batal',
+                    onClick: () => setDeleteModal({ ...deleteModal, isOpen: false })
+                }}
+            >
+                <div className="w-full mt-4">
+                    <p className="text-gray-600 mb-2 text-center text-sm">
+                        Ketik <strong>"hapus"</strong> di bawah untuk mengonfirmasi penghapusan. Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                    <input 
+                        value={deleteConfirmationText} 
+                        onChange={(e) => setDeleteConfirmationText(e.target.value)} 
+                        className="w-full border rounded-xl px-4 py-3 text-center focus:ring-2 focus:ring-red-500 focus:outline-none" 
+                        placeholder='Ketik "hapus"' 
+                        autoFocus
+                    />
                 </div>
-            )}
+            </Modal>
+
+            {/* PUBLISH MODAL */}
+            <Modal
+                isOpen={publishModal.isOpen}
+                onClose={() => setPublishModal({ ...publishModal, isOpen: false })}
+                title={publishModal.status ? "Sembunyikan Produk?" : "Tampilkan Produk?"}
+                type="warning"
+                message={publishModal.status ? "Produk ini tidak akan terlihat oleh publik di halaman utama." : "Produk ini akan dapat dilihat oleh semua orang dan dapat dipesan."}
+                primaryAction={{
+                    label: publishModal.status ? "Sembunyikan" : "Tampilkan",
+                    onClick: confirmPublish,
+                    isLoading: loading,
+                    variant: publishModal.status ? 'danger' : 'success'
+                }}
+                secondaryAction={{
+                    label: 'Batal',
+                    onClick: () => setPublishModal({ ...publishModal, isOpen: false })
+                }}
+            />
+
+            {/* ALERT MODAL */}
+            <Modal
+                isOpen={alertModal.isOpen}
+                onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+                title={alertModal.title}
+                type={alertModal.type}
+                message={alertModal.message}
+                primaryAction={{
+                    label: 'Tutup',
+                    onClick: () => setAlertModal(prev => ({ ...prev, isOpen: false })),
+                    variant: alertModal.type === 'error' ? 'danger' : 'success'
+                }}
+            />
 
             <div className="flex justify-between items-center mb-8">
                 <div>
@@ -473,7 +537,7 @@ export default function UMKMDashboardPage() {
                             <div className="flex gap-2">
                                {produk.status === 'APPROVED' && !produk.is_draft && (
                                    <button 
-                                        onClick={() => handlePublish(produk.id, produk.is_published)}
+                                        onClick={() => handlePublishClick(produk.id, produk.is_published)}
                                         className={`flex-1 h-10 flex items-center justify-center rounded-xl font-bold text-xs gap-1 transition-all ${produk.is_published ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-800 text-white hover:bg-black'}`}
                                         title={produk.is_published ? "Unpublish" : "Publish"}
                                    >

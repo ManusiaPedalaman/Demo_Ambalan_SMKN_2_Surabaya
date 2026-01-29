@@ -39,7 +39,7 @@ Alasan: ${formData.pesan}
         return { success: true };
     } catch (error) {
         console.error('Server Action Error:', error);
-        return { success: false, error };
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
 }
 
@@ -73,7 +73,7 @@ beri emoji ✅ atau balas "terjawab" pada data hubungi di atas jika telah menyam
         return { success: true };
     } catch (error) {
         console.error('Server Action Error:', error);
-        return { success: false, error };
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
 }
 
@@ -133,7 +133,7 @@ Message: ${data.message || '-'}
         return { success: true };
     } catch (error) {
         console.error('Server Action Error:', error);
-        return { success: false, error };
+        return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
 }
 
