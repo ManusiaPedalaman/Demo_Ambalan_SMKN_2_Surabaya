@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Package, Users, FileText, Phone, LogOut, ChevronDown, ChevronRight, Flame, Menu, X, Store } from 'lucide-react';
+import { LayoutDashboard, Package, Users, FileText, Phone, ArrowLeft, ChevronDown, ChevronRight, Flame, Menu, X, Store } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,7 +12,6 @@ export default function Sidebar() {
     const pathname = usePathname();
 
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
 
@@ -38,51 +37,6 @@ export default function Sidebar() {
                         onClick={() => setIsMobileOpen(false)}
                         className="fixed inset-0 bg-black/50 z-[90] lg:hidden backdrop-blur-sm"
                     />
-                )}
-            </AnimatePresence>
-
-            <AnimatePresence>
-                {showLogoutModal && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 font-dm-sans"
-                        onClick={() => setShowLogoutModal(false)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden relative"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="p-6 flex flex-col items-center text-center">
-                                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                                    <LogOut size={32} className="text-red-600 ml-1" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-800 mb-2">Konfirmasi Keluar</h3>
-                                <p className="text-gray-500 text-sm mb-6">
-                                    "Apakah Anda yakin ingin keluar dari akun Anda?"
-                                </p>
-
-                                <div className="flex gap-3 w-full">
-                                    <button
-                                        onClick={() => setShowLogoutModal(false)}
-                                        className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors"
-                                    >
-                                        Batal
-                                    </button>
-                                    <button
-                                        onClick={() => signOut({ callbackUrl: '/' })}
-                                        className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors shadow-lg shadow-red-200"
-                                    >
-                                        Keluar
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
                 )}
             </AnimatePresence>
 
@@ -210,15 +164,15 @@ export default function Sidebar() {
 
                 <div className="p-6">
                     <div className="h-[1px] w-full bg-gray-100 mb-6"></div>
-                    <button
-                        onClick={() => setShowLogoutModal(true)}
+                    <Link
+                        href="/"
                         className="flex items-center gap-3 group px-2 transition-all duration-200 hover:pl-4"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-[#F8E7E7] text-[#D35E5E] flex items-center justify-center group-hover:bg-[#D35E5E] group-hover:text-white transition-colors">
-                            <LogOut size={20} strokeWidth={2} className="ml-1" />
+                        <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center group-hover:bg-[#8B6E4A] group-hover:text-white transition-colors">
+                            <ArrowLeft size={20} strokeWidth={2} className="ml-1" />
                         </div>
-                        <span className="font-medium text-[#D35E5E] group-hover:font-semibold">Keluar</span>
-                    </button>
+                        <span className="font-medium text-gray-600 group-hover:font-semibold group-hover:text-[#8B6E4A]">Kembali</span>
+                    </Link>
                 </div>
             </div>
         </>

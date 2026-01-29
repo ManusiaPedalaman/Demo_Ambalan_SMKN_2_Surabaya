@@ -1097,6 +1097,45 @@ export async function getPendingUMKMList() {
     }
 }
 
+export async function getActiveUMKMList() {
+    try {
+        const umkms = await prisma.dataUmkm.findMany({
+            where: { status: 'APPROVED' },
+            orderBy: { created_at: 'desc' },
+            include: { produk: true } // Include products to count/show details if needed
+        });
+        
+        return umkms.map((item: any) => ({
+            ...item,
+            id: item.id.toString(),
+            created_at: item.created_at.toISOString(),
+            total_produk: item.produk ? item.produk.length : 0
+        }));
+    } catch (error) {
+        console.error('Error fetching active UMKMs:', error);
+        return [];
+    }
+}
+
+export async function deleteUMKM(id: string) {
+    try {
+        // Delete related products first? Or assume cascade?
+        // Let's safe delete: delete products first
+        const products = await prisma.dataProdukUmkm.findMany({ where: { id_umkm: BigInt(id) } });
+        for (const p of products) {
+             await prisma.dataProdukUmkm.delete({ where: { id: p.id } });
+        }
+
+        await prisma.dataUmkm.delete({
+            where: { id: BigInt(id) }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting UMKM:', error);
+        return { success: false, error: 'Failed to delete UMKM' };
+    }
+}
+
 export async function updateUMKMStatus(id: string, status: 'APPROVED' | 'REJECTED', note?: string) {
     try {
         await prisma.dataUmkm.update({
@@ -1130,6 +1169,28 @@ export async function getPendingProductList() {
         }));
     } catch (error) {
         console.error('Error fetching pending products:', error);
+        return [];
+    }
+}
+
+export async function getActiveProductList() {
+    try {
+        const products = await prisma.dataProdukUmkm.findMany({
+            where: { status: 'APPROVED' },
+            include: { umkm: true }, // Include UMKM details
+            orderBy: { created_at: 'desc' }
+        });
+        
+        return products.map((item: any) => ({
+            ...item,
+            id: item.id.toString(),
+            id_umkm: item.id_umkm.toString(),
+            created_at: item.created_at.toISOString(),
+            nama_umkm: item.umkm?.nama_umkm || 'Unknown UMKM',
+            foto_produk: item.foto_produk || (item.gambar ? [item.gambar] : []),
+        }));
+    } catch (error) {
+        console.error('Error fetching active products:', error);
         return [];
     }
 }

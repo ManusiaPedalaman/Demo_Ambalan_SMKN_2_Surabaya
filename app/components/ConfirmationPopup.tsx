@@ -14,7 +14,7 @@ interface ConfirmationPopupProps {
     onConfirm: () => void;
     onCancel: () => void;
     isLoading?: boolean;
-    icon?: 'warning' | 'check';
+    icon?: 'warning' | 'check' | 'alert';
 }
 
 export default function ConfirmationPopup({
@@ -29,6 +29,21 @@ export default function ConfirmationPopup({
     isLoading = false,
     icon = 'warning'
 }: ConfirmationPopupProps) {
+    
+    const getIconContent = () => {
+        switch (icon) {
+            case 'check':
+                return { bg: 'bg-green-100', text: 'text-green-600', icon: <CheckCircle size={32} /> };
+            case 'alert':
+                return { bg: 'bg-red-100', text: 'text-red-600', icon: <AlertTriangle size={32} /> };
+            case 'warning':
+            default:
+                return { bg: 'bg-yellow-100', text: 'text-yellow-600', icon: <AlertTriangle size={32} /> };
+        }
+    };
+
+    const iconStyle = getIconContent();
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -46,8 +61,8 @@ export default function ConfirmationPopup({
                         className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${icon === 'check' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                            {icon === 'check' ? <CheckCircle size={32} /> : <AlertTriangle size={32} />}
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${iconStyle.bg} ${iconStyle.text}`}>
+                            {iconStyle.icon}
                         </div>
                         
                         <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>

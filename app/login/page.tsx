@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 
 export default function MasukPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -77,9 +77,11 @@ export default function MasukPage() {
               if (result?.error) {
                 setError('Email atau password salah, atau akun belum terdaftar.');
               } else {
-                // Manually redirect if successful to avoid full page reload issues or use router
-                // Manually redirect if successful to avoid full page reload issues or use router
-                if (email === 'login') {
+                // Get updated session to check role
+                const session = await getSession();
+                const userRole = (session?.user as any)?.role;
+
+                if (userRole === 'ADMIN') {
                   window.location.href = '/badys538qeprbdv89uebdao8e-39g-t86-u043b-voudvb';
                 } else {
                   window.location.href = '/';

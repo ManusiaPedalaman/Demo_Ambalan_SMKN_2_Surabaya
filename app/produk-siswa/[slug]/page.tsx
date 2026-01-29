@@ -13,7 +13,11 @@ import {
   ArrowLeft,
   AlertTriangle,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  User,
+  Smartphone,
+  Building2,
+  CreditCard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { products } from '@/app/data/products';
@@ -32,8 +36,18 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  
+  // Checkout State
   const [quantity, setQuantity] = useState(1);
-  const [pesan, setPesan] = useState('');
+  const [formData, setFormData] = useState({
+    nama: '',
+    whatsapp: '',
+    sekolah: '',
+    metodePembayaran: '',
+    pesan: ''
+  });
+
+  const paymentMethods = ['BCA', 'Mandiri', 'BRI', 'GoPay', 'Dana', 'Qris', 'Cash'];
 
   const formatRupiah = (value: any) => {
       const num = Number(value);
@@ -45,18 +59,39 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
       }).format(isNaN(num) ? 0 : num);
   };
 
+  const getRealPrice = (price: any) => {
+      const num = Number(price);
+      // Heuristic: if price is very small (unlikely for a product in IDR), assume it's in thousands
+      return num < 1000 ? num * 1000 : num;
+  };
+
   const handleContactSeller = () => {
-    const total = Number(product.harga) * quantity;
+    // Validate fields
+    if (!formData.nama || !formData.whatsapp || !formData.sekolah || !formData.metodePembayaran) {
+        alert('Mohon lengkapi semua data pembelian (Nama, WhatsApp, Sekolah, Metode Pembayaran)');
+        return;
+    }
+
+    const realPrice = getRealPrice(product.harga);
+    const total = realPrice * quantity;
     const formattedTotal = formatRupiah(total);
     
     const message = `Halo, saya ingin membeli:
-Produk: ${product.nama_produk}
-Jumlah: ${quantity}
-Harga Satuan: ${formatRupiah(product.harga)}
-Total: ${formattedTotal}
-Pesan: ${pesan || '-'}
+--------------------------------
+*DETAIL PEMBELI*
+Nama: ${formData.nama}
+Sekolah/Instansi: ${formData.sekolah}
+No WA: ${formData.whatsapp}
+Metode Pembayaran: ${formData.metodePembayaran}
 
-Apakah masih tersedia?`;
+*DETAIL PESANAN*
+Produk: ${product.nama_produk}
+Jumlah: ${quantity} item
+Harga Satuan: ${formatRupiah(realPrice)}
+Total: ${formattedTotal}
+Pesan: ${formData.pesan || '-'}
+--------------------------------
+Apakah barang masih tersedia?`;
 
     const phoneNumber = product.no_wa || '6281234567890'; 
     const formattedPhone = phoneNumber.startsWith('0') ? '62' + phoneNumber.slice(1) : phoneNumber;
@@ -78,7 +113,7 @@ Apakah masih tersedia?`;
   const [allProducts, setAllProducts] = useState<any[]>(products.map(p => ({ ...p, type: 'rental' })));
   const [currentSlide, setCurrentSlide] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(4);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Default to true to fix visibility issues
   const sectionRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -98,17 +133,6 @@ Apakah masih tersedia?`;
       }
     }
     fetchUmkm();
-  }, []);
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => { if (sectionRef.current) observer.disconnect(); };
   }, []);
 
   React.useEffect(() => {
@@ -237,7 +261,7 @@ Apakah masih tersedia?`;
 
             <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3 mb-8">
               <h2 className="text-3xl font-bold text-[#1A1A1A]">
-                {formatRupiah(product.harga)}
+                {formatRupiah(getRealPrice(product.harga))}
               </h2>
             </div>
 
@@ -245,10 +269,6 @@ Apakah masih tersedia?`;
             {product.spesifikasi && product.spesifikasi.length > 0 && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 py-6 border-y border-gray-100 mb-8">
                      {product.spesifikasi.map((spec: any, idx: number) => {
-                         // Attempt to parse if string looking like JSON or just display
-                         // For now, assuming simple string array or object. 
-                         // If it's an object like {label: 'Berat', value: '20g'}, use that.
-                         // If it's a string, just display it.
                          const isString = typeof spec === 'string';
                          let label = 'Info';
                          let value = spec;
@@ -290,6 +310,72 @@ Apakah masih tersedia?`;
             </div>
 
             <div className="space-y-6">
+                
+                {/* Nama Lengkap */}
+                <div>
+                   <label className="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
+                   <div className="relative">
+                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                       <input 
+                           type="text" 
+                           placeholder="Masukkan Nama Lengkap Anda"
+                           className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#C9A86A] outline-none"
+                           value={formData.nama}
+                           onChange={(e) => setFormData({...formData, nama: e.target.value})}
+                       />
+                   </div>
+                </div>
+
+                {/* No WhatsApp & Sekolah */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div>
+                       <label className="block text-sm font-bold text-gray-700 mb-2">No WhatsApp</label>
+                       <div className="relative">
+                           <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                           <input 
+                               type="tel" 
+                               placeholder="Contoh: 08123..."
+                               className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#C9A86A] outline-none"
+                               value={formData.whatsapp}
+                               onChange={(e) => setFormData({...formData, whatsapp: e.target.value.replace(/[^0-9]/g, '')})}
+                           />
+                       </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Sekolah / Instansi</label>
+                       <div className="relative">
+                           <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                           <input 
+                               type="text" 
+                               placeholder="Asal Sekolah / Instansi"
+                               className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#C9A86A] outline-none"
+                               value={formData.sekolah}
+                               onChange={(e) => setFormData({...formData, sekolah: e.target.value})}
+                           />
+                       </div>
+                    </div>
+                </div>
+
+                {/* Metode Pembayaran */}
+                 <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Metode Pembayaran</label>
+                  <div className="flex flex-wrap gap-2">
+                      {paymentMethods.map((method) => (
+                          <button
+                            key={method}
+                            onClick={() => setFormData({...formData, metodePembayaran: method})}
+                            className={`px-4 py-2 text-sm rounded-full border transition-all duration-300 
+                                ${formData.metodePembayaran === method 
+                                ? 'bg-[#8A6A4B] text-white border-[#8A6A4B] shadow-md' 
+                                : 'bg-white text-gray-600 border-gray-300 hover:border-[#8A6A4B] hover:text-[#8A6A4B]'}
+                            `}
+                          >
+                              {method}
+                          </button>
+                      ))}
+                  </div>
+                </div>
+
                 {/* Quantity Input */}
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Jumlah Produk</label>
@@ -324,10 +410,10 @@ Apakah masih tersedia?`;
                     <label className="block text-sm font-bold text-gray-700 mb-2">Pesan (Opsional)</label>
                     <textarea
                         rows={3}
-                        placeholder="Contoh: Saya ingin ukuran L / Warna h..."
+                        placeholder="Contoh: Saya ingin ukuran L / Warna tertentu..."
                         className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-[#C9A86A] outline-none resize-none transition-all"
-                        value={pesan}
-                        onChange={(e) => setPesan(e.target.value)}
+                        value={formData.pesan}
+                        onChange={(e) => setFormData({...formData, pesan: e.target.value})}
                     ></textarea>
                 </div>
 
@@ -336,7 +422,7 @@ Apakah masih tersedia?`;
                     <div className="text-center md:text-left">
                       <p className="text-sm text-gray-500 font-bold">Total Harga</p>
                       <h3 className="text-3xl font-bold text-gray-800">
-                         {formatRupiah(Number(product.harga) * quantity)}
+                         {formatRupiah(getRealPrice(product.harga) * quantity)}
                       </h3>
                     </div>
                     
@@ -390,7 +476,7 @@ Apakah masih tersedia?`;
                 href={p.type === 'umkm' ? `/produk-siswa/${p.slug}` : `/${p.slug}`}
                 key={index}
                 style={{ transitionDelay: `${index * 150}ms` }}
-                className={`group block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-700 ease-out border border-gray-100 flex flex-col transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+                className={`group block h-full bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-700 ease-out border border-gray-100 flex flex-col transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-100 translate-y-0'
                   }`}
               >
                 <div className="relative w-full aspect-square overflow-hidden bg-[#F2E6D8]">
@@ -404,7 +490,7 @@ Apakah masih tersedia?`;
                     />
                    ) : (
                        <Image
-                        src={p.image || ''} // Fallback for static (sometimes 'image' not 'images' in normalized data if confused, but my normalization uses 'images')
+                        src={p.image || ''} 
                         alt={p.name}
                         fill
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500 ease-in-out" 
@@ -424,11 +510,10 @@ Apakah masih tersedia?`;
                     <div className="flex flex-col">
                       <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">{p.type === 'umkm' ? 'Harga' : 'Harga Sewa'}</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : `Rp ${(p.price).toLocaleString('id-ID')}`}</span>
+                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : `Rp ${(getRealPrice(p.price)).toLocaleString('id-ID')}`}</span>
                         {p.type === 'rental' && <span className="text-gray-400 text-sm font-medium">/ {p.duration}</span>}
                       </div>
                     </div>
-                    {/* Only show 'Sewa' button for rental, or specific action for UMKM if needed. Hiding or standardizing button */}
                      <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shadow-lg transition-all duration-300 ease-out cursor-pointer opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0">
                       {p.type === 'umkm' ? 'Lihat' : 'Sewa'}
                     </div>
