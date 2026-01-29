@@ -176,6 +176,30 @@ export default function Hub() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
 
+  /* Auto-fill from session */
+  useEffect(() => {
+    async function fetchProfile() {
+      if (session?.user?.email) {
+        try {
+          const { getMyFullProfile } = await import('@/app/actions');
+          const profile = await getMyFullProfile(session.user.email);
+          
+          if (profile) {
+            setFormData(prev => ({
+              ...prev,
+              nama: profile.nama_lengkap || prev.nama,
+              email: profile.email || prev.email,
+              phone: profile.no_wa || prev.phone
+            }));
+          }
+        } catch (err) {
+           console.error("Auto-fill error:", err);
+        }
+      }
+    }
+    fetchProfile();
+  }, [session]);
+
   const [formData, setFormData] = useState({
     nama: '',
     email: '',

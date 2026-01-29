@@ -848,6 +848,29 @@ export async function getUserProfileByEmail(email: string) {
     }
 }
 
+export async function getMyFullProfile(email: string) {
+    try {
+        const user = await prisma.dataUserLogin.findFirst({
+            where: { email: email }
+        });
+
+        if (!user) return null;
+
+        return {
+            nama_lengkap: user.nama_lengkap,
+            email: user.email,
+            no_wa: user.no_wa,
+            tgl_lahir: user.tgl_lahir ? user.tgl_lahir.toISOString().split('T')[0] : '',
+            sekolah_instansi: user.sekolah_instansi,
+            kelas: user.kelas,
+            jurusan: user.jurusan
+        };
+    } catch (error) {
+        console.error('Error fetching full profile:', error);
+        return null;
+    }
+}
+
 export async function getUserHistory(identifier: { email?: string, no_wa?: string, nama?: string }) {
     try {
         const { email, no_wa, nama } = identifier;

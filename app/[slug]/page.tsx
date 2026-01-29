@@ -2,7 +2,7 @@
 
 
 
-import React, { useState, use, useRef } from 'react';
+import React, { useState, use, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -136,6 +136,30 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     school: '',
     message: ''
   });
+
+  /* Auto-fill from session */
+  useEffect(() => {
+    async function fetchProfile() {
+      if (session?.user?.email) {
+         try {
+          const { getMyFullProfile } = await import('@/app/actions');
+          const profile = await getMyFullProfile(session.user.email);
+          
+          if (profile) {
+             setFormData(prev => ({
+               ...prev,
+               name: profile.nama_lengkap || prev.name,
+               whatsapp: profile.no_wa || prev.whatsapp,
+               school: profile.sekolah_instansi || prev.school
+             }));
+          }
+         } catch (err) {
+            console.error("Auto-fill error:", err);
+         }
+      }
+    }
+    fetchProfile();
+  }, [session]);
 
   const validateBooking = () => {
     const newErrors: { [key: string]: boolean } = {};

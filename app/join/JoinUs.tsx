@@ -277,6 +277,37 @@ const JoinUs = () => {
   const router = useRouter();
 
 
+  /* Auto-fill from session */
+  useEffect(() => {
+    async function fetchProfile() {
+      if (session?.user?.email) {
+        // Dynamic import to avoid server-side issues if needed, or stick to import
+        // Assuming fetchProfile action is imported
+        try {
+          // Import here or at top. Since this is client component, we rely on server action
+          // Note user might not have added import at top yet.
+          const { getMyFullProfile } = await import('@/app/actions');
+          const profile = await getMyFullProfile(session.user.email);
+          
+          if (profile) {
+            setFormData(prev => ({
+              ...prev,
+              nama: profile.nama_lengkap || prev.nama,
+              tanggalLahir: profile.tgl_lahir || prev.tanggalLahir,
+              whatsapp: profile.no_wa || prev.whatsapp,
+              sekolah: profile.sekolah_instansi || prev.sekolah,
+              kelas: profile.kelas || prev.kelas,
+              jurusan: profile.jurusan || prev.jurusan
+            }));
+          }
+        } catch (err) {
+            console.error("Auto-fill error:", err);
+        }
+      }
+    }
+    fetchProfile();
+  }, [session]);
+
   const [formData, setFormData] = useState({
     nama: '',
     tanggalLahir: '',
