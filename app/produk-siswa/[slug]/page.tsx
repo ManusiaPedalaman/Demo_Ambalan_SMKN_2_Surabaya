@@ -51,12 +51,7 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
 
   const formatRupiah = (value: any) => {
       const num = Number(value);
-      return new Intl.NumberFormat('id-ID', {
-          style: 'currency',
-          currency: 'IDR',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0
-      }).format(isNaN(num) ? 0 : num);
+      return 'Rp ' + (isNaN(num) ? 0 : num).toLocaleString('id-ID');
   };
 
   const getRealPrice = (price: any) => {
@@ -261,7 +256,7 @@ Apakah barang masih tersedia?`;
 
             <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3 mb-8">
               <h2 className="text-3xl font-bold text-[#1A1A1A]">
-                {formatRupiah(getRealPrice(product.harga))}
+                {formatRupiah(getRealPrice(product.harga))} <span className="text-lg text-gray-500 font-medium">(/item)</span>
               </h2>
             </div>
 
@@ -510,8 +505,9 @@ Apakah barang masih tersedia?`;
                     <div className="flex flex-col">
                       <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">{p.type === 'umkm' ? 'Harga' : 'Harga Sewa'}</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : `Rp ${(getRealPrice(p.price)).toLocaleString('id-ID')}`}</span>
+                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : formatRupiah(getRealPrice(p.price))}</span>
                         {p.type === 'rental' && <span className="text-gray-400 text-sm font-medium">/ {p.duration}</span>}
+                        {p.type === 'umkm' && <span className="text-gray-400 text-sm font-medium">(/item)</span>}
                       </div>
                     </div>
                      <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shadow-lg transition-all duration-300 ease-out cursor-pointer opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0">

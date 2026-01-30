@@ -57,6 +57,11 @@ const Produk = () => {
     }
   };
 
+
+  const formatRupiah = (price: number) => {
+    return 'Rp ' + price.toLocaleString('id-ID');
+  };
+
   // Fetch UMKM products
   const [umkmProducts, setUmkmProducts] = useState<Product[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
@@ -68,7 +73,7 @@ const Produk = () => {
           const normalized: Product[] = res.map((p: any) => ({
               id: p.id,
               name: p.nama_produk,
-              price: 'Rp ' + p.harga, // Format price
+              price: formatRupiah(Number(p.harga)), // Format price
               duration: 'item', // or 'beli'
               image: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk[0] : (p.gambar || ''),
               slug: p.slug || p.id, // Use slug or id
@@ -80,56 +85,22 @@ const Produk = () => {
     fetchUmkm();
   }, []);
 
-  const products: Product[] = [
-    {
-      id: 1,
-      name: 'Tenda Prisma',
-      price: '25k',
-      duration: '1 hari',
-      image: '/Image/tenda1.webp',
-      slug: 'tenda-segitiga',
-      type: 'rental'
-    },
-    {
-      id: 2,
-      name: 'Matras Spons',
-      price: '5k',
-      duration: '1 hari',
-      image: '/Image/matras.webp',
-      slug: 'matras-spons',
-      type: 'rental'
-    },
-    {
-      id: 3,
-      name: 'Tongkat Pramuka',
-      price: '3k',
-      duration: '1 hari',
-      image: '/Image/tongkat.webp',
-      slug: 'tongkat-pramuka',
-      type: 'rental'
-    },
-    {
-      id: 4,
-      name: 'Paket Lengkap',
-      price: '40k',
-      duration: '3 hari',
-      image: '/Image/paket_lengkap.webp',
-      slug: 'paket-lengkap',
-      type: 'rental'
-    },
-    {
-      id: 5,
-      name: 'Tali Tambang',
-      price: '10k',
-      duration: '3 hari',
-      image: '/Image/tali.webp',
-      slug: 'tali-pramuka',
-      type: 'rental'
-    },
-  ];
+  // Import products from data source to ensure consistency
+  // We need to map the data structure to match the Product interface
+  const { products: rentalData } = require('@/app/data/products');
+  
+  const rentalProducts: Product[] = rentalData.map((p: any, index: number) => ({
+    id: index + 100, // Avoid ID conflict
+    name: p.name,
+    price: formatRupiah(p.price),
+    duration: p.duration,
+    image: p.images[0],
+    slug: p.slug,
+    type: 'rental'
+  }));
 
   // Combine products
-  const allProducts = [...products, ...umkmProducts];
+  const allProducts = [...rentalProducts, ...umkmProducts];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -145,6 +116,7 @@ const Produk = () => {
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
+
 
     return () => {
       if (sectionRef.current) observer.disconnect();

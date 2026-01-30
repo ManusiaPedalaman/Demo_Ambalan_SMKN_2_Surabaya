@@ -41,6 +41,11 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
 
 
+
+  const formatRupiah = (price: number) => {
+    return 'Rp ' + price.toLocaleString('id-ID');
+  };
+
   const product = (products as any[]).find(p => p.slug === slug) || products[0];
 
   const [activeImage, setActiveImage] = useState(0);
@@ -267,7 +272,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
         const normalized = res.map((p: any) => ({
           id: p.id, // Keep as string or whatever fetch returns
           name: p.nama_produk,
-          price: 'Rp ' + p.harga,
+          price: formatRupiah(Number(p.harga)),
           duration: 'item',
           images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
           slug: p.slug || p.id,
@@ -278,6 +283,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     }
     fetchUmkm();
   }, []);
+
 
   const totalSlides = Math.ceil(allProducts.length / itemsPerView);
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -888,7 +894,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
                     <div className="flex flex-col">
                       <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">Harga Sewa</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : `${(p.price / 1000)}k`}</span>
+                        <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : formatRupiah(p.price)}</span>
                         <span className="text-gray-400 text-sm font-medium">/ {p.duration}</span>
                       </div>
                     </div>

@@ -1,175 +1,188 @@
-# Panduan Presentasi Project Website Ambalan SMKN 2 Surabaya
+# Naskah Presentasi Sidang Tugas Akhir - Sistem Informasi Ambalan
 
-Dokumen ini berisi **Outline Slide** (apa yang ditulis di PPT) dan **Teks Presentasi** (apa yang Anda ucapkan) untuk 15 Slide.
-
----
-
-## Slide 1: Judul & Pembukaan
-**Visual di Slide:**
-*   **Judul:** Sistem Informasi & Digitalisasi Ambalan SMKN 2 Surabaya
-*   **Logo:** Logo Ambalan & Logo SMKN 2 (Kanan/Kiri)
-*   **Penyusun:** Nama Anda / Tim Anda
-*   **Foto Background:** Foto kegiatan pramuka yang estetik (gelap/blur).
-
-**Teks Presentasi:**
-"Assalamualaikum Wr. Wb. Selamat pagi/siang. Pada kesempatan kali ini, saya akan mempresentasikan hasil proyek Tugas Akhir saya, yaitu Sistem Informasi dan Digitalisasi Ambalan SMKN 2 Surabaya. Website ini dibangun untuk memodernisasi pengelolaan kegiatan dan administrasi kepramukaan di sekolah kita."
+**Durasi Target:** 20 Menit
+**Tone:** Formal, Sopan, Percaya Diri, & Menarik.
 
 ---
 
-## Slide 2: Latar Belakang Masalah
-**Visual di Slide:**
-*   Icon/Gambar: Tumpukan kertas (administrasi manual), Orang bingung (informasi sulit dicari).
-*   Poin:
-    1.  Pengelolaan inventaris barang masih manual (buku tulis).
-    2.  Materi latihan sulit diakses di luar sekolah.
-    3.  Pendaftaran anggota baru masih konvensional.
+## **I. PEMBUKAAN (Menit 0:00 - 2:00)**
 
-**Teks Presentasi:**
-"Latar belakang pembuatan sistem ini adalah adanya kendala operasional yang selama ini terjadi. Pertama, pendataan barang inventaris masih manual di buku, sehingga rawan hilang. Kedua, materi latihan seringkali sulit diakses siswa jika tidak hadir saat latihan. Ketiga, proses administrasi pendaftaran anggota baru yang kurang efisien."
+### **Slide 1: Judul Project**
 
----
+- **Visual:** Judul Besar "Sistem Informasi & Digitalisasi Ambalan SMKN 2 Surabaya", Logo Sekolah & Ambalan, Nama Penyusun.
+- **Script:**
+  "Assalamualaikum Warahmatullahi Wabarakatuh. Selamat pagi/siang dan salam sejahtera bagi kita semua.
+  Yang saya hormati, Bapak/Ibu Penguji serta teman-teman yang berbahagia.
 
-## Slide 3: Tujuan & Solusi
-**Visual di Slide:**
-*   Gambar: Mockup Website Ambalan di Laptop & HP.
-*   Poin Solusi:
-    1.  **Digitalisasi Inventaris** (Peminjaman online).
-    2.  **E-Learning Pramuka** (Materi & Quiz online).
-    3.  **Sistem Terintegrasi** (Web based, bisa diakses kapan saja).
+  Perkenankan saya, **[Sebutkan Nama Anda]**, berdiri di sini untuk mempresentasikan hasil Tugas Akhir saya yang berjudul **'Sistem Informasi dan Digitalisasi Ambalan SMKN 2 Surabaya'**.
 
-**Teks Presentasi:**
-"Tujuannya adalah menciptakan 'One Stop Solution' bagi Ambalan. Sistem ini mendigitalisasi pencatatan barang agar transparan, menyediakan platform belajar mandiri bagi siswa, dan mempermudah masyarakat luar untuk menjangkau informasi tentang Ambalan kita melalui website yang modern."
+  Project ini lahir dari sebuah keresahan akan sistem administrasi konvensional di lingkungan Pramuka kita, dan harapan besar untuk membawa Ambalan SMKN 2 Surabaya melangkah menuju era digital yang lebih terintegrasi."
 
----
+### **Slide 2: Latar Belakang Masalah**
 
-## Slide 4: Teknologi yang Digunakan (Tech Stack)
-**Visual di Slide:**
-*   Logo-logo Teknologi (Berjajar rapi):
-    *   **Next.js 15** (Framework Utama)
-    *   **TypeScript** (Bahasa Pemrograman)
-    *   **Tailwind CSS** (Desain / Styling)
-    *   **PostgreSQL / Supabase** (Database)
-    *   **Prisma ORM** (Manajemen Data)
-    *   **Vercel** (Cloud Hosting)
+- **Visual:** Ilustrasi tumpukan berkas manual, siswa bingung mencari info, jadwal latihan yang tidak terdistribusi.
+- **Script:**
+  "Hadirin sekalian, mari kita lihat kondisi yang melatarbelakangi pengembangan sistem ini.
+  Selama ini, operasional Ambalan kita berjalan dengan metode yang sangat konvensional:
+  1.  **Administrasi Manual:** Pencatatan anggota dan inventaris masih menggunakan buku tulis fisik, yang rentan rusak atau hilang.
+  2.  **Keterbatasan Akses Materi:** Materi kepramukaan hanya bisa didapat saat latihan tatap muka. Jika siswa berhalangan hadir, mereka tertinggal pelajaran.
+  3.  **Potensi Ekonomi yang Belum Tergarap:** Unit usaha (UMKM) siswa tidak memiliki wadah promosi yang layak, sehingga jangkauan pasarnya sangat terbatas.
 
-**Teks Presentasi:**
-"Sistem ini dibangun menggunakan teknologi industri terkini. Basisnya adalah Next.js versi 15 yang sangat cepat dan ramah SEO. Untuk desain, saya menggunakan Tailwind CSS agar responsif di HP maupun Laptop. Databasenya menggunakan PostgreSQL yang dikelola Supabase, menjamin keamanan dan kecepatan akses data."
+  Tiga masalah inilah yang menjadi **'Pain Points'** atau titik nyeri utama yang ingin saya selesaikan."
 
 ---
 
-## Slide 5: Analisis Sistem (Use Case Diagram)
-**Visual di Slide:**
-*   (Masukkan Gambar Use Case Diagram dari `USECASE_CODE.mmd` yang sudah dibuat).
-*   Highlight: 2 Aktor Utama (User & Admin).
+## **II. SOLUSI & TUJUAN (Menit 2:00 - 4:00)**
 
-**Teks Presentasi:**
-"Dalam sistem ini, terdapat dua aktor utama. Pertama adalah **User/Anggota**, yang bisa mengakses materi, melihat produk, dan melakukan pendaftaran. Kedua adalah **Administrator**, yang memiliki hak akses penuh untuk mengelola data inventaris, memverifikasi peminjaman, dan mengupdate konten website melalui Dashboard khusus."
+### **Slide 3: Solusi yang Ditawarkan**
 
----
+- **Visual:** Mockup Website (Tampilan Laptop & HP) dengan headline "One Stop Solution".
+- **Script:**
+  "Sebagai solusi, saya membangun sebuah **'Web-Based Information System'**.
+  Ini bukan sekadar website profil, melainkan sebuah ekosistem digital. Bayangkan sebuah platform di mana:
+  - Siswa bisa belajar materi pramuka dari rumah.
+  - Pengurus bisa mendata stok tenda dan tongkat secara real-time.
+  - Dan siswa yang memiliki usaha (UMKM) bisa memasarkan produknya ke seluruh warga sekolah.
 
-## Slide 6: Arsitektur Database (ERD)
-**Visual di Slide:**
-*   (Masukkan Gambar ERD Simple atau Potongan ERD yang penting).
-*   Fokus pada: Tabel User, Tabel Produk, Tabel Peminjaman.
-
-**Teks Presentasi:**
-"Untuk struktur datanya, sistem ini memiliki beberapa tabel utama yang saling berelasi. Tabel 'Data Produk' menyimpan stok barang, yang terhubung dengan 'Data Peminjaman' untuk mencatat transaksi. Ada juga tabel 'User' dan 'Admin' yang menyimpan data autentikasi dengan keamanan enkripsi password."
+  Inilah yang saya sebut sebagai **Digitalisasi Menyeluruh**."
 
 ---
 
-## Slide 7: Fitur Utama 1 - Halaman Publik & Responsif
-**Visual di Slide:**
-*   Screenshot Halaman Beranda (Hero Section).
-*   Screenshot tampilan di HP (Mobile View) bersandingan dengan Laptop.
-*   Poin: "Desain Modern & Mobile Friendly".
+## **III. ARSITEKTUR SISTEM (Menit 4:00 - 9:00)**
 
-**Teks Presentasi:**
-"Masuk ke fitur aplikasi. Halaman depan didesain modern 'eye-catching' untuk menarik minat siswa baru. Fitur krusialnya adalah 'Responsivitas'. Website ini otomatis menyesuaikan tampilan dengan rapi, baik saat dibuka di Laptop, Tablet, maupun Smartphone, sehingga aksesibilitasnya sangat tinggi."
+### **Slide 4: Tech Stack (Teknologi)**
 
----
+- **Visual:** Logo Next.js 15, TypeScript, Tailwind CSS, Supabase/PostgreSQL.
+- **Script:**
+  "Untuk membangun sistem yang handal, saya menggunakan teknologi industri terkini:
+  - **Frontend:** Dibangun dengan **Next.js versi 15** dan **TypeScript**. Ini menjamin performa website yang sangat cepat dan minim bug.
+  - **Styling:** Menggunakan **Tailwind CSS** untuk memastikan tampilan tetap cantik dan responsif di HP maupun Laptop.
+  - **Backend & Database:** Didukung oleh **Supabase (PostgreSQL)**, yang menjamin keamanan data siswa dan kecepatan akses server."
 
-## Slide 8: Fitur Utama 2 - E-Learning (Latihan)
-**Visual di Slide:**
-*   Screenshot Halaman Latihan (Daftar Materi).
-*   Screenshot Modal Gambar Fullscreen / Video Youtube.
-*   Screenshot Quiz Interaktif.
+### **Slide 5: DFD Level 0 (Diagram Konteks)**
 
-**Teks Presentasi:**
-"Fitur unggulan kedua adalah E-Learning. Di menu 'Latihan', anggota bisa belajar materi kepramukaan seperti sandi, tali-temali, dan survival. Materi disajikan dalam bentuk Teks, Gambar Tutorial, dan Video terintegrasi. Tersedia juga fitur 'Uji Pemahaman' berupa Quiz interaktif untuk mengukur kemampuan anggota."
+- **Visual:** Gambar DFD Level 0 (Sistem di tengah, dikelilingi Aktor). _(Gunakan gambar dari `dfd_level_0.md`)_
+- **Script:**
+  "Secara garis besar, alur data sistem ini dapat dilihat pada **Diagram Konteks (DFD Level 0)** berikut.
+  Sistem berada di pusat, melayani tiga entitas utama:
+  1.  **User/Anggota:** Memberikan data profil dan jawaban kuis, menerima materi dan info produk.
+  2.  **Admin:** Mengelola data master dan menerima laporan otomatis.
+  3.  **Pengunjung (Guest):** Mengakses informasi publik dan formulir pendaftaran.
+      Semua alur ini berjalan secara _real-time_ dan terpusat."
 
----
+### **Slide 6: Use Case Diagram**
 
-## Slide 9: Fitur Utama 3 - Katalog Produk & Sewa
-**Visual di Slide:**
-*   Screenshot Halaman "Produk Kami".
-*   Screenshot Detail Produk.
-*   Tombol "Sewa Sekarang" yang mengarah ke WhatsApp.
+- **Visual:** Gambar Use Case Diagram (Aktor User, Admin, Guest). _(Gunakan gambar dari `usecase_diagram.md`)_
+- **Script:**
+  "Lebih mendalam lagi, apa saja yang bisa dilakukan di dalam sistem?
+  Pada **Use Case Diagram** ini terlihat jelas pembagian peran:
+  - **User/Siswa** memiliki akses fitur Edukasi (Kuis) dan Ekonomi (Buka Toko UMKM).
+  - **Admin** bertindak sebagai _Gatekeeper_ atau verifikator. Adminlah yang menyetujui (Approve) produk UMKM sebelum tayang, menjaga agar konten tetap sesuai etika sekolah.
+  - Perhatikan juga adanya relasi software seperti **'Include'** pada fitur Kuis, di mana pengerjaan kuis pasti menghasilkan skor penilaian."
 
-**Teks Presentasi:**
-"Untuk mendukung kas Ambalan, tersedia fitur Katalog Produk. Pengunjung bisa melihat daftar barang yang disewakan lengkap dengan status ketersediaannya. Jika berminat, sistem menyediakan tombol 'Sewa via WhatsApp' yang otomatis membuat pesan pemesanan, menghubungkan penyewa langsung dengan admin logistik."
+### **Slide 7: Entity Relationship Diagram (ERD)**
 
----
-
-## Slide 10: Keamanan & Autentikasi (Social Login)
-**Visual di Slide:**
-*   Screenshot Halaman Login.
-*   Zoom pada tombol "Sign in with Google" dan "Facebook".
-*   Icon Gembok/Security.
-
-**Teks Presentasi:**
-"Keamanan dan kemudahan akses menjadi prioritas. Sistem Login sudah mendukung **Social Login** menggunakan akun Google dan Facebook. Jadi user tidak perlu repot menghafal password baru. Di sisi backend, sistem menggunakan 'Session' yang aman dan Password Admin dienkripsi menggunakan standar Bcrypt agar tidak mudah diretas."
-
----
-
-## Slide 11: Dashboard Admin - Overview
-**Visual di Slide:**
-*   Screenshot Halaman Dashboard Utama Admin.
-*   Grafik Statistik "Produk Tersewa" (Chart yang sudah diperbaiki).
-*   Summary Cards (Total User, Total Produk).
-
-**Teks Presentasi:**
-"Ini adalah 'Dapur' dari sistem ini, yaitu Dashboard Admin. Di sini, pengurus bisa melihat ringkasan data secara Real-Time. Terdapat Grafik Peminjaman yang interaktif untuk memantau performa penyewaan barang setiap bulannya, serta kartu ringkasan untuk melihat jumlah anggota dan inventaris dengan cepat."
+- **Visual:** Gambar ERD (Chen Notation/Simbol Geometris). _(Gunakan gambar dari `database_design.md`)_
+- **Script:**
+  "Kekuatan utama sistem ini terletak pada desain databasenya.
+  Bisa dilihat pada **ERD** berikut, saya merancang relasi yang komprehensif.
+  - Tabel **User** adalah pusat data.
+  - User memiliki relasi **One-to-Many** ke tabel **UMKM** (satu siswa bisa punya tokoh).
+  - Tabel **Inventory** terhubung dengan **History Peminjaman** untuk pencatatan aset sekolah yang akurat.
+    Struktur ini memastikan tidak ada redudansi data dan integritas informasi terjaga."
 
 ---
 
-## Slide 12: Dashboard Admin - Manajemen Data
-**Visual di Slide:**
-*   Screenshot Tabel Daftar Produk (dengan tombol Edit/Delete).
-*   Screenshot Tabel Peminjaman (Produk Tersewa).
-*   Poin: CRUD (Create, Read, Update, Delete) System.
+## **IV. DEMONSTRASI EKSKLUSIF (Menit 9:00 - 16:00)**
 
-**Teks Presentasi:**
-"Fungsi utama Admin adalah manajemen data. Admin bisa Menambah, Mengedit, dan Menghapus data produk dengan mudah. Fitur krusial lainnya adalah 'Manajemen Peminjaman', di mana Admin bisa mengubah status barang dari 'Disewa' menjadi 'Dikembalikan', yang otomatis akan mengupdate stok barang di katalog public."
+_(Bagian ini adalah inti presentasi. Jika memungkinkan, lakukan Live Demo. Jika tidak, gunakan screenshot/video)._
+
+### **Slide 8 fitur 1: Halaman Publik & Profil**
+
+- **Script:**
+  "Mari kita telusuri fiturnya.
+  Pertama, **Halaman Beranda**. Desainnya dibuat _Modern & Clean_. Informasi tentang Ambalan tersaji rapi.
+  Saya menerapkan **'Consistent Premium Design'**, di mana tampilan website dikunci pada mode terang (Light Mode) dengan paduan warna emas dan krem. Ini memastikan estetika website tetap terjaga dan terlihat profesional di semua perangkat pengguna, tanpa terpengaruh setting dark mode browser yang seringkali merusak komposisi warna.
+  Selain itu, sistem ini juga sudah **Mobile Responsive**. Bapak/Ibu bisa membukanya lewat HP, dan tampilannya akan menyesuaikan diri dengan sempurna."
+
+### **Slide 9 Fitur 2: Sistem Edukasi (E-Learning)**
+
+- **Script:**
+  "Kedua, fitur **Edu-Pramuka**.
+  Siswa bisa mengakses menu 'Latihan'. Di sini tersedia modul sandi, tali-temali, hingga sejarah.
+  Tidak hanya membaca, siswa ditantang dengan **Kuis Interaktif**.
+  _(Tunjukkan demo mengerjakan kuis)_
+  Begitu selesai, skor langsung keluar. Ini memudahkan pembina untuk memantau pemahaman teori anggota tanpa harus mengoreksi kertas satu per satu."
+
+### **Slide 10 Fitur 3: Ekosistem UMKM Siswa**
+
+- **Script:**
+  "Ketiga, dan ini yang paling unik, **Marketplace UMKM**.
+  Siswa SMKN 2 yang memiliki usaha bisa mendaftarkan tokonya di sini.
+  Mereka bisa upload foto produk makanan atau kerajinan.
+  **Fitur Cerdas:** Sistem kontak WhatsApp bekerja secara **Dinamis**. Ketika pembeli menekan tombol 'Checkout', sistem otomatis mengambil nomor WhatsApp terbaru dari profil siswa penjual. Jadi, jika penjual mengganti nomor HP di profilnya, tombol pemesanan akan langsung terupdate tanpa perlu mengedit produk satu per satu.
+
+  Tentu, produk tidak langsung muncul begitu saja. **Admin harus memverifikasi dulu**. Ini fitur keamanan untuk mencegah konten yang tidak pantas."
+
+### **Slide 11 Fitur 4: Inventory & Peminjaman (Rental)**
+
+- **Script:**
+  "Keempat, **Digitalisasi Aset**.
+  Dulu kita mencatat peminjaman tenda di buku tulis. Sekarang, semua tercatat di sistem.
+  Siapa meminjam, kapan harus kembali, dan status dendanya terekam jelas. Admin Logistik bisa memantau aset mana yang sedang keluar dan mana yang tersedia di gudang."
+
+### **Slide 12 Fitur 5: Dashboard Admin**
+
+- **Script:**
+  "Terakhir, **Dashboard Admin**.
+  Ini adalah ruang kendali bagi Pembina atau Dewan Ambalan.
+  Dari sini, kita bisa melihat Grafik Statistik: Berapa siswa yang login hari ini? Berapa produk yang terjual?
+  Semua data disajikan dalam bentuk Grafik Visual yang mudah dibaca, bukan lagi tabel angka yang membosankan."
 
 ---
 
-## Slide 13: Tantangan & Penyelesaian
-**Visual di Slide:**
-*   Icon Bug/Tantangan -> Panah -> Icon Centang/Solusi.
-*   Contoh kasus: "Login Error" -> "Fix Redirect URI", "Tampilan Tablet Berantakan" -> "Responsive Breakpoints".
+## **V. KENDALA & PENGEMBANGAN (Menit 16:00 - 18:00)**
 
-**Teks Presentasi:**
-"Selama pengembangan, tentu ada tantangan. Salah satunya adalah konfigurasi Social Login yang ketat dari Google, serta penyesuaian tampilan di perangkat Tablet yang sempat berantakan. Namun, semua itu berhasil diatasi dengan penerapan 'Responsive Breakpoints' yang tepat dan konfigurasi OAuth yang sesuai standar keamanan platform."
+### **Slide 13: Tantangan Pengembangan**
+
+- **Script:**
+  "Tentu, perjalanan membangun sistem ini tidak mulus.
+  Tantangan terbesar yang saya hadapi adalah **Kompleksitas Relasi Database**. Menghubungkan data Akademik (Kuis) dengan data Ekonomi (UMKM) dalam satu user ID membutuhkan logika pemrograman yang matang.
+  Namun, dengan penerapan skema database **PostgreSQL** yang tepat, tantangan tersebut berhasil teratasi."
+
+### **Slide 14: Rencana Pengembangan (Future Work)**
+
+- **Script:**
+  "Sistem ini belum mencapai titik akhir. Ke depannya, saya berencana mengembangkan:
+  1.  **Mobile App Native** (Android/iOS) agar notifikasi lebih real-time.
+  2.  **Integrasi Payment Gateway** agar pembayaran UMKM bisa dilakukan secara cashless (QRIS)."
 
 ---
 
-## Slide 14: Kesimpulan
-**Visual di Slide:**
-*   Poin Kesimpulan:
-    1.  Sistem Berjalan 100% (Deployed).
-    2.  Solusi Efektif untuk Administrasi.
-    3.  Siap Diimplementasikan.
+## **VI. PENUTUP (Menit 18:00 - 20:00)**
 
-**Teks Presentasi:**
-"Kesimpulannya, Website Ambalan ini telah berhasil dibangun dan di-deploy secara online. Sistem ini mampu mejawab permasalahan administrasi manual, menyediakan sarana belajar digital, dan membuka peluang pemasukan kas melalui penyewaan online. Sistem ini siap untuk diimplementasikan sepenuhnya di SMKN 2 Surabaya."
- 
+### **Slide 15: Kesimpulan**
+
+- **Visual:** Poin ringkasan manfaat (Efisien, Transparan, Modern).
+- **Script:**
+  "Hadirin sekalian, sebagai penutup.
+  Sistem Informasi Ambalan ini bukan sekadar tugas akhir bagi saya. Ini adalah kontribusi nyata untuk sekolah tercinta.
+  Dengan sistem ini, kita mengubah:
+  - Dari administrasi manual menjadi **Digital**.
+  - Dari informasi tertutup menjadi **Transparan**.
+  - Dan dari organisasi konvensional menjadi **Ambalan Modern Berbasis Teknologi**.
+
+  Saya siap mempertanggungjawabkan karya ini dan sangat terbuka terhadap masukan dari Bapak/Ibu Penguji."
+
+### **Slide 16: Salam Penutup**
+
+- **Visual:** "Terima Kasih", Kontak, Quote.
+- **Script:**
+  "Terima kasih atas waktu dan perhatian yang diberikan.
+  Mohon maaf apabila ada tutur kata yang kurang berkenan.
+  Saya akhiri presentasi ini.
+  **Wassalamualaikum Warahmatullahi Wabarakatuh.**
+  **(Jeda sejenak)**
+  Saya kembalikan waktu kepada Moderator/Dewan Penguji."
+
 ---
-
-## Slide 15: Penutup & QnA
-**Visual di Slide:**
-*   Tulisan Besar: "Terima Kasih".
-*   Kontak Anda (Email/LinkedIn).
-*   Quote Pramuka (Opsional): *"Satyaku Kudharmakan, Dharmaku Kubaktikan"*.
-
-**Teks Presentasi:**
-"Demikian presentasi dari saya. Saya percaya digitalisasi ini adalah langkah awal untuk kemajuan Ambalan kita. Terima kasih atas perhatian Bapak/Ibu dan teman-teman sekalian. Saya buka sesi tanya jawab jika ada yang ingin didiskusikan. Wasalamualaikum Wr. Wb. Salam Pramuka!"

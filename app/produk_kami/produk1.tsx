@@ -17,13 +17,17 @@ const dmSans = DM_Sans({
 import { products } from '../data/products';
 
 // Helper to normalize data structure
+const formatRupiah = (price: number) => {
+  return 'Rp ' + price.toLocaleString('id-ID');
+};
+
 const normalizeProduct = (p: any, isStatic = false) => {
     if (isStatic) {
         return {
             id: 'static-' + p.id,
             slug: p.slug,
             name: p.name,
-            price: p.price,
+            price: formatRupiah(p.price),
             images: p.images,
             description: p.description,
             duration: p.duration,
@@ -35,7 +39,7 @@ const normalizeProduct = (p: any, isStatic = false) => {
         id: p.id,
         slug: p.slug || p.id,
         name: p.nama_produk,
-        price: 'Rp ' + p.harga,
+        price: formatRupiah(Number(p.harga)),
         images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
         description: p.deskripsi,
         duration: 'item', // UMKM default?
@@ -127,7 +131,7 @@ export default function Produk() {
                   {product.price}
                 </span>
                 <span className="text-gray-400 text-sm font-medium">
-                  {product.type === 'static' ? `/ ${product.duration}` : ''}
+                  {product.type === 'static' ? `/ ${product.duration}` : '(/item)'}
                 </span>
               </div>
             </div>

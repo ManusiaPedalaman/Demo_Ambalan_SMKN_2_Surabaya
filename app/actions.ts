@@ -1346,6 +1346,18 @@ export async function getPublicProductById(slugOrId: string) {
         if (!product || product.status !== 'APPROVED' || !product.is_published) {
              return null;
         }
+
+        // Fetch User Profile to get the latest phone number
+        let latestWa = product.umkm?.no_wa || '';
+        if (product.umkm?.id_user) {
+            const userProfile = await prisma.dataUserLogin.findUnique({
+                where: { id_login: product.umkm.id_user },
+                select: { no_wa: true }
+            });
+            if (userProfile && userProfile.no_wa) {
+                latestWa = userProfile.no_wa;
+            }
+        }
         
         return {
             ...product,
@@ -1353,7 +1365,7 @@ export async function getPublicProductById(slugOrId: string) {
             id_umkm: product.id_umkm.toString(),
             created_at: product.created_at.toISOString(),
             nama_umkm: product.umkm?.nama_umkm || 'Unknown UMKM',
-            no_wa: product.umkm?.no_wa || '',
+            no_wa: latestWa, // Use latest WA from user profile
             foto_produk: product.foto_produk || (product.gambar ? [product.gambar] : []),
             spesifikasi: product.spesifikasi || []
         };
