@@ -302,7 +302,7 @@ export default function Navbar() {
                 <>
 
                   <Link
-                    href="/hubungi_kami"
+                    href="/hubungi_kami#contact-form"
                     className={`px-6 py-2.5 rounded-full font-medium transition-all duration-300 whitespace-nowrap inline-block shadow-md hover:shadow-lg hover:-translate-y-0.5 
                       bg-[#6B4D27] hover:bg-[#7A5F3D] text-white
                     `}

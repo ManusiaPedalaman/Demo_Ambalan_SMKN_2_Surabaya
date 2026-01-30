@@ -8,13 +8,28 @@ import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal, { ModalType } from '@/components/ui/Modal';
+import { useUserDashboard } from '../UserContext';
 
 export default function UMKMDashboardPage() {
     const { data: session } = useSession();
     const router = useRouter();
+    
+    // Use Context
+    const { umkm: contextUmkm, loading: contextLoading, refreshData } = useUserDashboard();
+    
     const [loading, setLoading] = useState(true);
     const [umkmData, setUmkmData] = useState<any>(null);
     
+    // Sync context data to local state
+    useEffect(() => {
+        if (contextLoading) {
+            setLoading(true);
+        } else {
+            setUmkmData(contextUmkm);
+            setLoading(false);
+        }
+    }, [contextUmkm, contextLoading]);
+
     // Modals & Forms handling
     const [view, setView] = useState<'LIST' | 'FORM_PRODUCT' | 'FORM_UMKM'>('LIST'); 
     const [isEditing, setIsEditing] = useState(false); 
@@ -61,20 +76,10 @@ export default function UMKMDashboardPage() {
     const SPEC_OPTIONS = ["Berat", "Rasa", "Ukuran", "Bahan", "Warna", "Kadaluarsa", "Lainnya"];
     const [tempSpec, setTempSpec] = useState({ label: "Berat", value: "" });
 
+    // Replaces init() with refreshData() from context
     const init = async () => {
-        if (session?.user?.email) {
-            const profile = await getUserProfileByEmail(session.user.email);
-            if (profile) {
-                const umkm = await getUserUMKM(profile.id_login);
-                setUmkmData(umkm);
-            }
-        }
-        setLoading(false);
+        await refreshData();
     };
-
-    useEffect(() => {
-        init();
-    }, [session]);
 
     // --- PRODUCT HANDLERS ---
     const handleProductSubmit = async (e?: React.FormEvent, isDraft = false) => {

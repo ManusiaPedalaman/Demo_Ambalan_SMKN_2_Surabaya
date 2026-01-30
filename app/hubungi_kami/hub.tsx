@@ -278,7 +278,7 @@ export default function Hub() {
   };
 
   return (
-    <section id="contact-form" className={`w-full min-h-screen bg-white overflow-hidden ${dmSans.className}`}>
+    <section id="contact-form" className={`w-full min-h-screen bg-white overflow-hidden scroll-mt-32 ${dmSans.className}`}>
 
 
 <Modal

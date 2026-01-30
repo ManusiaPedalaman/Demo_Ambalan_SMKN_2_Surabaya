@@ -39,10 +39,10 @@ const normalizeProduct = (p: any, isStatic = false) => {
         id: p.id,
         slug: p.slug || p.id,
         name: p.nama_produk,
-        price: formatRupiah(Number(p.harga)),
+        price: formatRupiah(Number(p.harga) < 1000 ? Number(p.harga) * 1000 : Number(p.harga)),
         images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
         description: p.deskripsi,
-        duration: 'item', // UMKM default?
+        duration: 'produk', // Default UMKM suffix
         type: 'umkm',
         spesifikasi: p.spesifikasi || [],
         umkm_name: p.nama_umkm
@@ -131,7 +131,7 @@ export default function Produk() {
                   {product.price}
                 </span>
                 <span className="text-gray-400 text-sm font-medium">
-                  {product.type === 'static' ? `/ ${product.duration}` : '(/item)'}
+                  {product.type === 'static' ? `/ ${product.duration}` : '/ produk'}
                 </span>
               </div>
             </div>
@@ -149,13 +149,13 @@ export default function Produk() {
             onSubmit={(e) => e.preventDefault()}
             className="bg-gray-50 rounded-full p-1.5 flex items-center w-full max-w-3xl border border-gray-200 shadow-sm focus-within:border-[#C9A86A] transition-all duration-300"
           >
-            <div className="pl-4 text-gray-400">
+            <div className="pl-4 text-gray-600">
               <Search size={20} />
             </div>
             <input
               type="text"
               placeholder="Cari produk UMKM & perlengkapan..."
-              className="flex-1 px-4 py-2.5 bg-transparent outline-none text-gray-700 placeholder-gray-400"
+              className="flex-1 px-4 py-2.5 bg-transparent outline-none text-gray-900 placeholder-gray-600"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -169,6 +169,7 @@ export default function Produk() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
             initial="hidden"
             whileInView="visible"
+            key={searchQuery + 'rental'}
             viewport={{ once: true, amount: 0.1 }}
             >
             {filteredRental.length > 0 ? (
@@ -189,6 +190,7 @@ export default function Produk() {
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
                     initial="hidden"
                     whileInView="visible"
+                    key={searchQuery + 'umkm'}
                     viewport={{ once: true, amount: 0.1 }}
                 >
                     {filteredUmkm.length > 0 ? (

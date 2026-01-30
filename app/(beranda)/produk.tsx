@@ -58,6 +58,12 @@ const Produk = () => {
   };
 
 
+  const getRealPrice = (price: any) => {
+    const num = Number(price);
+    // Heuristic: if price is very small (unlikely for a product in IDR), assume it's in thousands
+    return num < 1000 ? num * 1000 : num;
+  };
+
   const formatRupiah = (price: number) => {
     return 'Rp ' + price.toLocaleString('id-ID');
   };
@@ -73,8 +79,8 @@ const Produk = () => {
           const normalized: Product[] = res.map((p: any) => ({
               id: p.id,
               name: p.nama_produk,
-              price: formatRupiah(Number(p.harga)), // Format price
-              duration: 'item', // or 'beli'
+              price: formatRupiah(getRealPrice(p.harga)), // Format price with heuristic
+              duration: 'produk', // Default suffix for UMKM
               image: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk[0] : (p.gambar || ''),
               slug: p.slug || p.id, // Use slug or id
               type: 'umkm'
@@ -177,7 +183,7 @@ const Produk = () => {
             }`}
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 tracking-tight">
-            Produk Sewa
+            Produk Kami
           </h1>
           <p className="text-sm md:text-base text-gray-500 max-w-2xl mx-auto leading-relaxed px-4">
             Lengkapi kebutuhan perkemahan ambalanmu dengan peralatan berkualitas.
@@ -260,7 +266,7 @@ const Produk = () => {
 
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex flex-col">
-                        <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">Harga Sewa</span>
+                        <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-widest">Harga{product.type === 'umkm' ? '' : ' Sewa'}</span>
                         <div className="flex items-baseline gap-1">
                           <span className="text-[#E07D5F] text-xl font-bold">{product.price}</span>
                           <span className="text-gray-400 text-sm font-medium">/ {product.duration}</span>
@@ -273,7 +279,7 @@ const Produk = () => {
                       opacity-100 translate-y-0 
                       lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0
                     ">
-                        Sewa
+                        {product.type === 'umkm' ? 'Beli' : 'Sewa'}
                       </div>
                     </div>
                   </div>

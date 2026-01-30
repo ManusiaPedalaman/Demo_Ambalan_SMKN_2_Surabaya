@@ -6,7 +6,8 @@ import { getUserDashboardData } from '@/app/actions';
 
 interface UserDashboardContextType {
     profile: any;
-    history: any; // stats removed as it is not returned by action
+    history: any;
+    umkm: any; // Added umkm
     loading: boolean;
     refreshData: () => Promise<void>;
 }
@@ -14,6 +15,7 @@ interface UserDashboardContextType {
 const UserDashboardContext = createContext<UserDashboardContextType>({
     profile: null,
     history: { rentals: [], contacts: [], joins: [], quizzes: [] },
+    umkm: null, // Initial umkm
     loading: true,
     refreshData: async () => {},
 });
@@ -24,18 +26,20 @@ export function UserDashboardProvider({ children }: { children: React.ReactNode 
     const { data: session, status } = useSession();
     const [data, setData] = useState<any>({
         profile: null,
-        history: { rentals: [], contacts: [], joins: [], quizzes: [] }
+        history: { rentals: [], contacts: [], joins: [], quizzes: [] },
+        umkm: null // Initial state
     });
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
         if (session?.user?.email) {
             const dashboardData = await getUserDashboardData(session.user.email);
-            // Action returns { profile, history } directly, or fallback object. No 'success' property.
-            if (dashboardData && dashboardData.profile) {
+            // Action returns { profile, history, umkm }
+            if (dashboardData) {
                 setData({
                     profile: dashboardData.profile,
-                    history: dashboardData.history
+                    history: dashboardData.history,
+                    umkm: dashboardData.umkm
                 });
             }
             setLoading(false);

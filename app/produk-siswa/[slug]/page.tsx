@@ -308,13 +308,13 @@ Apakah barang masih tersedia?`;
                 
                 {/* Nama Lengkap */}
                 <div>
-                   <label className="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap</label>
+                   <label className="block text-sm font-bold text-gray-900 mb-2">Nama Lengkap</label>
                    <div className="relative">
-                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
                        <input 
                            type="text" 
                            placeholder="Masukkan Nama Lengkap Anda"
-                           className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#C9A86A] outline-none"
+                           className="w-full border border-gray-400 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-600 focus:ring-2 focus:ring-[#C9A86A] outline-none"
                            value={formData.nama}
                            onChange={(e) => setFormData({...formData, nama: e.target.value})}
                        />
@@ -324,26 +324,26 @@ Apakah barang masih tersedia?`;
                 {/* No WhatsApp & Sekolah */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div>
-                       <label className="block text-sm font-bold text-gray-700 mb-2">No WhatsApp</label>
+                       <label className="block text-sm font-bold text-gray-900 mb-2">No WhatsApp</label>
                        <div className="relative">
-                           <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                           <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
                            <input 
                                type="tel" 
                                placeholder="Contoh: 08123..."
-                               className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#C9A86A] outline-none"
+                               className="w-full border border-gray-400 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-600 focus:ring-2 focus:ring-[#C9A86A] outline-none"
                                value={formData.whatsapp}
                                onChange={(e) => setFormData({...formData, whatsapp: e.target.value.replace(/[^0-9]/g, '')})}
                            />
                        </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">Sekolah / Instansi</label>
+                        <label className="block text-sm font-bold text-gray-900 mb-2">Sekolah / Instansi</label>
                        <div className="relative">
-                           <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                           <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
                            <input 
                                type="text" 
                                placeholder="Asal Sekolah / Instansi"
-                               className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#C9A86A] outline-none"
+                               className="w-full border border-gray-400 rounded-lg py-3 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-600 focus:ring-2 focus:ring-[#C9A86A] outline-none"
                                value={formData.sekolah}
                                onChange={(e) => setFormData({...formData, sekolah: e.target.value})}
                            />
@@ -353,7 +353,7 @@ Apakah barang masih tersedia?`;
 
                 {/* Metode Pembayaran */}
                  <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Metode Pembayaran</label>
+                  <label className="block text-sm font-bold text-gray-900 mb-2">Metode Pembayaran</label>
                   <div className="flex flex-wrap gap-2">
                       {paymentMethods.map((method) => (
                           <button
@@ -362,7 +362,7 @@ Apakah barang masih tersedia?`;
                             className={`px-4 py-2 text-sm rounded-full border transition-all duration-300 
                                 ${formData.metodePembayaran === method 
                                 ? 'bg-[#8A6A4B] text-white border-[#8A6A4B] shadow-md' 
-                                : 'bg-white text-gray-600 border-gray-300 hover:border-[#8A6A4B] hover:text-[#8A6A4B]'}
+                                : 'bg-white text-gray-700 border-gray-400 hover:border-[#8A6A4B] hover:text-[#8A6A4B]'}
                             `}
                           >
                               {method}
@@ -373,7 +373,7 @@ Apakah barang masih tersedia?`;
 
                 {/* Quantity Input */}
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Jumlah Produk</label>
+                  <label className="block text-sm font-bold text-gray-900 mb-2">Jumlah Produk</label>
                   <div className="flex items-center justify-between border-2 border-[#8A6A4B] rounded-full px-4 py-2 w-[140px] text-[#8A6A4B] font-bold bg-[#FAF8F5]">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -402,21 +402,21 @@ Apakah barang masih tersedia?`;
 
                 {/* Message Input */}
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Pesan (Opsional)</label>
+                    <label className="block text-sm font-bold text-gray-900 mb-2">Pesan (Opsional)</label>
                     <textarea
                         rows={3}
                         placeholder="Contoh: Saya ingin ukuran L / Warna tertentu..."
-                        className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-[#C9A86A] outline-none resize-none transition-all"
+                        className="w-full border border-gray-400 rounded-lg p-3 text-sm text-gray-900 placeholder:text-gray-600 focus:ring-2 focus:ring-[#C9A86A] outline-none resize-none transition-all"
                         value={formData.pesan}
                         onChange={(e) => setFormData({...formData, pesan: e.target.value})}
                     ></textarea>
                 </div>
 
                 {/* Total & Button */}
-                 <div className="pt-6 border-t border-dashed border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                 <div className="pt-6 border-t border-dashed border-gray-300 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="text-center md:text-left">
-                      <p className="text-sm text-gray-500 font-bold">Total Harga</p>
-                      <h3 className="text-3xl font-bold text-gray-800">
+                      <p className="text-sm text-gray-600 font-bold">Total Harga</p>
+                      <h3 className="text-3xl font-bold text-gray-900">
                          {formatRupiah(getRealPrice(product.harga) * quantity)}
                       </h3>
                     </div>

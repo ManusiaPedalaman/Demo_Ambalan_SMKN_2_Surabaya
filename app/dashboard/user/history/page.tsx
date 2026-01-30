@@ -152,17 +152,17 @@ export default function UserHistoryPage() {
                         {historyData.rentals.length === 0 ? <p className="text-gray-400 text-center py-10">Belum ada data history.</p> : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm text-gray-600">
-                                    <thead className="bg-gray-50 text-gray-800 font-semibold">
+                                    <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
                                         <tr>
-                                            <th className="p-3">Barang</th>
-                                            <th className="p-3">Tgl Ambil</th>
-                                            <th className="p-3">Status</th>
-                                            <th className="p-3 text-center">Aksi</th>
+                                            <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Barang</th>
+                                            <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Tgl Ambil</th>
+                                            <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Status</th>
+                                            <th className="px-6 py-4 font-bold text-gray-700 text-center border border-gray-300">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {historyData.rentals.map((item: any) => (
-                                            <tr key={item.id} className="border-b hover:bg-gray-50/50">
+                                        {historyData.rentals.map((item: any, idx: number) => (
+                                            <tr key={item.id} className={`${idx % 2 === 0 ? 'bg-[#F6F1EB]' : 'bg-white'} hover:bg-[#EBE5DE] transition-colors border-b border-gray-100/50`}>
                                                 <td className="p-3 font-medium">{item.nama_produk || item.produk?.nama_produk}</td>
                                                 <td className="p-3">{formatDate(item.tgl_pengambilan)}</td>
                                                 <td className="p-3">

@@ -118,17 +118,17 @@ export default function UserDashboardPage() {
                 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm text-gray-600">
-                        <thead className="bg-gray-50 text-gray-800 font-semibold">
+                        <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-100">
                             <tr>
-                                <th className="p-4">Aktivitas</th>
-                                <th className="p-4">Detail</th>
-                                <th className="p-4">Status / Skor</th>
-                                <th className="p-4">ID</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Aktivitas</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Detail</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">Status / Skor</th>
+                                <th className="px-6 py-4 font-bold text-gray-700 border border-gray-300">ID</th>
                             </tr>
                         </thead>
                         <tbody>
                             {recentActivity.length > 0 ? recentActivity.map((item, idx) => (
-                                <tr key={idx} className="border-b hover:bg-gray-50/50">
+                                <tr key={idx} className={`${idx % 2 === 0 ? 'bg-[#F6F1EB]' : 'bg-white'} hover:bg-[#EBE5DE] transition-colors border-b border-gray-100/50`}>
                                     <td className="p-4 font-medium flex items-center gap-3">
                                         {item.type === 'rental' && <div className="p-2 rounded-lg bg-blue-50 text-blue-600"><ShoppingBag size={18} /></div>}
                                         {item.type === 'quiz' && <div className="p-2 rounded-lg bg-orange-50 text-orange-600"><Flame size={18} /></div>}

@@ -2,17 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { updateUserProfile, getUserProfileByEmail } from '@/app/actions';
+import { updateUserProfile } from '@/app/actions';
 import Image from 'next/image';
 import { Camera, Save, Loader2 } from 'lucide-react';
 import AlertModal from '@/app/components/AlertModal';
 import SuccessPopup from '@/app/components/SuccessPopup';
+import { useUserDashboard } from '../UserContext';
 
 export default function UserProfilePage() {
     const { data: session, update } = useSession();
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const { profile, loading: contextLoading, refreshData } = useUserDashboard();
 
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -39,29 +41,36 @@ export default function UserProfilePage() {
         foto: ''
     });
 
+    // Use context loading state
     useEffect(() => {
-        const fetchProfile = async () => {
-            if (session?.user?.email) {
-                const profile = await getUserProfileByEmail(session.user.email);
-                if (profile) {
-                    setUserId(profile.id_login);
-                    setFormData({
-                        nama: profile.nama_lengkap || session.user.name || '',
-                        email: profile.email || '',
-                        no_wa: profile.no_wa || '',
-                        tgl_lahir: profile.tgl_lahir ? new Date(profile.tgl_lahir).toISOString().split('T')[0] : '',
-                        sekolah: profile.sekolah_instansi || '',
-                        kelas: profile.kelas || '',
-                        jurusan: profile.jurusan || '',
-                        foto: profile.foto || session.user.image || ''
-                    });
-                }
-            }
-            setLoading(false);
-        };
+        if (loading) setLoading(contextLoading);
+    }, [contextLoading, loading]);
 
-        fetchProfile();
-    }, [session]);
+    useEffect(() => {
+        if (profile) {
+            setUserId(profile.id_login);
+            setFormData({
+                nama: profile.nama_lengkap || session?.user?.name || '',
+                email: profile.email || '',
+                no_wa: profile.no_wa || '',
+                tgl_lahir: profile.tgl_lahir ? new Date(profile.tgl_lahir).toISOString().split('T')[0] : '',
+                sekolah: profile.sekolah_instansi || '',
+                kelas: profile.kelas || '',
+                jurusan: profile.jurusan || '',
+                foto: profile.foto || session?.user?.image || ''
+            });
+            setLoading(false);
+        } else if (!contextLoading && session?.user?.email) {
+             // Fallback if profile is null but context finished loading (e.g. first time user)
+             setFormData(prev => ({
+                ...prev,
+                nama: session.user?.name || '',
+                email: session.user?.email || '',
+                foto: session.user?.image || ''
+             }));
+             setLoading(false);
+        }
+    }, [profile, contextLoading, session]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -115,7 +124,7 @@ export default function UserProfilePage() {
                     console.warn("Session update failed (likely due to image size), but DB updated:", sessionError);
                 }
                 
-                // Show success popup regardless of session update status
+                await refreshData();
                 setShowSuccessPopup(true);
             } else {
                 showAlert('error', 'Gagal', 'Gagal memperbarui profil: ' + result.error);
@@ -146,10 +155,7 @@ export default function UserProfilePage() {
 
             <SuccessPopup 
                 isOpen={showSuccessPopup}
-                onClose={() => {
-                    setShowSuccessPopup(false);
-                    window.location.reload();
-                }}
+                onClose={() => setShowSuccessPopup(false)}
             />
 
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Profil</h1>

@@ -151,16 +151,24 @@ export async function getUserDashboardData(email: string) {
             no_wa: no_wa || undefined
         });
 
-        // 3. Return aggregated data
+        // 3. Fetch UMKM Data
+        let umkm = null;
+        if (profile) {
+            umkm = await getUserUMKM(profile.id_login);
+        }
+
+        // 4. Return aggregated data
         return {
             profile,
-            history
+            history,
+            umkm
         };
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         return {
             profile: null,
-            history: { rentals: [], quizzes: [], contacts: [], joins: [] }
+            history: { rentals: [], quizzes: [], contacts: [], joins: [] },
+            umkm: null
         };
     }
 }

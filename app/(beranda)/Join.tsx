@@ -65,7 +65,7 @@ const Join = () => {
             </p>
 
             <Link
-              href="/join"
+              href="/join#join-form"
               className="inline-block bg-[#9C7C5B] hover:bg-[#8A6A4B] text-white font-bold py-3 px-10 md:px-12 rounded-[4px] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm md:text-base tracking-wide text-center"
             >
               Join

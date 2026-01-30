@@ -398,7 +398,7 @@ const JoinUs = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col lg:flex-row w-full overflow-hidden ${dmSans.className}`}>
+    <div id="join-form" className={`min-h-screen flex flex-col lg:flex-row w-full overflow-hidden scroll-mt-32 ${dmSans.className}`}>
 
 
 {/* MODAL IMPLEMENTATION */}
