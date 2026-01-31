@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal, { ModalType } from '@/components/ui/Modal';
 import { useUserDashboard } from '../UserContext';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 export default function UMKMDashboardPage() {
     const { data: session } = useSession();
@@ -82,15 +83,35 @@ export default function UMKMDashboardPage() {
     };
 
     // --- PRODUCT HANDLERS ---
+    // Shake Animation State
+    const [shake, setShake] = useState(false);
+    
+    // --- PRODUCT HANDLERS ---
     const handleProductSubmit = async (e?: React.FormEvent, isDraft = false) => {
         if (e) e.preventDefault();
+        
+        // Validation for SUBMIT
+        if (!isDraft) {
+             let errors = [];
+             if (!productForm.nama_produk) errors.push("Nama Produk wajib diisi.");
+             if (!productForm.harga) errors.push("Harga wajib diisi.");
+             if (productForm.deskripsi.length < 20) errors.push("Deskripsi terlalu pendek (min. 20 karakter).");
+             if (productForm.spesifikasi.length < 2) errors.push("Minimal 2 spesifikasi.");
+             if (productForm.foto_produk.length < 3 && !productForm.gambar) errors.push("Minimal 3 foto produk.");
+             
+             if (errors.length > 0) {
+                 setShake(true);
+                 setTimeout(() => setShake(false), 500);
+                 showAlert("Data Belum Lengkap", errors.join("\n"), 'warning');
+                 return;
+             }
+        }
+
         setLoading(true);
 
         const payload = {
             ...productForm,
             is_draft: isDraft,
-            // Ensure specs are stringified if needed or pass as object if action accepts json
-            // Action updated to accept object array `spesifikasi`
         };
 
         let res;
@@ -116,7 +137,7 @@ export default function UMKMDashboardPage() {
 
     const confirmPublish = async () => {
         if (!publishModal.id) return;
-        setLoading(true); // Or usage specific loading state
+        setLoading(true); 
         const res = await publishProductUMKM(publishModal.id, !publishModal.status);
         if (res.success) {
             init();
@@ -179,6 +200,11 @@ export default function UMKMDashboardPage() {
             }
             
             Array.from(files).forEach(file => {
+                if (file.size > 2 * 1024 * 1024) { // Max 2MB
+                    showAlert("File Terlalu Besar", `File ${file.name} melebihi 2MB.`, 'warning');
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     setProductForm(prev => ({
@@ -191,7 +217,7 @@ export default function UMKMDashboardPage() {
             });
         }
     };
-
+    
     const removeImage = (index: number) => {
         setProductForm(prev => {
             const newPhotos = prev.foto_produk.filter((_, i) => i !== index);
@@ -238,7 +264,7 @@ export default function UMKMDashboardPage() {
     };
 
     const executeDelete = async () => {
-        if (deleteConfirmationText !== 'hapus') return;
+        if (deleteConfirmationText !== 'Hapus') return; // Strict Case Sensitive
         setLoading(true);
         let res = await deleteProductUMKM(deleteModal.id!);
         
@@ -272,7 +298,6 @@ export default function UMKMDashboardPage() {
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                     <h2 className="text-2xl font-bold text-gray-800 mb-6">Edit Informasi UMKM</h2>
                     <form onSubmit={handleUMKMSubmit} className="space-y-4">
-                        {/* Shortened for brevity - logic same as before */}
                         <div><label className="block text-sm font-semibold mb-1">Nama UMKM</label><input required value={umkmForm.nama_umkm} onChange={e => setUmkmForm({...umkmForm, nama_umkm: e.target.value})} className="w-full border rounded-xl p-3" /></div>
                         <div className="grid grid-cols-2 gap-4">
                              <div><label className="block text-sm font-semibold mb-1">Nama Pemilik</label><input required value={umkmForm.nama_lengkap} onChange={e => setUmkmForm({...umkmForm, nama_lengkap: e.target.value})} className="w-full border rounded-xl p-3" /></div>
@@ -292,7 +317,6 @@ export default function UMKMDashboardPage() {
 
     // --- VIEW: STATUS PENDING / REJECTED ---
     if (umkmData && (umkmData.status === 'PENDING' || umkmData.status === 'REJECTED')) {
-         // Same as before
         return (
             <div className="p-8 font-dm-sans">
                 <h1 className="text-2xl font-bold text-gray-800 mb-6">Status UMKM</h1>
@@ -322,7 +346,6 @@ export default function UMKMDashboardPage() {
 
     // --- MAIN DASHBOARD ---
     if (!umkmData) {
-         // Register logic
         return (
             <div className="p-8 font-dm-sans flex flex-col items-center justify-center min-h-[60vh] text-center">
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 max-w-md w-full">
@@ -381,13 +404,13 @@ export default function UMKMDashboardPage() {
             >
                 <div className="w-full mt-4">
                     <p className="text-gray-600 mb-2 text-center text-sm">
-                        Ketik <strong>"hapus"</strong> di bawah untuk mengonfirmasi penghapusan. Tindakan ini tidak dapat dibatalkan.
+                        Ketik <strong>"Hapus"</strong> di bawah untuk mengonfirmasi penghapusan. Tindakan ini tidak dapat dibatalkan.
                     </p>
                     <input 
                         value={deleteConfirmationText} 
                         onChange={(e) => setDeleteConfirmationText(e.target.value)} 
                         className="w-full border rounded-xl px-4 py-3 text-center focus:ring-2 focus:ring-red-500 focus:outline-none" 
-                        placeholder='Ketik "hapus"' 
+                        placeholder='Ketik "Hapus"' 
                         autoFocus
                     />
                 </div>
@@ -449,38 +472,61 @@ export default function UMKMDashboardPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-semibold mb-1">Nama Produk</label>
-                                <input required value={productForm.nama_produk} onChange={e => setProductForm({...productForm, nama_produk: e.target.value})} className="w-full border rounded-lg p-3" />
+                                <input 
+                                    required 
+                                    value={productForm.nama_produk} 
+                                    onChange={e => setProductForm({...productForm, nama_produk: e.target.value})} 
+                                    className={`w-full border rounded-lg p-3 ${shake && !productForm.nama_produk ? 'border-red-500 animate-pulse' : ''}`}
+                                    placeholder="Contoh: Keripik Pisang Coklat"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold mb-1">Harga (Rp)</label>
-                                <input required type="number" value={productForm.harga} onChange={e => setProductForm({...productForm, harga: e.target.value})} className="w-full border rounded-lg p-3" />
+                                <input 
+                                    required 
+                                    type="number" 
+                                    value={productForm.harga} 
+                                    onChange={e => setProductForm({...productForm, harga: e.target.value})} 
+                                    className={`w-full border rounded-lg p-3 ${shake && !productForm.harga ? 'border-red-500 animate-pulse' : ''}`}
+                                    placeholder="Contoh: 15000"
+                                />
                             </div>
                         </div>
                         
                         {/* Specifications */}
                         <div>
                             <div className="flex justify-between items-center mb-2">
-                                <label className="block text-sm font-semibold">Spesifikasi</label>
+                                <label className="block text-sm font-semibold">Spesifikasi <span className="text-xs font-normal text-red-500 ml-1">(Min. 2)</span></label>
                                 <button type="button" onClick={() => setShowSpecModal(true)} className="text-xs bg-gray-100 px-3 py-1.5 rounded-lg font-bold text-[#997B55] hover:bg-gray-200">+ Tambah Spesifikasi</button>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                                {productForm.spesifikasi.length === 0 && <span className="text-sm text-gray-400 italic">Belum ada spesifikasi.</span>}
+                            <div className={`flex flex-wrap gap-2 p-3 border rounded-lg bg-gray-50/50 min-h-[60px] ${shake && productForm.spesifikasi.length < 2 ? 'border-red-500 bg-red-50/30' : 'border-dashed border-gray-300'}`}>
+                                {productForm.spesifikasi.length === 0 && <span className="text-sm text-gray-400 italic w-full text-center my-auto">Belum ada spesifikasi. Minimal 2 wajib diisi.</span>}
                                 {productForm.spesifikasi.map((spec, i) => (
-                                    <div key={i} className="bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 text-sm">
+                                    <div key={i} className="bg-white border border-gray-200 px-3 py-1 rounded-lg flex items-center gap-2 text-sm shadow-sm">
                                         <span className="font-semibold text-gray-700">{spec.label}:</span>
                                         <span className="text-gray-600">{spec.value}</span>
                                         <button type="button" onClick={() => removeSpec(i)} className="text-red-400 hover:text-red-600 ml-1"><X size={14}/></button>
                                     </div>
                                 ))}
                             </div>
+                            {shake && productForm.spesifikasi.length < 2 && <p className="text-xs text-red-500 mt-1">Mohon tambahkan minimal 2 spesifikasi.</p>}
                         </div>
 
-                        <div><label className="block text-sm font-semibold mb-1">Deskripsi</label><textarea value={productForm.deskripsi} onChange={e => setProductForm({...productForm, deskripsi: e.target.value})} className="w-full border rounded-lg p-3 h-24" /></div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Deskripsi <span className="text-xs font-normal text-gray-400">(Min. 20 karakter)</span></label>
+                            <RichTextEditor 
+                                value={productForm.deskripsi}
+                                onChange={(html) => setProductForm({...productForm, deskripsi: html})}
+                                placeholder="Jelaskan detail produk Anda secara lengkap agar pembeli tertarik..."
+                                isInvalid={shake && productForm.deskripsi.length < 20}
+                            />
+                             {shake && productForm.deskripsi.length < 20 && <p className="text-xs text-red-500 mt-1">Deskripsi terlalu pendek.</p>}
+                        </div>
                         
                         {/* Multiple Images */}
                         <div>
-                                <label className="block text-sm font-semibold mb-1">Foto Produk (Max 10)</label>
-                                <div className="grid grid-cols-5 gap-2 mb-2">
+                                <label className="block text-sm font-semibold mb-1">Foto Produk (Max 10, Min 3) <span className="text-xs font-normal text-gray-400">Max 2MB/file</span></label>
+                                <div className={`grid grid-cols-5 gap-2 mb-2 p-3 rounded-lg border ${shake && productForm.foto_produk.length < 3 ? 'border-red-500 bg-red-50/30' : 'border-transparent'}`}>
                                     {productForm.foto_produk.map((src, i) => (
                                         <div key={i} className="relative aspect-square rounded-lg overflow-hidden border">
                                             <img src={src} className="w-full h-full object-cover"/>
@@ -488,29 +534,37 @@ export default function UMKMDashboardPage() {
                                         </div>
                                     ))}
                                     {productForm.foto_produk.length < 10 && (
-                                        <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 cursor-pointer hover:border-[#997B55] hover:text-[#997B55]">
+                                        <label className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-[#997B55] hover:text-[#997B55] transition-colors bg-gray-50 hover:bg-white p-2 text-center">
                                             <Plus size={24} />
-                                            <input type="file" multiple accept="image/*" onChange={handleMultiFileChange} className="hidden" />
+                                             <span className="text-[10px] mt-1 leading-tight">Format JPG, JPEG, PNG<br/>Max: 2MB</span>
+                                            <input type="file" multiple accept="image/png, image/jpeg, image/jpg" onChange={handleMultiFileChange} className="hidden" />
                                         </label>
                                     )}
                                 </div>
+                                {shake && productForm.foto_produk.length < 3 && <p className="text-xs text-red-500 mt-1">Mohon unggah minimal 3 foto produk.</p>}
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                              {/* Save Draft Button */}
-                             {!isEditing && ( // Only show draft for new or draft items (logic simplified)
+                             {!isEditing && ( 
                                  <button type="button" onClick={() => handleProductSubmit(undefined, true)} className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 flex items-center gap-2">
                                      <Save size={18} /> Simpan Draf
                                  </button>
                              )}
-                            <button type="submit" className="px-8 py-3 bg-[#997B55] text-white rounded-xl font-bold hover:bg-[#8B6E4A] shadow-lg">
-                                {isEditing ? 'Simpan Perubahan' : 'Ajukan Produk'}
-                            </button>
+                            <motion.button 
+                                animate={shake ? { x: [-5, 5, -5, 5, 0] } : {}}
+                                transition={{ duration: 0.4 }}
+                                type="submit" 
+                                className={`px-8 py-3 text-white rounded-xl font-bold shadow-lg flex items-center gap-2
+                                    ${shake ? 'bg-red-500 hover:bg-red-600' : 'bg-[#997B55] hover:bg-[#8B6E4A]'}`}
+                            >
+                                <Save size={18} /> {isEditing ? 'Simpan Perubahan' : 'Ajukan Produk'}
+                            </motion.button>
                         </div>
                      </form>
                  </div>
             )}
-
+            
             {/* Product List */}
             {view === 'LIST' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
