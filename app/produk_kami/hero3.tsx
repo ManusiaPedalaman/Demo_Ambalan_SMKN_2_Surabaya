@@ -126,7 +126,7 @@ export default function HeroLatihan() {
             </motion.div>
             <motion.div variants={itemVariants} className="relative w-full h-[220px] md:h-[350px] overflow-hidden">
               <Image
-                src="/Image/gambar (41).webp"
+                src="/Image/gambar (34).webp"
                 alt="Pasukan Pramuka"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -159,7 +159,7 @@ export default function HeroLatihan() {
           <div className="flex flex-col gap-3 md:gap-4 mt-0 md:mt-8">
             <motion.div variants={itemVariants} className="relative w-full h-[180px] md:h-[250px] overflow-hidden">
               <Image
-                src="/Image/gambar (34).webp"
+                src="/Image/gambar (41).webp"
                 alt="Pramuka Putri"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
