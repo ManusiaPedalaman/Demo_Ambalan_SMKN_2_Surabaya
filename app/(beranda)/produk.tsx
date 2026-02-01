@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 
-import { getPublicProducts } from '@/app/actions';
+import { getPublicProducts, getProductsList } from '@/app/actions';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -23,6 +23,7 @@ interface Product {
   image: string;
   slug: string;
   type?: string;
+  status?: string;
 }
 
 const Produk = () => {
@@ -91,19 +92,41 @@ const Produk = () => {
     fetchUmkm();
   }, []);
 
-  // Import products from data source to ensure consistency
-  // We need to map the data structure to match the Product interface
+  // Import products from data source
   const { products: rentalData } = require('@/app/data/products');
   
-  const rentalProducts: Product[] = rentalData.map((p: any, index: number) => ({
-    id: index + 100, // Avoid ID conflict
-    name: p.name,
-    price: formatRupiah(p.price),
-    duration: p.duration,
-    image: p.images[0],
-    slug: p.slug,
-    type: 'rental'
-  }));
+  const [rentalProducts, setRentalProducts] = useState<Product[]>(() => {
+    return rentalData.map((p: any, index: number) => ({
+        id: index + 100, // Avoid ID conflict
+        name: p.name,
+        price: formatRupiah(p.price),
+        duration: p.duration,
+        image: p.images[0],
+        slug: p.slug,
+        type: 'rental',
+        status: 'Tersedia'
+      }));
+  });
+
+  useEffect(() => {
+    const syncStatus = async () => {
+        try {
+            const dbProducts = await getProductsList();
+            if (dbProducts) {
+                setRentalProducts(prev => prev.map(p => {
+                    // Match by name or dbName
+                    const source = rentalData.find((rd: any) => rd.slug === p.slug);
+                    const dbName = source?.dbName || p.name;
+                    const found = dbProducts.find((item: any) => item.nama === dbName);
+                    return found ? { ...p, status: found.status } : p;
+                }));
+            }
+        } catch (error) {
+            console.error("Failed to sync status", error);
+        }
+    };
+    syncStatus();
+  }, []);
 
   // Combine products
   const allProducts = [...rentalProducts, ...umkmProducts];
@@ -275,11 +298,16 @@ const Produk = () => {
 
 
 
-                      <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shadow-lg transition-all duration-300 ease-out cursor-pointer
+                      <div className={`px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all duration-300 ease-out cursor-pointer
                       opacity-100 translate-y-0 
                       lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0
-                    ">
-                        {product.type === 'umkm' ? 'Beli' : 'Sewa'}
+                      ${product.status === 'Tidak Tersedia' && product.type === 'rental' 
+                        ? 'bg-red-500 text-white cursor-not-allowed hover:bg-red-600' 
+                        : 'bg-gray-900 text-white hover:bg-gray-800'}
+                    `}>
+                        {product.status === 'Tidak Tersedia' && product.type === 'rental' 
+                          ? 'Habis' 
+                          : (product.type === 'umkm' ? 'Beli' : 'Sewa')}
                       </div>
                     </div>
                   </div>

@@ -118,8 +118,8 @@ Apakah barang masih tersedia?`;
         const normalized = res.map((p: any) => ({
           id: p.id,
           name: p.nama_produk,
-          price: Number(p.harga),
-          duration: 'item',
+          price: formatRupiah(Number(p.harga) < 1000 ? Number(p.harga) * 1000 : Number(p.harga)),
+          duration: 'produk',
           images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
           slug: p.slug || p.id,
           type: 'umkm'
@@ -256,7 +256,7 @@ Apakah barang masih tersedia?`;
 
             <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3 mb-8">
               <h2 className="text-3xl font-bold text-[#1A1A1A]">
-                {formatRupiah(getRealPrice(product.harga))} <span className="text-lg text-gray-500 font-medium">(/item)</span>
+                {formatRupiah(getRealPrice(product.harga))} <span className="text-lg text-gray-500 font-medium">(/produk)</span>
               </h2>
             </div>
 
@@ -507,7 +507,7 @@ Apakah barang masih tersedia?`;
                       <div className="flex items-baseline gap-1">
                         <span className="text-[#E07D5F] text-xl font-bold">{typeof p.price === 'string' ? p.price : formatRupiah(getRealPrice(p.price))}</span>
                         {p.type === 'rental' && <span className="text-gray-400 text-sm font-medium">/ {p.duration}</span>}
-                        {p.type === 'umkm' && <span className="text-gray-400 text-sm font-medium">(/item)</span>}
+                        {p.type === 'umkm' && <span className="text-gray-400 text-sm font-medium">(/produk)</span>}
                       </div>
                     </div>
                      <div className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 shadow-lg transition-all duration-300 ease-out cursor-pointer opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-4 lg:group-hover:opacity-100 lg:group-hover:translate-y-0">

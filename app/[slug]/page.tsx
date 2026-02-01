@@ -272,8 +272,8 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
         const normalized = res.map((p: any) => ({
           id: p.id, // Keep as string or whatever fetch returns
           name: p.nama_produk,
-          price: formatRupiah(Number(p.harga)),
-          duration: 'item',
+          price: formatRupiah(Number(p.harga) < 1000 ? Number(p.harga) * 1000 : Number(p.harga)),
+          duration: 'produk',
           images: p.foto_produk && p.foto_produk.length > 0 ? p.foto_produk : (p.gambar ? [p.gambar] : []),
           slug: p.slug || p.id,
           type: 'umkm'
