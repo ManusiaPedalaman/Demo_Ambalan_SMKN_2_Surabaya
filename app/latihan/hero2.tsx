@@ -110,7 +110,7 @@ export default function HeroLatihan() {
             </motion.div>
             <motion.div variants={itemVariants} className="relative w-full h-[140px] md:h-[200px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (1).webp"
                 alt="Latihan Outdoor"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -123,7 +123,7 @@ export default function HeroLatihan() {
           <div className="flex flex-col gap-3 md:gap-4 mt-0 md:mt-12">
             <motion.div variants={itemVariants} className="relative w-full h-[140px] md:h-[200px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (5).webp"
                 alt="Latihan Lapangan"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -132,7 +132,7 @@ export default function HeroLatihan() {
             </motion.div>
             <motion.div variants={itemVariants} className="relative w-full h-[220px] md:h-[350px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (7).webp"
                 alt="Pasukan Pramuka"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -145,7 +145,7 @@ export default function HeroLatihan() {
           <div className="flex flex-col gap-3 md:gap-4">
             <motion.div variants={itemVariants} className="relative w-full h-[220px] md:h-[400px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (21).webp"
                 alt="Detail Seragam"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -154,7 +154,7 @@ export default function HeroLatihan() {
             </motion.div>
             <motion.div variants={itemVariants} className="relative w-full h-[140px] md:h-[150px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (13).webp"
                 alt="Apel Pagi"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -167,7 +167,7 @@ export default function HeroLatihan() {
           <div className="flex flex-col gap-3 md:gap-4 mt-0 md:mt-8">
             <motion.div variants={itemVariants} className="relative w-full h-[180px] md:h-[250px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (23).webp"
                 alt="Pramuka Putri"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"
@@ -176,7 +176,7 @@ export default function HeroLatihan() {
             </motion.div>
             <motion.div variants={itemVariants} className="relative w-full h-[180px] md:h-[300px] overflow-hidden">
               <Image
-                src="/Image/Ambalan.webp"
+                src="/Image/gambar (38).webp"
                 alt="Kegiatan Lain"
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-700"

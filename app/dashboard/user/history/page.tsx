@@ -96,10 +96,90 @@ export default function UserHistoryPage() {
             setIsDeleting(false);
         }
     };
-
-    // ... (keep handleEdit, handleSaveEdit, formatDate same)
     
-// ...
+    const formatDate = (date: string) => {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    };
+
+    const handleSaveEdit = async () => {
+        if (!editItem) return;
+        
+        let updateData: any = {};
+        if (editType === 'sewa') {
+             updateData = { 
+                 nama_peminjam: editItem.nama_peminjam,
+                 sekolah_instansi: editItem.sekolah_instansi,
+                 nama_produk: editItem.nama_produk,
+                 no_wa: editItem.no_wa,
+                 metode_bayar: editItem.metode_bayar,
+                 jam_sewa: editItem.jam_sewa,
+                 jam_kembali: editItem.jam_kembali,
+                 jumlah_produk: editItem.jumlah_produk,
+                 tgl_pengambilan: new Date(editItem.tgl_pengambilan),
+                 tgl_pengembalian: new Date(editItem.tgl_pengembalian)
+             };
+        } else if (editType === 'hubungi') {
+             updateData = { 
+                 nama_lengkap: editItem.nama_lengkap,
+                 email: editItem.email,
+                 no_wa: editItem.no_wa,
+                 pesan: editItem.pesan
+             };
+        } else if (editType === 'join') {
+             updateData = { 
+                 nama_lengkap: editItem.nama_lengkap,
+                 tanggal_lahir: editItem.tanggal_lahir ? new Date(editItem.tanggal_lahir) : null,
+                 no_wa: editItem.no_wa,
+                 asal_sekolah: editItem.asal_sekolah,
+                 kelas: editItem.kelas,
+                 jurusan: editItem.jurusan,
+                 pesan: editItem.pesan
+             };
+        }
+
+        const res = await updateHistoryItem(editType as any, editItem.id, updateData);
+        if (res.success) {
+            alert('Data berhasil diperbarui!');
+            setEditItem(null);
+            refreshData(); // Reload data via context
+        } else {
+            alert('Gagal update: ' + res.error);
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-gray-800">Riwayat & Aktivitas</h1>
+            
+             <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
+                <TabList>
+                    <TabTrigger value="sewa">Penyewaan</TabTrigger>
+                    <TabTrigger value="hubungi">Pesan Kontak</TabTrigger>
+                    <TabTrigger value="join">Permintaan Join</TabTrigger>
+                    <TabTrigger value="kuis">Hasil Kuis</TabTrigger>
+                </TabList>
+                
+                {/* 
+                   WARNING: The original list content seems to have been lost/truncated. 
+                   I am retaining the structure but you may need to restore the actual table/list UI.
+                */}
+                <TabContent value="sewa">
+                    {/* Placeholder for Sewa List */}
+                    <p className="text-gray-500 italic">Riwayat Penyewaan (Konten hilang, mohon periksa kembali kodenya)</p>
+                </TabContent>
+                 <TabContent value="hubungi">
+                    <p className="text-gray-500 italic">Riwayat Pesan (Konten hilang)</p>
+                </TabContent>
+                 <TabContent value="join">
+                    <p className="text-gray-500 italic">Riwayat Join (Konten hilang)</p>
+                </TabContent>
+                 <TabContent value="kuis">
+                    <p className="text-gray-500 italic">Riwayat Kuis (Konten hilang)</p>
+                </TabContent>
+            </Tabs>
 
             {/* Delete Modal */}
             <AnimatePresence>
@@ -156,56 +236,6 @@ export default function UserHistoryPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-    const handleSaveEdit = async () => {
-        if (!editItem) return;
-        
-        let updateData: any = {};
-        if (editType === 'sewa') {
-             updateData = { 
-                 nama_peminjam: editItem.nama_peminjam,
-                 sekolah_instansi: editItem.sekolah_instansi,
-                 nama_produk: editItem.nama_produk,
-                 no_wa: editItem.no_wa,
-                 metode_bayar: editItem.metode_bayar,
-                 jam_sewa: editItem.jam_sewa,
-                 jam_kembali: editItem.jam_kembali,
-                 jumlah_produk: editItem.jumlah_produk,
-                 tgl_pengambilan: new Date(editItem.tgl_pengambilan),
-                 tgl_pengembalian: new Date(editItem.tgl_pengembalian)
-             };
-        } else if (editType === 'hubungi') {
-             updateData = { 
-                 nama_lengkap: editItem.nama_lengkap,
-                 email: editItem.email,
-                 no_wa: editItem.no_wa,
-                 pesan: editItem.pesan
-             };
-        } else if (editType === 'join') {
-             updateData = { 
-                 nama_lengkap: editItem.nama_lengkap,
-                 tanggal_lahir: editItem.tanggal_lahir ? new Date(editItem.tanggal_lahir) : null,
-                 no_wa: editItem.no_wa,
-                 asal_sekolah: editItem.asal_sekolah,
-                 kelas: editItem.kelas,
-                 jurusan: editItem.jurusan,
-                 pesan: editItem.pesan
-             };
-        }
-
-        const res = await updateHistoryItem(editType as any, editItem.id, updateData);
-        if (res.success) {
-            alert('Data berhasil diperbarui!');
-            setEditItem(null);
-            refreshData(); // Reload data via context
-        } else {
-            alert('Gagal update: ' + res.error);
-        }
-    };
-
-    // ... (keep confirmDelete, executeDelete, formatDate same)
-
-    // ... (keep returns until Modal)
     
             {/* Edit Modal */}
             <AnimatePresence>
@@ -338,62 +368,6 @@ export default function UserHistoryPage() {
                                 <button onClick={() => setEditItem(null)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-medium">Batal</button>
                                 <button onClick={handleSaveEdit} className="px-6 py-2 text-white bg-[#997B55] rounded-lg hover:bg-[#8B6E4A] flex items-center gap-2 font-bold shadow-lg shadow-[#997B55]/20">
                                     <Save size={18} /> Simpan Perubahan
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Delete Modal */}
-            <AnimatePresence>
-                {deleteItem && (
-                    <motion.div 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
-                        exit={{ opacity: 0 }} 
-                        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm"
-                        onClick={() => !isDeleting && setDeleteItem(null)}
-                    >
-                        <motion.div 
-                            initial={{ scale: 0.9, opacity: 0 }} 
-                            animate={{ scale: 1, opacity: 1 }} 
-                            exit={{ scale: 0.9, opacity: 0 }} 
-                            className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertTriangle size={32} className="text-red-600" />
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-800 mb-2">Konfirmasi Hapus</h3>
-                            <p className="text-gray-500 mb-4 text-sm">
-                                Ketik <strong>"Hapus"</strong> di bawah untuk mengonfirmasi penghapusan. Tindakan ini tidak dapat dibatalkan.
-                            </p>
-                            
-                            <input 
-                                value={deleteConfirmationText}
-                                onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                                className="w-full border rounded-xl px-4 py-3 text-center mb-6 focus:ring-2 focus:ring-red-500 focus:outline-none"
-                                placeholder='Ketik "Hapus"'
-                                autoFocus
-                            />
-
-                            <div className="flex gap-3">
-                                <button 
-                                    onClick={() => setDeleteItem(null)} 
-                                    disabled={isDeleting}
-                                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors"
-                                >
-                                    Batal
-                                </button>
-                                <button 
-                                    onClick={executeDelete} 
-                                    disabled={isDeleting || deleteConfirmationText !== 'Hapus'}
-                                    className={`flex-1 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors
-                                        ${deleteConfirmationText === 'Hapus' && !isDeleting ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-                                    `}
-                                >
-                                    {isDeleting ? <Loader2 className="animate-spin" size={18} /> : 'Hapus'}
                                 </button>
                             </div>
                         </motion.div>

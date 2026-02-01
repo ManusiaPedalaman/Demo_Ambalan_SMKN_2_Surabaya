@@ -17,8 +17,8 @@ const activities = [
   { id: 1, src: '/Image/ApiUnggun.webp', rotate: 20, z: -20 },
   { id: 2, src: '/Image/bayangan.webp', rotate: 10, z: -10 },
   { id: 3, src: '/Image/Ambalan.webp', rotate: 0, z: 0 },
-  { id: 4, src: '/Image/ApiUnggun.webp', rotate: -10, z: -10 },
-  { id: 5, src: '/Image/bayangan.webp', rotate: -20, z: -20 },
+  { id: 4, src: '/Image/gambar (12).webp', rotate: -10, z: -10 },
+  { id: 5, src: '/Image/gambar (26).webp', rotate: -20, z: -20 },
 ];
 
 export default function Kt3() {

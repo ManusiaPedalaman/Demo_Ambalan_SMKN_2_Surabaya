@@ -14,11 +14,11 @@ const dmSans = DM_Sans({
 
 
 const activities = [
-  { id: 1, src: '/Image/ApiUnggun.webp', rotate: 20, z: -20 },
-  { id: 2, src: '/Image/bayangan.webp', rotate: 10, z: -10 },
-  { id: 3, src: '/Image/Ambalan.webp', rotate: 0, z: 0 },
-  { id: 4, src: '/Image/ApiUnggun.webp', rotate: -10, z: -10 },
-  { id: 5, src: '/Image/bayangan.webp', rotate: -20, z: -20 },
+  { id: 1, src: '/Image/gambar (34).webp', rotate: 20, z: -20 },
+  { id: 2, src: '/Image/gambar (28).webp', rotate: 10, z: -10 },
+  { id: 3, src: '/Image/gambar (18).webp', rotate: 0, z: 0 },
+  { id: 4, src: '/Image/gambar (15).webp', rotate: -10, z: -10 },
+  { id: 5, src: '/Image/gambar (10).webp', rotate: -20, z: -20 },
 ];
 
 export default function Kt2() {

@@ -27,7 +27,7 @@ const historyData = [
     fullDate: '9 April 1996',
     title: 'Masa Awal Berdiri',
     description: 'Pramuka SMKN 2 Surabaya resmi berdiri dengan nomor Gugusdepan 1546 (Putri) dan 1547 (Putra) dari Kwartir Cabang Kota Surabaya. Tokoh awal yang bergabung antara lain Kak Adi dan Kak Wulandari Destiningtyas.',
-    image: '/Image/sejarah1.webp',
+    image: '/Image/gambar (46).webp',
   },
   {
     id: 2,
@@ -35,7 +35,7 @@ const historyData = [
     fullDate: 'Periode Vakum',
     title: 'Masa Kevakuman',
     description: 'Setelah beberapa tahun berjalan, kegiatan Pramuka mengalami kevakuman total. Tidak ada aktivitas kepramukaan yang signifikan di SMKN 2 Surabaya hingga awal tahun 2005.',
-    image: '/Image/sejarah2.webp',
+    image: '/Image/sejarah (5).webp',
   },
   {
     id: 3,
@@ -43,7 +43,7 @@ const historyData = [
     fullDate: 'Maret 2005',
     title: 'Titik Balik Kebangkitan',
     description: 'Semangat bangkit dimulai saat salah satu siswa nekat mengikuti Kursus Pengelola Dewan Kerja (KPDK) di Malang bermodal surat rekomendasi Kwarran Sawahan, meski Gudep sedang tidak aktif.',
-    image: '/Image/sejarah3.webp',
+    image: '/Image/sejarah (4).webp',
   },
   {
     id: 4,
@@ -51,7 +51,7 @@ const historyData = [
     fullDate: 'Mei 2005',
     title: 'Perekrutan Gerilya',
     description: 'Dimulainya perekrutan anggota secara "gerilya". Terkumpul 13 orang diantaranya (12 orang dari jurusan Audio Video, dan 1 orang dari jurusan Otomotif) yang menjadi Angkatan Pertama Ambalan dengan Pradana Kak Aris Pratama.',
-    image: '/Image/sejarah1.webp',
+    image: '/Image/sejarah (1).webp',
   },
   {
     id: 5,
@@ -59,7 +59,7 @@ const historyData = [
     fullDate: 'Juni 2005',
     title: 'Identitas Ambalan',
     description: 'Penetapan nama "Gajah Mada - Tribhuwana Tungga Dewi" dan penciptaan Logo Ambalan. Logo disempurnakan warnanya oleh Kak Choirul Wahyudi dan disetujui seluruh anggota.',
-    image: '/Image/sejarah2.webp',
+    image: '/Image/sejarah (2).webp',
   },
   {
     id: 6,
@@ -67,7 +67,7 @@ const historyData = [
     fullDate: 'Juli 2005',
     title: 'Adat & Nama Lapangan',
     description: 'Penyusunan Adat Ambalan, Sandi Ambalan (berdasarkan Dasa Darma), dan tradisi "Nama Lapangan" (Singkatan Nama) di kaos PDL, contoh: Aris Pratama menjadi "Risma".',
-    image: '/Image/sejarah3.webp',
+    image: '/Image/sejarah (3).webp',
   },
   {
     id: 7,
@@ -75,7 +75,7 @@ const historyData = [
     fullDate: 'Agustus 2005',
     title: 'Prestasi Perdana',
     description: 'Ambalan mulai aktif berpartisipasi dalam kegiatan luar, termasuk salah satunya pada kegiatan Kursus pengelola Dewan Kerja Cabang 2005 di Lemdikacab Lawang, Malang, kegiatan Latihan Pengembangan Kepemimpinan 2005 di Kwarcab Surabaya, dan kegiatan Raimuna Cabang Kota Surabaya tahun 2005 di Ken Park, Surabaya dan lain sebagainya',
-    image: '/Image/sejarah1.webp',
+    image: '/Image/sejarah (7).webp',
   },
   {
     id: 8,
@@ -83,7 +83,7 @@ const historyData = [
     fullDate: '2007 - 2008',
     title: 'Era Pengembangan',
     description: 'Mengirimkan delegasi ke Gladian Pemimpin Satuan (DIANPINSAT) 2007 di Pacet dan East Java Scouts Spirit (EJSS) 2008 di Karang Pilang, Surabaya.',
-    image: '/Image/sejarah2.webp',
+    image: '/Image/sejarah (8).webp',
   },
   {
     id: 9,
@@ -91,7 +91,7 @@ const historyData = [
     fullDate: 'Julukan GRASS',
     title: 'Semangat Rumput (GRASS)',
     description: 'Ambalan memiliki nama lain "GRASS" (Gerakan Pramuka SMKN 2 Surabaya). Filosofinya seperti rumput: mampu hidup, menyesuaikan diri, dan bertahan di lingkungan manapun.',
-    image: '/Image/sejarah3.webp',
+    image: '/Image/sejarah (6).webp',
   }
 ];
 
