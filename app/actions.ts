@@ -1196,7 +1196,8 @@ export async function getPendingProductList() {
             id: item.id.toString(),
             id_umkm: item.id_umkm.toString(),
             created_at: item.created_at.toISOString(),
-            nama_umkm: item.umkm?.nama_umkm || 'Unknown UMKM'
+            nama_umkm: item.umkm?.nama_umkm || 'Unknown UMKM',
+            foto_produk: item.foto_produk || (item.gambar ? [item.gambar] : []),
         }));
     } catch (error) {
         console.error('Error fetching pending products:', error);

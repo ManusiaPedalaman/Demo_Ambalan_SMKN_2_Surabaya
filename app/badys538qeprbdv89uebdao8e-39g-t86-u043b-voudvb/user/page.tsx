@@ -57,7 +57,7 @@ const MonthlyChart = ({ data, color = '#997B55', label }: { data: number[]; colo
                         return <span key={i}>{val.toString().padStart(2, '0')}</span>;
                     })}
                 </div>
-                <div className="relative h-64 flex-1 flex items-end justify-between gap-2">
+                <div className="relative h-64 flex-1 flex items-end justify-between gap-2 min-w-0">
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
                         {[...Array(steps + 1)].map((_, i) => (
                             <div key={i} className={`w-full border-b border-gray-100 ${i === 0 ? 'border-solid border-gray-200' : 'border-dashed'}`} />

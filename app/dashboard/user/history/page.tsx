@@ -167,17 +167,181 @@ export default function UserHistoryPage() {
                    I am retaining the structure but you may need to restore the actual table/list UI.
                 */}
                 <TabContent value="sewa">
-                    {/* Placeholder for Sewa List */}
-                    <p className="text-gray-500 italic">Riwayat Penyewaan (Konten hilang, mohon periksa kembali kodenya)</p>
+                    {historyData.rentals.length === 0 ? (
+                        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                            <p className="text-gray-500">Belum ada riwayat penyewaan.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {historyData.rentals.map((item: any) => (
+                                <div key={item.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                                    {/* Desktop View */}
+                                    <div className="hidden md:flex items-center justify-between p-6">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-1">
+                                                <h3 className="font-bold text-gray-800">{item.produk?.nama_produk || item.nama_produk || 'Produk'}</h3>
+                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
+                                                    ${item.status_kembali === 'Sudah' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}
+                                                `}>
+                                                    {item.status_kembali === 'Sudah' ? 'Selesai' : 'Sedang Disewa'}
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-6 text-sm text-gray-500">
+                                                <p>Ambil: <span className="text-gray-800 font-medium">{formatDate(item.tgl_pengambilan)}</span></p>
+                                                <p>Kembali: <span className="text-gray-800 font-medium">{formatDate(item.tgl_pengembalian)}</span></p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 pl-4 border-l border-gray-100">
+                                            <button 
+                                                onClick={() => { setEditItem({...item, type: 'sewa'}); setEditType('sewa'); }}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                title="Edit"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button 
+                                                onClick={() => confirmDelete('sewa', item.id)}
+                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Hapus"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Mobile View */}
+                                    <div className="md:hidden p-4">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div>
+                                                <h3 className="font-bold text-gray-800 text-sm mb-1">{item.produk?.nama_produk || item.nama_produk || 'Produk'}</h3>
+                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
+                                                    ${item.status_kembali === 'Sudah' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}
+                                                `}>
+                                                    {item.status_kembali === 'Sudah' ? 'Selesai' : 'Disewa'}
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <button onClick={() => { setEditItem({...item, type: 'sewa'}); setEditType('sewa'); }} className="p-1.5 text-blue-600 bg-blue-50 rounded-lg"><Edit size={16} /></button>
+                                                <button onClick={() => confirmDelete('sewa', item.id)} className="p-1.5 text-red-600 bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+                                            <div>
+                                                <p className="mb-0.5">Ambil</p>
+                                                <p className="font-medium text-gray-800">{formatDate(item.tgl_pengambilan)}</p>
+                                            </div>
+                                            <div>
+                                                <p className="mb-0.5">Kembali</p>
+                                                <p className="font-medium text-gray-800">{formatDate(item.tgl_pengembalian)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </TabContent>
-                 <TabContent value="hubungi">
-                    <p className="text-gray-500 italic">Riwayat Pesan (Konten hilang)</p>
+
+                <TabContent value="hubungi">
+                    {historyData.contacts.length === 0 ? (
+                         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                            <p className="text-gray-500">Belum ada riwayat pesan.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {historyData.contacts.map((item: any) => (
+                                <div key={item.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition-shadow">
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h3 className="font-bold text-gray-800 text-sm truncate">{item.pesan}</h3>
+                                            </div>
+                                            <p className="text-xs text-gray-500 line-clamp-2">{item.email} • {item.no_wa}</p>
+                                            <p className="text-[10px] text-gray-400 mt-2">{item.created_at ? formatDate(item.created_at) : 'Baru saja'}</p>
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <button onClick={() => { setEditItem({...item, type: 'hubungi'}); setEditType('hubungi'); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit size={16} /></button>
+                                            <button onClick={() => confirmDelete('hubungi', item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </TabContent>
-                 <TabContent value="join">
-                    <p className="text-gray-500 italic">Riwayat Join (Konten hilang)</p>
+
+                <TabContent value="join">
+                    {historyData.joins.length === 0 ? (
+                         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                            <p className="text-gray-500">Belum ada riwayat join.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {historyData.joins.map((item: any) => (
+                                <div key={item.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition-shadow">
+                                     <div className="flex justify-between items-start gap-4">
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-800 text-sm mb-1">Permintaan Join Ambalan</h3>
+                                            <div className="text-xs text-gray-600 space-y-1 mb-2">
+                                                <p>Sekolah: <span className="font-medium">{item.asal_sekolah}</span></p>
+                                                <p>Jurusan: <span className="font-medium">{item.kelas} {item.jurusan}</span></p>
+                                            </div>
+                                            <div className="bg-gray-50 p-2 rounded text-xs text-gray-500 italic">
+                                                "{item.pesan}"
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-2 pt-1">
+                                             <button onClick={() => { setEditItem({...item, type: 'join'}); setEditType('join'); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit size={16} /></button>
+                                             <button onClick={() => confirmDelete('join', item.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </TabContent>
-                 <TabContent value="kuis">
-                    <p className="text-gray-500 italic">Riwayat Kuis (Konten hilang)</p>
+
+                <TabContent value="kuis">
+                     {historyData.quizzes.length === 0 ? (
+                         <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                            <p className="text-gray-500">Belum ada riwayat kuis.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {historyData.quizzes.map((item: any) => (
+                                <div key={item.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                                    <div className="p-5 flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-800 mb-1">{item.materi?.nama_materi || 'Materi Kuis'}</h3>
+                                            <p className="text-xs text-gray-400">{formatDate(item.tanggal)}</p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right">
+                                                <p className="text-2xl font-bold text-[#997B55]">{item.skor}</p>
+                                                <p className="text-[10px] text-gray-400 uppercase tracking-wider">Skor</p>
+                                            </div>
+                                            <div className="flex flex-col gap-1 pl-4 border-l border-gray-100">
+                                                <button 
+                                                    onClick={() => setShowDetailModal(item)}
+                                                    className="p-2 text-gray-500 hover:text-[#997B55] hover:bg-gray-50 rounded-lg transition-colors"
+                                                    title="Lihat Detail"
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => confirmDelete('kuis', item.id)}
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Hapus"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </TabContent>
             </Tabs>
 

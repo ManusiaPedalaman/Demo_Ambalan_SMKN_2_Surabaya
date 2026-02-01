@@ -368,16 +368,20 @@ export default function AdminConfirmProductPage() {
                                 
                                 <div className="pt-4 border-t border-gray-100">
                                     <p className="text-xs text-gray-500 font-bold uppercase mb-2">Foto Produk</p>
-                                    {detailModal.data.gambar ? (
-                                        <div className="relative w-full h-48 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden group cursor-pointer" onClick={() => setPreviewImage(detailModal.data.gambar)}>
-                                            <img 
-                                                src={detailModal.data.gambar} 
-                                                alt="Foto Produk" 
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                                 <Eye className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
+                                    {detailModal.data.foto_produk && detailModal.data.foto_produk.length > 0 ? (
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {detailModal.data.foto_produk.map((img: string, idx: number) => (
+                                                <div key={idx} className="relative w-full h-32 bg-gray-50 rounded-lg border border-gray-200 overflow-hidden group cursor-pointer" onClick={() => setPreviewImage(img)}>
+                                                    <img 
+                                                        src={img} 
+                                                        alt={`Foto Produk ${idx + 1}`} 
+                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                                         <Eye className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     ) : (
                                         <p className="text-sm text-gray-400 italic">Tidak ada foto produk</p>
