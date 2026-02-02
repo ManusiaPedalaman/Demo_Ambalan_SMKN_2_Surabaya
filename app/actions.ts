@@ -1568,3 +1568,60 @@ export async function checkoutUmkmProduct(id: string, quantity: number, userEmai
         return { success: false, error: 'Gagal memproses stok atau transaksi' };
     }
 }
+
+export async function getUmkmSales(userEmail: string) {
+    try {
+        const user = await prisma.dataUserLogin.findFirst({ where: { email: userEmail } });
+        if (!user) return { success: false, error: 'User not found' };
+
+        // 1. Get User's UMKM
+        const umkm = await prisma.dataUmkm.findFirst({
+            where: { id_user: user.id_login }
+        });
+
+        if (!umkm) return { success: false, error: 'UMKM not found' };
+
+        // 2. Get Transactions for products belonging to this UMKM
+        const sales = await prisma.dataTransaksiUmkm.findMany({
+            where: {
+                produk: {
+                    id_umkm: umkm.id
+                }
+            },
+            include: {
+                produk: true,
+                user: true // To get buyer details
+            },
+            orderBy: { tanggal: 'desc' }
+        });
+
+        // 3. Serialize
+        const serializedSales = sales.map((item: any) => ({
+            ...item,
+            id: item.id.toString(),
+            id_user: item.id_user,
+            id_produk: item.id_produk.toString(),
+            tanggal: item.tanggal.toISOString(),
+            total_harga: item.total_harga, 
+            status: item.status,
+            jumlah: item.jumlah,
+            produk: item.produk ? {
+                ...item.produk,
+                id: item.produk.id.toString(),
+                id_umkm: item.produk.id_umkm.toString(),
+                created_at: item.produk.created_at.toISOString()
+            } : null,
+            buyer: item.user ? {
+                nama_lengkap: item.user.nama_lengkap,
+                no_wa: item.user.no_wa,
+                email: item.user.email
+            } : null
+        }));
+
+        return { success: true, data: serializedSales };
+
+    } catch (error) {
+        console.error('Error fetching UMKM sales:', error);
+        return { success: false, error: 'Gagal mengambil data penjualan' };
+    }
+}

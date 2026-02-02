@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { getUserProfileByEmail, getUserUMKM, addProductUMKM, updateProductUMKM, deleteProductUMKM, updateUMKMData, publishProductUMKM } from '@/app/actions';
-import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image as ImageIcon, Pencil, Trash2, X, Globe, Save } from 'lucide-react';
+import { getUserProfileByEmail, getUserUMKM, addProductUMKM, updateProductUMKM, deleteProductUMKM, updateUMKMData, publishProductUMKM, getUmkmSales } from '@/app/actions';
+import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image as ImageIcon, Pencil, Trash2, X, Globe, Save, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal, { ModalType } from '@/components/ui/Modal';
@@ -32,7 +32,8 @@ export default function UMKMDashboardPage() {
     }, [contextUmkm, contextLoading]);
 
     // Modals & Forms handling
-    const [view, setView] = useState<'LIST' | 'FORM_PRODUCT' | 'FORM_UMKM'>('LIST'); 
+    const [view, setView] = useState<'LIST' | 'FORM_PRODUCT' | 'FORM_UMKM' | 'SALES'>('LIST'); 
+    const [salesData, setSalesData] = useState<any[]>([]); 
     const [isEditing, setIsEditing] = useState(false); 
     const [editId, setEditId] = useState<string | null>(null);
 
@@ -260,6 +261,20 @@ export default function UMKMDashboardPage() {
         setLoading(false);
     };
 
+    // --- SALES HANDLER ---
+    const fetchSales = async () => {
+        if (!session?.user?.email) return;
+        setLoading(true);
+        const res = await getUmkmSales(session.user.email);
+        if (res.success) {
+            setSalesData(res.data || []);
+            setView('SALES');
+        } else {
+            showAlert('Gagal', res.error || 'Gagal mengambil data penjualan', 'error');
+        }
+        setLoading(false);
+    };
+
     // --- DELETE HANDLERS ---
     const handleDeleteCheck = (type: 'PRODUCT' | 'UMKM', id: string) => {
         setDeleteModal({ isOpen: true, type, id });
@@ -452,11 +467,27 @@ export default function UMKMDashboardPage() {
                 }}
             />
 
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">{umkmData.nama_umkm}</h1>
                     <p className="text-gray-500">Kelola produk jualan Anda disini</p>
                 </div>
+                
+                <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
+                    <button 
+                        onClick={() => setView('LIST')} 
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'LIST' ? 'bg-white shadow-sm text-[#997B55]' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Produk Anda
+                    </button>
+                    <button 
+                        onClick={fetchSales} 
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'SALES' ? 'bg-white shadow-sm text-[#997B55]' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        Pesanan Masuk
+                    </button>
+                </div>
+
                 {view === 'LIST' && (
                     <button onClick={() => setView('FORM_PRODUCT')} className="px-6 py-3 bg-[#997B55] text-white font-bold rounded-xl hover:bg-[#8B6E4A] flex items-center gap-2 shadow-lg">
                         <Plus size={20} /> Tambah Produk
@@ -624,6 +655,70 @@ export default function UMKMDashboardPage() {
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Sales View */}
+            {view === 'SALES' && (
+                <div className="space-y-4">
+                    {salesData.length === 0 ? (
+                        <div className="text-center py-12 text-gray-500">
+                            <Store size={48} className="mx-auto mb-4 text-gray-300" />
+                            <p>Belum ada pesanan masuk.</p>
+                        </div>
+                    ) : (
+                        salesData.map((sale) => (
+                            <div key={sale.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center">
+                                {/* Product Image */}
+                                <div className="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+                                    {sale.produk?.foto_produk && sale.produk.foto_produk.length > 0 ? (
+                                        <img src={sale.produk.foto_produk[0]} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400"><ImageIcon size={20} /></div>
+                                    )}
+                                </div>
+
+                                {/* Order Info */}
+                                <div className="flex-grow">
+                                    <div className="flex justify-between items-start mb-1">
+                                         <h3 className="font-bold text-gray-800 text-lg">{sale.produk?.nama_produk || 'Produk Dihapus'}</h3>
+                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${sale.status === 'BERHASIL' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{sale.status}</span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 mb-2">
+                                        Qty: {sale.jumlah} • Total: <span className="font-bold text-[#997B55]">Rp {sale.total_harga}</span>
+                                    </p>
+                                    <p className="text-xs text-gray-400 mb-1">Pembeli:</p>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+                                            {sale.buyer?.nama_lengkap?.[0] || '?'}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold">{sale.buyer?.nama_lengkap || 'Guest'}</p>
+                                            <p className="text-xs text-gray-500">{new Date(sale.tanggal).toLocaleDateString()} {new Date(sale.tanggal).toLocaleTimeString()}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="w-full md:w-auto">
+                                    {sale.buyer?.no_wa ? (
+                                        <a 
+                                            href={`https://wa.me/${sale.buyer.no_wa.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo ${sale.buyer.nama_lengkap}, saya dari ${umkmData?.nama_umkm || 'Toko'}. Terimakasih sudah memesan ${sale.produk?.nama_produk}.`)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#128C7E] transition-colors shadow-lg shadow-green-200"
+                                        >
+                                            <MessageCircle size={18} /> Hubungi via WA
+                                        </a>
+                                    ) : (
+                                        <button disabled className="flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed">
+                                            <MessageCircle size={18} /> No WhatsApp Tidak Ada
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             )}
         </div>
