@@ -35,6 +35,7 @@ model DataProdukTersedia {
   DataProdukTersewa   DataProdukTersewa[]
   DataCustomerPenyewa DataCustomerPenyewa[]
 
+  stok                Int                   @default(0)
   @@map("data_produk_tersedia")
 }
 
@@ -181,6 +182,7 @@ model DataProdukUmkm {
   alasan_tolak String?
   created_at   DateTime @default(now())
 
+  stok         Int      @default(0)
   @@map("data_produk_umkm")
 }
 

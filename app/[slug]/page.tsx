@@ -50,6 +50,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
 
   const [activeImage, setActiveImage] = useState(0);
   const [dbStatus, setDbStatus] = useState<string>('Memuat...');
+  const [dbStock, setDbStock] = useState<number>(0);
 
 
   React.useEffect(() => {
@@ -59,6 +60,7 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
       const res = await getProductStatusByName(queryName);
       if (res.success) {
         setDbStatus(res.status);
+        setDbStock(res.stok);
       } else {
 
         setDbStatus(product.status);
@@ -194,7 +196,9 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
     paymentMethod &&
     formData.message &&
     quantity > 0 &&
-    dbStatus === 'Tersedia'
+    quantity > 0 &&
+    dbStatus === 'Tersedia' &&
+    dbStock >= quantity
   );
 
 
@@ -368,10 +372,10 @@ export default function DetailProduct({ params }: { params: Promise<{ slug: stri
               ) : (
                 <div className={`mt-2 md:mt-0 flex flex-shrink-0 items-center gap-2 px-3 py-1.5 rounded-full border ${dbStatus === 'Tersedia' ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200'
                   }`}>
-                  <span className={`font-bold text-sm ${dbStatus === 'Tersedia' ? 'text-green-700' : 'text-red-700'}`}>
-                    {dbStatus}
+                  <span className={`font-bold text-sm ${dbStatus === 'Tersedia' && dbStock > 0 ? 'text-green-700' : 'text-red-700'}`}>
+                    {dbStatus === 'Tersedia' && dbStock > 0 ? `Tersedia (${dbStock})` : (dbStatus === 'Tersedia' ? 'Habis' : dbStatus)}
                   </span>
-                  {dbStatus === 'Tersedia' ? (
+                  {dbStatus === 'Tersedia' && dbStock > 0 ? (
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
                   ) : (
                     <AlertTriangle className="w-4 h-4 text-red-600" />

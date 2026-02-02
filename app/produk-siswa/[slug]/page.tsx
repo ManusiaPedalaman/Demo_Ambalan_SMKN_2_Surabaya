@@ -4,7 +4,8 @@ import React, { useState, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { DM_Sans } from 'next/font/google';
-import { getPublicProductById } from '@/app/actions';
+import { getPublicProductById, checkoutUmkmProduct } from '@/app/actions';
+import AlertModal from '@/app/components/AlertModal';
 import {
   ShieldCheck,
   Check,
@@ -35,6 +36,7 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
   const { slug } = use(params); // slug here serves as ID
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   
   // Checkout State
@@ -46,6 +48,23 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
     metodePembayaran: '',
     pesan: ''
   });
+
+  // Alert Modal State
+  const [alertState, setAlertState] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'warning',
+    title: '',
+    message: ''
+  });
+
+  const showAlert = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+    setAlertState({ isOpen: true, type, title, message });
+  };
 
   const paymentMethods = ['BCA', 'Mandiri', 'BRI', 'GoPay', 'Dana', 'Qris', 'Cash'];
 
@@ -60,10 +79,21 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
       return num < 1000 ? num * 1000 : num;
   };
 
-  const handleContactSeller = () => {
+  const handleContactSeller = async () => {
     // Validate fields
     if (!formData.nama || !formData.whatsapp || !formData.sekolah || !formData.metodePembayaran) {
-        alert('Mohon lengkapi semua data pembelian (Nama, WhatsApp, Sekolah, Metode Pembayaran)');
+        showAlert('warning', 'Data Belum Lengkap', 'Mohon lengkapi semua data pembelian (Nama, WhatsApp, Sekolah, Metode Pembayaran)');
+        return;
+    }
+
+    setIsSubmitting(true);
+
+    // Call Server Action to Decrement Stock
+    const result = await checkoutUmkmProduct(product.id, quantity);
+
+    if (!result.success) {
+        showAlert('error', 'Gagal Memproses', result.error || 'Gagal memproses pesanan. Stok mungkin habis.');
+        setIsSubmitting(false);
         return;
     }
 
@@ -92,6 +122,9 @@ Apakah barang masih tersedia?`;
     const formattedPhone = phoneNumber.startsWith('0') ? '62' + phoneNumber.slice(1) : phoneNumber;
     
     window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, '_blank');
+    
+    // Optional: Refresh page to update stock UI or redirect
+    setTimeout(() => window.location.reload(), 1000); 
   };
 
   React.useEffect(() => {
@@ -258,6 +291,11 @@ Apakah barang masih tersedia?`;
               <h2 className="text-3xl font-bold text-[#1A1A1A]">
                 {formatRupiah(getRealPrice(product.harga))} <span className="text-lg text-gray-500 font-medium">(/produk)</span>
               </h2>
+              <div className="flex items-center gap-2 mt-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${product.stok > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {product.stok > 0 ? `Stok Tersedia: ${product.stok}` : 'Stok Habis'}
+                  </span>
+              </div>
             </div>
 
             {/* Spesifikasi - Styled like Rental Page Grid */}
@@ -423,9 +461,19 @@ Apakah barang masih tersedia?`;
                     
                     <button
                         onClick={handleContactSeller}
-                        className="w-full md:w-auto px-8 py-3 bg-[#322F2D] hover:bg-[#1E1C1B] text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                        disabled={isSubmitting || product.stok <= 0}
+                        className={`w-full md:w-auto px-8 py-3 font-bold rounded-lg transition-all shadow-lg flex items-center justify-center gap-2
+                            ${isSubmitting || product.stok <= 0 
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-[#322F2D] hover:bg-[#1E1C1B] hover:shadow-xl transform hover:-translate-y-1 text-white'
+                            }
+                        `}
                     >
-                         <ShoppingCart className="w-5 h-5" />
+                         {isSubmitting ? (
+                             <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div> 
+                         ) : (
+                             <ShoppingCart className="w-5 h-5" />
+                         )}
                         Checkout
                     </button>
                 </div>
@@ -436,10 +484,13 @@ Apakah barang masih tersedia?`;
       </div >
 
       <div ref={sectionRef} className="max-w-7xl mx-auto mt-20 pt-12 border-t border-dashed border-gray-300">
-        <div className={`text-center mb-12 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+        {/* ... (Existing footer content) ... */}
+         <div className={`text-center mb-12 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Produk Lainnya</h2>
           <p className="text-gray-500">Cari perlengkapan lain yang kamu butuhkan</p>
         </div>
+        {/* ... existing slider code ... */}
+        {/* Shortened for brevity in tool call, will rely on context to append modal at end of section or before closing tag */}
 
         <div className="relative w-full">
 
@@ -535,6 +586,13 @@ Apakah barang masih tersedia?`;
           </div>
         )}
       </div>
+      <AlertModal 
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+        type={alertState.type}
+        title={alertState.title}
+        message={alertState.message}
+      />
     </section>
   );
 }

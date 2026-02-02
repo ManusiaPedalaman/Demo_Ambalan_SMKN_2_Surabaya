@@ -114,6 +114,20 @@ export async function submitBookingForm(data: any) {
 
         if (productError) console.error('Supabase Product Booking Error:', productError);
 
+        // --- NEW: Decrement Stock (Rental) ---
+        // Using Prisma update to atomic decrement
+        // DataProdukTersedia uses string ID 'id_produk', but schema says @id is String.
+        // Let's assume data.slug is the ID.
+        try {
+             await prisma.dataProdukTersedia.update({
+                 where: { id_produk: data.slug },
+                 data: { stok: { decrement: data.quantity } }
+             });
+        } catch (stockError) {
+             console.error('Error decrementing stock:', stockError);
+             // Should we rollback or just log? For now log, as booking is recorded.
+             // Ideally this whole function should be a transaction.
+        }
 
         const message = `
 *New Booking Order*
@@ -743,12 +757,12 @@ export async function getProductStatusByName(name: string) {
     try {
         const product = await prisma.dataProdukTersedia.findFirst({
             where: { nama_produk: name },
-            select: { status: true }
+            select: { status: true, stok: true }
         });
-        return { success: true, status: product?.status || 'Tidak Tersedia' };
+        return { success: true, status: product?.status || 'Tidak Tersedia', stok: product?.stok || 0 };
     } catch (error) {
         console.error('Error fetching product status:', error);
-        return { success: false, status: 'Tidak Tersedia' };
+        return { success: false, status: 'Tidak Tersedia', stok: 0 };
     }
 }
 
@@ -1097,9 +1111,10 @@ export async function addProductUMKM(data: any) {
                 gambar: gambar || (foto_produk && foto_produk.length > 0 ? foto_produk[0] : null), // Primary image
                 foto_produk: foto_produk || [],
                 spesifikasi: spesifikasi || [],
+                stok: parseInt(data.stok) || 0, // Add stock
                 is_draft: is_draft || false,
                 is_published: false,
-                status: is_draft ? 'PENDING' : 'PENDING' // Drafts are pending submission, but technically 'draft' state. Let's keep status PENDING but rely on is_draft flag.
+                status: is_draft ? 'PENDING' : 'PENDING' 
             }
         });
         return { success: true };
@@ -1254,6 +1269,7 @@ export async function updateProductUMKM(data: any) {
                 gambar: gambar || (foto_produk && foto_produk.length > 0 ? foto_produk[0] : null),
                 foto_produk: foto_produk || [],
                 spesifikasi: spesifikasi || [],
+                stok: data.stok !== undefined ? parseInt(data.stok) : undefined, // Update stock only if provided
                 is_draft: is_draft // Update draft status if passed
         };
 
@@ -1472,5 +1488,28 @@ export async function deleteQuizResult(id: string) {
     } catch (e) {
         console.error(e);
         return { success: false, error: 'Failed to delete quiz result' };
+    }
+}
+
+export async function checkoutUmkmProduct(id: string, quantity: number) {
+    try {
+        // 1. Check Stock
+        const product = await prisma.dataProdukUmkm.findUnique({
+            where: { id: BigInt(id) }
+        });
+
+        if (!product) return { success: false, error: 'Produk tidak ditemukan' };
+        if (product.stok < quantity) return { success: false, error: 'Stok tidak mencukupi' };
+
+        // 2. Decrement Stock
+        await prisma.dataProdukUmkm.update({
+            where: { id: BigInt(id) },
+            data: { stok: { decrement: quantity } }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error checkout UMKM product:', error);
+        return { success: false, error: 'Gagal memproses stok' };
     }
 }

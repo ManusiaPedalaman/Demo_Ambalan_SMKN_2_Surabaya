@@ -62,6 +62,7 @@ export default function UMKMDashboardPage() {
         gambar: '', // Primary (backward compat)
         foto_produk: [] as string[], // Multiple images
         spesifikasi: [] as {label: string, value: string}[],
+        stok: '',
         is_draft: false
     });
 
@@ -95,6 +96,7 @@ export default function UMKMDashboardPage() {
              let errors = [];
              if (!productForm.nama_produk) errors.push("Nama Produk wajib diisi.");
              if (!productForm.harga) errors.push("Harga wajib diisi.");
+             if (!productForm.stok) errors.push("Stok wajib diisi.");
              if (productForm.deskripsi.length < 20) errors.push("Deskripsi terlalu pendek (min. 20 karakter).");
              if (productForm.spesifikasi.length < 2) errors.push("Minimal 2 spesifikasi.");
              if (productForm.foto_produk.length < 3 && !productForm.gambar) errors.push("Minimal 3 foto produk.");
@@ -151,7 +153,7 @@ export default function UMKMDashboardPage() {
     const resetProductForm = () => {
         setProductForm({ 
             nama_produk: '', deskripsi: '', harga: '', gambar: '', 
-            foto_produk: [], spesifikasi: [], is_draft: false 
+            foto_produk: [], spesifikasi: [], stok: '', is_draft: false 
         });
         setIsEditing(false);
         setEditId(null);
@@ -166,6 +168,7 @@ export default function UMKMDashboardPage() {
             gambar: product.gambar || '',
             foto_produk: product.foto_produk && product.foto_produk.length > 0 ? product.foto_produk : (product.gambar ? [product.gambar] : []),
             spesifikasi: product.spesifikasi || [],
+            stok: product.stok !== undefined ? product.stok : '',
             is_draft: product.is_draft || false
         });
         setEditId(product.id);
@@ -469,15 +472,15 @@ export default function UMKMDashboardPage() {
                         <button onClick={resetProductForm} className="text-gray-400 hover:text-gray-600"><XCircle size={24} /></button>
                      </div>
                      <form onSubmit={(e) => handleProductSubmit(e, false)} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="md:col-span-1">
                                 <label className="block text-sm font-semibold mb-1">Nama Produk</label>
                                 <input 
                                     required 
                                     value={productForm.nama_produk} 
                                     onChange={e => setProductForm({...productForm, nama_produk: e.target.value})} 
                                     className={`w-full border rounded-lg p-3 ${shake && !productForm.nama_produk ? 'border-red-500 animate-pulse' : ''}`}
-                                    placeholder="Contoh: Keripik Pisang Coklat"
+                                    placeholder="Nama Produk"
                                 />
                             </div>
                             <div>
@@ -488,7 +491,18 @@ export default function UMKMDashboardPage() {
                                     value={productForm.harga} 
                                     onChange={e => setProductForm({...productForm, harga: e.target.value})} 
                                     className={`w-full border rounded-lg p-3 ${shake && !productForm.harga ? 'border-red-500 animate-pulse' : ''}`}
-                                    placeholder="Contoh: 15000"
+                                    placeholder="0"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold mb-1">Stok</label>
+                                <input 
+                                    required 
+                                    type="number" 
+                                    value={productForm.stok} 
+                                    onChange={e => setProductForm({...productForm, stok: e.target.value})} 
+                                    className={`w-full border rounded-lg p-3 ${shake && !productForm.stok ? 'border-red-500 animate-pulse' : ''}`}
+                                    placeholder="0"
                                 />
                             </div>
                         </div>
@@ -588,6 +602,7 @@ export default function UMKMDashboardPage() {
                                 <h3 className="font-bold text-lg text-gray-800 mb-1">{produk.nama_produk}</h3>
                                 <div className="flex justify-between items-center">
                                     <p className="text-[#997B55] font-bold text-lg">Rp {produk.harga}</p>
+                                    <p className="text-sm text-gray-500">Stok: {produk.stok ?? 0}</p>
                                     
                                 </div>
                             </div>

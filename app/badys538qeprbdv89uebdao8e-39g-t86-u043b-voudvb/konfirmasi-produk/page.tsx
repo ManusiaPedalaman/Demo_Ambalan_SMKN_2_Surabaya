@@ -179,6 +179,13 @@ export default function AdminConfirmProductPage() {
                                         <td className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button
+                                                    onClick={() => setDetailModal({ isOpen: true, data: item })}
+                                                    className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                                    title="Detail Info"
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+                                                <button
                                                     onClick={() => handleApproveClick(item.id)}
                                                     disabled={processingId === item.id}
                                                     className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50"
