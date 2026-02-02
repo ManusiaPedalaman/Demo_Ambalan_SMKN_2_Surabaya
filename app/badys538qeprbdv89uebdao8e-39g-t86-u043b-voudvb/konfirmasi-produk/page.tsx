@@ -364,9 +364,40 @@ export default function AdminConfirmProductPage() {
                                         <p className="text-[#997B55] font-bold text-lg">Rp {detailModal.data.harga}</p>
                                     </div>
                                     <div>
+                                        <p className="text-xs text-gray-500 font-bold uppercase mb-1">Stok</p>
+                                        <p className="text-gray-800 font-bold text-lg">{detailModal.data.stok || 0}</p>
+                                    </div>
+                                    <div className="col-span-2">
                                         <p className="text-xs text-gray-500 font-bold uppercase mb-1">Asal UMKM</p>
                                         <p className="text-gray-800 font-medium">{detailModal.data.nama_umkm}</p>
                                     </div>
+
+                                    {detailModal.data.spesifikasi && detailModal.data.spesifikasi.length > 0 && (
+                                        <div className="col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                            <p className="text-xs text-gray-500 font-bold uppercase mb-2">Spesifikasi</p>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {detailModal.data.spesifikasi.map((spec: any, idx: number) => {
+                                                    let label = 'Info';
+                                                    let value = spec;
+                                                    
+                                                    if (typeof spec === 'string' && spec.includes(':')) {
+                                                        [label, value] = spec.split(':');
+                                                    } else if (typeof spec === 'object' && spec.label && spec.value) {
+                                                        label = spec.label;
+                                                        value = spec.value;
+                                                    }
+
+                                                    return (
+                                                        <div key={idx} className="bg-white p-2 rounded shadow-sm">
+                                                            <p className="text-[10px] text-gray-400 font-bold uppercase">{String(label).replace(/"/g, '').trim()}</p>
+                                                            <p className="text-sm font-medium text-gray-800">{String(value).replace(/"/g, '').trim()}</p>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="col-span-2">
                                         <p className="text-xs text-gray-500 font-bold uppercase mb-1">Deskripsi</p>
                                         <p className="text-gray-600 text-sm leading-relaxed">{detailModal.data.deskripsi || '-'}</p>

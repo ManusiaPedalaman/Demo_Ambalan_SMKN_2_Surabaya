@@ -188,7 +188,7 @@ export async function getUserDashboardData(email: string) {
 }
 
 
-import { prisma } from "@/lib/prisma";
+
 
 export async function getDashboardStats() {
     try {
@@ -1111,7 +1111,7 @@ export async function addProductUMKM(data: any) {
                 gambar: gambar || (foto_produk && foto_produk.length > 0 ? foto_produk[0] : null), // Primary image
                 foto_produk: foto_produk || [],
                 spesifikasi: spesifikasi || [],
-                stok: parseInt(data.stok) || 0, // Add stock
+                stok: parseInt(String(data.stok)) || 0, // Add stock
                 is_draft: is_draft || false,
                 is_published: false,
                 status: is_draft ? 'PENDING' : 'PENDING' 
@@ -1269,7 +1269,7 @@ export async function updateProductUMKM(data: any) {
                 gambar: gambar || (foto_produk && foto_produk.length > 0 ? foto_produk[0] : null),
                 foto_produk: foto_produk || [],
                 spesifikasi: spesifikasi || [],
-                stok: data.stok !== undefined ? parseInt(data.stok) : undefined, // Update stock only if provided
+                stok: data.stok !== undefined ? parseInt(String(data.stok)) : undefined, // Update stock only if provided
                 is_draft: is_draft // Update draft status if passed
         };
 
