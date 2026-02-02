@@ -2,6 +2,9 @@
 
 import { supabase } from '@/lib/supabase';
 import { sendTelegramNotification } from '@/lib/telegram';
+import { prisma } from "@/lib/prisma";
+
+// Force recompile: Prisma import restored
 
 export async function submitJoinForm(formData: any) {
     try {

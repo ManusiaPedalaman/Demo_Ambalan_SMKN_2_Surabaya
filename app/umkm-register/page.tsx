@@ -38,8 +38,11 @@ export default function UMKMRegisterPage() {
 
     useEffect(() => {
         const init = async () => {
+            console.log("UMKM Register Init: Session:", session); // DEBUG
             if (session?.user?.email) {
+                console.log("Fetching profile for:", session.user.email); // DEBUG
                 const profile = await getUserProfileByEmail(session.user.email);
+                console.log("Profile fetched:", profile); // DEBUG
                 if (profile) {
                     setUserId(profile.id_login);
                     // Autofill some data
@@ -57,7 +60,11 @@ export default function UMKMRegisterPage() {
                         router.push('/dashboard/user/umkm'); // Redirect back if already exists
                         return;
                     }
+                } else {
+                    console.error("Profile not found via action for email:", session.user.email); // DEBUG
                 }
+            } else {
+                console.log("No session email found"); // DEBUG
             }
             setChecking(false);
         };
