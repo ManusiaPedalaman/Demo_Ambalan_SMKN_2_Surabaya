@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, use } from 'react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { DM_Sans } from 'next/font/google';
@@ -33,6 +34,7 @@ const dmSans = DM_Sans({
 
 
 export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: string }> }) {
+  const { data: session } = useSession();
   const { slug } = use(params); // slug here serves as ID
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -88,8 +90,12 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
 
     setIsSubmitting(true);
 
-    // Call Server Action to Decrement Stock
-    const result = await checkoutUmkmProduct(product.id, quantity);
+    const realPrice = getRealPrice(product.harga);
+    const total = realPrice * quantity;
+
+    // Call Server Action to Decrement Stock and Record Transaction
+    // Pass session email if available
+    const result = await checkoutUmkmProduct(product.id, quantity, session?.user?.email, total);
 
     if (!result.success) {
         showAlert('error', 'Gagal Memproses', result.error || 'Gagal memproses pesanan. Stok mungkin habis.');
@@ -97,8 +103,6 @@ export default function DetailProdukSiswa({ params }: { params: Promise<{ slug: 
         return;
     }
 
-    const realPrice = getRealPrice(product.harga);
-    const total = realPrice * quantity;
     const formattedTotal = formatRupiah(total);
     
     const message = `Halo, saya ingin membeli:

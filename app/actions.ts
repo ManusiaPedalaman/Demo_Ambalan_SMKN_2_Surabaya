@@ -184,7 +184,7 @@ export async function getUserDashboardData(email: string) {
         console.error('Error fetching dashboard data:', error);
         return {
             profile: null,
-            history: { rentals: [], quizzes: [], contacts: [], joins: [] },
+            history: { rentals: [], quizzes: [], contacts: [], joins: [], purchases: [] },
             umkm: null
         };
     }
@@ -904,6 +904,7 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
         let contacts: any[] = [];
         let joins: any[] = [];
         let quizzes: any[] = [];
+        let purchases: any[] = [];
 
         // Fetch Rentals (DataProdukTersewa match by nama_peminjam? or DataCustomerPenyewa match by no_wa?)
         // Assuming DataProdukTersewa stores the rental items. Without exact link, matching by name is best guess or no_wa if available.
@@ -972,6 +973,7 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
         if (email) {
             const user = await prisma.dataUserLogin.findFirst({ where: { email } });
             if (user) {
+                // Fetch Quizzes
                 const rawQuizzes = await prisma.dataHasilKuis.findMany({
                     where: { id_user: user.id_login },
                     include: { materi: true },
@@ -982,14 +984,34 @@ export async function getUserHistory(identifier: { email?: string, no_wa?: strin
                     id: item.id.toString(),
                     tanggal: item.tanggal.toISOString()
                 }));
+
+                // Fetch UMKM Purchases
+                const rawPurchases = await prisma.dataTransaksiUmkm.findMany({
+                    where: { id_user: user.id_login },
+                    include: { produk: true },
+                    orderBy: { tanggal: 'desc' }
+                });
+                purchases = rawPurchases.map((item: any) => ({
+                    ...item,
+                    id: item.id.toString(),
+                    id_produk: item.id_produk.toString(),
+                    produk: item.produk ? {
+                        ...item.produk,
+                        id: item.produk.id.toString(),
+                        id_umkm: item.produk.id_umkm.toString(),
+                        created_at: item.produk.created_at.toISOString()
+                    } : null,
+                    tanggal: item.tanggal.toISOString(),
+                    type: 'beli' // Identifier
+                }));
             }
         }
 
-        return { rentals, contacts, joins, quizzes };
+        return { rentals, contacts, joins, quizzes, purchases };
 
     } catch (error) {
         console.error('Error getting user history:', error);
-        return { rentals: [], contacts: [], joins: [], quizzes: [] };
+        return { rentals: [], contacts: [], joins: [], quizzes: [], purchases: [] };
     }
 }
 
@@ -1330,6 +1352,11 @@ export async function getPublicProducts() {
             ...item,
             id: item.id.toString(),
             id_umkm: item.id_umkm.toString(),
+            umkm: item.umkm ? { 
+                ...item.umkm, 
+                id: item.umkm.id.toString(),
+                created_at: item.umkm.created_at.toISOString()
+            } : null,
             created_at: item.created_at.toISOString(),
             nama_umkm: item.umkm?.nama_umkm || 'Unknown UMKM',
             foto_produk: item.foto_produk || (item.gambar ? [item.gambar] : []),
@@ -1391,6 +1418,11 @@ export async function getPublicProductById(slugOrId: string) {
             ...product,
             id: product.id.toString(),
             id_umkm: product.id_umkm.toString(),
+            umkm: product.umkm ? { 
+                ...product.umkm, 
+                id: product.umkm.id.toString(),
+                created_at: product.umkm.created_at.toISOString()
+            } : null,
             created_at: product.created_at.toISOString(),
             nama_umkm: product.umkm?.nama_umkm || 'Unknown UMKM',
             no_wa: latestWa, // Use latest WA from user profile
@@ -1494,11 +1526,12 @@ export async function deleteQuizResult(id: string) {
     }
 }
 
-export async function checkoutUmkmProduct(id: string, quantity: number) {
+export async function checkoutUmkmProduct(id: string, quantity: number, userEmail: string | null | undefined, totalPrice: number) {
     try {
         // 1. Check Stock
         const product = await prisma.dataProdukUmkm.findUnique({
-            where: { id: BigInt(id) }
+            where: { id: BigInt(id) },
+             include: { umkm: true } 
         });
 
         if (!product) return { success: false, error: 'Produk tidak ditemukan' };
@@ -1510,9 +1543,28 @@ export async function checkoutUmkmProduct(id: string, quantity: number) {
             data: { stok: { decrement: quantity } }
         });
 
+        // 3. Record Transaction (If user is logged in)
+        if (userEmail) {
+            const user = await prisma.dataUserLogin.findFirst({
+                where: { email: userEmail }
+            });
+
+            if (user) {
+                await prisma.dataTransaksiUmkm.create({
+                    data: {
+                        id_user: user.id_login,
+                        id_produk: BigInt(id),
+                        jumlah: quantity,
+                        total_harga: totalPrice.toString(),
+                        status: 'MENUNGGU KONFIRMASI (WA)' 
+                    }
+                });
+            }
+        }
+
         return { success: true };
     } catch (error) {
         console.error('Error checkout UMKM product:', error);
-        return { success: false, error: 'Gagal memproses stok' };
+        return { success: false, error: 'Gagal memproses stok atau transaksi' };
     }
 }

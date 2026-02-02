@@ -9,20 +9,21 @@ datasource db {
 }
 
 model DataUserLogin {
-  id_login         String          @id
+  id_login         String              @id
   email            String
   password_hash    String
-  status           String?         @default("Login")
+  status           String?             @default("Login")
   nama_lengkap     String?
   no_wa            String?
-  tgl_lahir        DateTime?       @db.Date
+  tgl_lahir        DateTime?           @db.Date
   sekolah_instansi String?
   kelas            String?
   jurusan          String?
   foto             String?
-  created_at       DateTime?       @default(now()) @map("created_at")
+  created_at       DateTime?           @default(now()) @map("created_at")
   umkm             DataUmkm[]
   hasil_kuis       DataHasilKuis[]
+  transaksi_umkm   DataTransaksiUmkm[]
 
   @@map("data_user_login")
 }
@@ -35,7 +36,8 @@ model DataProdukTersedia {
   DataProdukTersewa   DataProdukTersewa[]
   DataCustomerPenyewa DataCustomerPenyewa[]
 
-  stok                Int                   @default(0)
+  stok Int @default(0)
+
   @@map("data_produk_tersedia")
 }
 
@@ -149,19 +151,19 @@ model VerificationToken {
 }
 
 model DataUmkm {
-  id           BigInt           @id @default(autoincrement())
-  id_user      String
-  user         DataUserLogin    @relation(fields: [id_user], references: [id_login])
-  nama_umkm    String
-  no_wa        String
-  kelas        String
-  jurusan      String
-  nama_lengkap String
-  status       String           @default("PENDING") // PENDING, APPROVED, REJECTED
-  alasan_tolak String?
+  id            BigInt           @id @default(autoincrement())
+  id_user       String
+  user          DataUserLogin    @relation(fields: [id_user], references: [id_login])
+  nama_umkm     String
+  no_wa         String
+  kelas         String
+  jurusan       String
+  nama_lengkap  String
+  status        String           @default("PENDING") // PENDING, APPROVED, REJECTED
+  alasan_tolak  String?
   kartu_pelajar String?
-  created_at   DateTime         @default(now())
-  produk       DataProdukUmkm[]
+  created_at    DateTime         @default(now())
+  produk        DataProdukUmkm[]
 
   @@map("data_umkm")
 }
@@ -175,14 +177,16 @@ model DataProdukUmkm {
   harga        String
   gambar       String?
   foto_produk  String[] // Array of image URLs
-  spesifikasi  Json?    // Array of {label, value}
+  spesifikasi  Json? // Array of {label, value}
   is_draft     Boolean  @default(false)
   is_published Boolean  @default(false)
   status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
   alasan_tolak String?
   created_at   DateTime @default(now())
 
-  stok         Int      @default(0)
+  stok      Int                 @default(0)
+  transaksi DataTransaksiUmkm[]
+
   @@map("data_produk_umkm")
 }
 
@@ -197,4 +201,18 @@ model DataHasilKuis {
   tanggal      DateTime          @default(now())
 
   @@map("data_hasil_kuis")
+}
+
+model DataTransaksiUmkm {
+  id          BigInt         @id @default(autoincrement())
+  id_user     String
+  user        DataUserLogin  @relation(fields: [id_user], references: [id_login])
+  id_produk   BigInt
+  produk      DataProdukUmkm @relation(fields: [id_produk], references: [id])
+  jumlah      Int
+  total_harga String
+  tanggal     DateTime       @default(now())
+  status      String         @default("BERHASIL")
+
+  @@map("data_transaksi_umkm")
 }

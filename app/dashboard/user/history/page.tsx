@@ -156,7 +156,7 @@ export default function UserHistoryPage() {
             
              <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
                 <TabList>
-                    <TabTrigger value="sewa">Penyewaan</TabTrigger>
+                    <TabTrigger value="sewa">Produk</TabTrigger>
                     <TabTrigger value="hubungi">Pesan Kontak</TabTrigger>
                     <TabTrigger value="join">Permintaan Join</TabTrigger>
                     <TabTrigger value="kuis">Hasil Kuis</TabTrigger>
@@ -167,42 +167,69 @@ export default function UserHistoryPage() {
                    I am retaining the structure but you may need to restore the actual table/list UI.
                 */}
                 <TabContent value="sewa">
-                    {historyData.rentals.length === 0 ? (
-                        <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                            <p className="text-gray-500">Belum ada riwayat penyewaan.</p>
-                        </div>
-                    ) : (
+                    {(() => {
+                        const mergedHistory = [
+                            ...(historyData.rentals || []).map((i: any) => ({ ...i, type: 'sewa' })),
+                            ...(historyData.purchases || []).map((i: any) => ({ ...i, type: 'beli' }))
+                        ].sort((a, b) => {
+                            const dateA = new Date(a.tanggal || a.tgl_pengambilan || 0).getTime();
+                            const dateB = new Date(b.tanggal || b.tgl_pengambilan || 0).getTime();
+                            return dateB - dateA;
+                        });
+
+                        return mergedHistory.length === 0 ? (
+                            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                <p className="text-gray-500">Belum ada riwayat produk (Sewa/Beli).</p>
+                            </div>
+                        ) : (
                         <div className="space-y-4">
-                            {historyData.rentals.map((item: any) => (
+                            {mergedHistory.map((item: any) => (
                                 <div key={item.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                                     {/* Desktop View */}
                                     <div className="hidden md:flex items-center justify-between p-6">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-1">
                                                 <h3 className="font-bold text-gray-800">{item.produk?.nama_produk || item.nama_produk || 'Produk'}</h3>
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
-                                                    ${item.status_kembali === 'Sudah' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}
-                                                `}>
-                                                    {item.status_kembali === 'Sudah' ? 'Selesai' : 'Sedang Disewa'}
-                                                </span>
+                                                {item.type === 'beli' ? (
+                                                     <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-100 text-blue-700">
+                                                        Beli: {item.status || 'Berhasil'}
+                                                    </span>
+                                                ) : (
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
+                                                        ${item.status_kembali === 'Sudah' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}
+                                                    `}>
+                                                        {item.status_kembali === 'Sudah' ? 'Sewa: Selesai' : 'Sewa: Aktif'}
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className="flex gap-6 text-sm text-gray-500">
-                                                <p>Ambil: <span className="text-gray-800 font-medium">{formatDate(item.tgl_pengambilan)}</span></p>
-                                                <p>Kembali: <span className="text-gray-800 font-medium">{formatDate(item.tgl_pengembalian)}</span></p>
+                                                {item.type === 'beli' ? (
+                                                     <>
+                                                        <p>Tanggal: <span className="text-gray-800 font-medium">{formatDate(item.tanggal)}</span></p>
+                                                        <p>Total: <span className="text-gray-800 font-medium">{item.total_harga ? `Rp ${parseInt(item.total_harga).toLocaleString('id-ID')}` : '-'}</span></p>
+                                                     </>
+                                                ) : (
+                                                    <>
+                                                        <p>Ambil: <span className="text-gray-800 font-medium">{formatDate(item.tgl_pengambilan)}</span></p>
+                                                        <p>Kembali: <span className="text-gray-800 font-medium">{formatDate(item.tgl_pengembalian)}</span></p>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 pl-4 border-l border-gray-100">
                                             <button 
-                                                onClick={() => { setEditItem({...item, type: 'sewa'}); setEditType('sewa'); }}
+                                                onClick={() => { setEditItem({...item, type: item.type || 'sewa'}); setEditType(item.type || 'sewa'); }}
                                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Edit"
+                                                disabled={item.type === 'beli'} // Disable edit for purchases for now
                                             >
-                                                <Edit size={18} />
+                                                <Edit size={18} className={item.type === 'beli' ? 'opacity-30' : ''} />
                                             </button>
                                             <button 
-                                                onClick={() => confirmDelete('sewa', item.id)}
+                                                onClick={() => confirmDelete(item.type || 'sewa', item.id)}
                                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                 title="Hapus"
+                                                disabled={item.type === 'beli'} // Disable delete for purchases for now unless implemented
                                             >
                                                 <Trash2 size={18} />
                                             </button>
@@ -239,7 +266,8 @@ export default function UserHistoryPage() {
                                 </div>
                             ))}
                         </div>
-                    )}
+                    );
+                    })()}
                 </TabContent>
 
                 <TabContent value="hubungi">
