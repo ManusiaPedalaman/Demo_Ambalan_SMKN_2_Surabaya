@@ -34,7 +34,8 @@ export default function UMKMDashboardPage() {
     // Modals & Forms handling
     const [view, setView] = useState<'LIST' | 'FORM_PRODUCT' | 'FORM_UMKM' | 'SALES'>('LIST'); 
     const [salesData, setSalesData] = useState<any[]>([]); 
-    const [isEditing, setIsEditing] = useState(false); 
+    const [salesLoading, setSalesLoading] = useState(false); // Local loading for Sales tab
+    const [isEditing, setIsEditing] = useState(false);  
     const [editId, setEditId] = useState<string | null>(null);
 
     // Alert Modal
@@ -266,17 +267,25 @@ export default function UMKMDashboardPage() {
     };
 
     // --- SALES HANDLER ---
+    // --- SALES HANDLER ---
     const fetchSales = async () => {
         if (!session?.user?.email) return;
-        setLoading(true);
-        const res = await getUmkmSales(session.user.email);
-        if (res.success) {
-            setSalesData(res.data || []);
-            setView('SALES');
-        } else {
-            showAlert('Gagal', res.error || 'Gagal mengambil data penjualan', 'error');
+        
+        // Immediate UI switch
+        setView('SALES');
+
+        // Only fetch if data is empty to avoid re-fetching constantly
+        // Or if you want to refresh every time, keep logic but use local loading
+        if (salesData.length === 0) {
+            setSalesLoading(true);
+            const res = await getUmkmSales(session.user.email);
+            if (res.success) {
+                setSalesData(res.data || []);
+            } else {
+                showAlert('Gagal', res.error || 'Gagal mengambil data penjualan', 'error');
+            }
+            setSalesLoading(false);
         }
-        setLoading(false);
     };
 
     // --- DELETE HANDLERS ---
@@ -752,7 +761,11 @@ export default function UMKMDashboardPage() {
             {/* Sales View */}
             {view === 'SALES' && (
                 <div className="space-y-4">
-                    {salesData.length === 0 ? (
+                    {salesLoading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <Loader2 size={40} className="text-[#997B55] animate-spin" />
+                        </div>
+                    ) : salesData.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">
                             <Store size={48} className="mx-auto mb-4 text-gray-300" />
                             <p>Belum ada pesanan masuk.</p>
