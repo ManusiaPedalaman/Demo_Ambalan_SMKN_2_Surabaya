@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { getUserProfileByEmail, getUserUMKM, addProductUMKM, updateProductUMKM, deleteProductUMKM, updateUMKMData, publishProductUMKM, getUmkmSales } from '@/app/actions';
-import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image as ImageIcon, Pencil, Trash2, X, Globe, Save, MessageCircle } from 'lucide-react';
+import { Store, Plus, Loader2, Package, AlertCircle, CheckCircle, XCircle, Image as ImageIcon, Pencil, Trash2, X, Globe, Save, MessageCircle, Info, Calendar, MapPin, User, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal, { ModalType } from '@/components/ui/Modal';
@@ -54,6 +54,10 @@ export default function UMKMDashboardPage() {
 
     // Spec Modal
     const [showSpecModal, setShowSpecModal] = useState(false);
+
+    // Sale Detail Modal
+    const [selectedSale, setSelectedSale] = useState<any>(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     // Product Form State
     const [productForm, setProductForm] = useState({
@@ -403,6 +407,88 @@ export default function UMKMDashboardPage() {
                 )}
             </AnimatePresence>
 
+            {/* DETAIL MODAL */}
+            <AnimatePresence>
+                {showDetailModal && selectedSale && (
+                    <div className="fixed inset-0 z-[120] bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm">
+                        <motion.div 
+                            initial={{scale:0.9, opacity:0, y:20}} 
+                            animate={{scale:1, opacity:1, y:0}} 
+                            exit={{scale:0.9, opacity:0, y:20}} 
+                            className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden"
+                        >
+                            <div className="bg-[#997B55] p-6 text-white relative overflow-hidden">
+                                <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                                <h3 className="text-xl font-bold relative z-10">Detail Pesanan</h3>
+                                <p className="text-white/80 text-sm relative z-10">ID: #{selectedSale.id}</p>
+                                <button onClick={() => setShowDetailModal(false)} className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors bg-white/10 p-1 rounded-full"><X size={20}/></button>
+                            </div>
+                            
+                            <div className="p-6 space-y-6">
+                                {/* Product Section */}
+                                <div className="flex gap-4 items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <div className="w-16 h-16 rounded-xl bg-white overflow-hidden border border-gray-200 flex-shrink-0">
+                                        {selectedSale.produk?.foto_produk?.[0] ? (
+                                            <img src={selectedSale.produk.foto_produk[0]} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-300"><ImageIcon size={20}/></div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-800 line-clamp-1">{selectedSale.produk?.nama_produk}</h4>
+                                        <p className="text-[#997B55] font-bold">Rp {selectedSale.total_harga}</p>
+                                        <p className="text-xs text-gray-500">Jumlah: {selectedSale.jumlah} pcs</p>
+                                    </div>
+                                </div>
+
+                                {/* Buyer Info */}
+                                <div className="space-y-3">
+                                    <h4 className="font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
+                                        <User size={18} className="text-[#997B55]" /> Informasi Pembeli
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <p className="text-gray-400 text-xs">Nama Lengkap</p>
+                                            <p className="font-semibold text-gray-700">{selectedSale.buyer?.nama_lengkap || '-'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-gray-400 text-xs">No WhatsApp</p>
+                                            <p className="font-semibold text-gray-700">{selectedSale.buyer?.no_wa || '-'}</p>
+                                        </div>
+                                        <div className="col-span-2">
+                                            <p className="text-gray-400 text-xs">Email</p>
+                                            <p className="font-semibold text-gray-700">{selectedSale.buyer?.email || '-'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Date Info */}
+                                <div className="space-y-3">
+                                    <h4 className="font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
+                                        <Calendar size={18} className="text-[#997B55]" /> Waktu Transaksi
+                                    </h4>
+                                    <div className="text-sm">
+                                        <p className="text-gray-400 text-xs">Tanggal & Jam</p>
+                                        <p className="font-semibold text-gray-700">
+                                            {new Date(selectedSale.tanggal).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                        </p>
+                                        <p className="font-semibold text-gray-700">
+                                            Pukul {new Date(selectedSale.tanggal).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-6 pt-0">
+                                <button onClick={() => setShowDetailModal(false)} className="w-full py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors">
+                                    Tutup Detail
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
             {/* DELETE MODAL USES REUSABLE MODAL */}
             <Modal
                 isOpen={deleteModal.isOpen}
@@ -473,26 +559,20 @@ export default function UMKMDashboardPage() {
                     <p className="text-gray-500">Kelola produk jualan Anda disini</p>
                 </div>
                 
-                <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
+                <div className="flex gap-1 bg-white border border-gray-200 p-1 rounded-full shadow-sm">
                     <button 
                         onClick={() => setView('LIST')} 
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'LIST' ? 'bg-white shadow-sm text-[#997B55]' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${view === 'LIST' ? 'bg-[#997B55] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
                     >
                         Produk Anda
                     </button>
                     <button 
                         onClick={fetchSales} 
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'SALES' ? 'bg-white shadow-sm text-[#997B55]' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${view === 'SALES' ? 'bg-[#997B55] text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
                     >
                         Pesanan Masuk
                     </button>
                 </div>
-
-                {view === 'LIST' && (
-                    <button onClick={() => setView('FORM_PRODUCT')} className="px-6 py-3 bg-[#997B55] text-white font-bold rounded-xl hover:bg-[#8B6E4A] flex items-center gap-2 shadow-lg">
-                        <Plus size={20} /> Tambah Produk
-                    </button>
-                )}
             </div>
 
             {/* Add/Edit Product Form */}
@@ -655,6 +735,17 @@ export default function UMKMDashboardPage() {
                             </div>
                         </div>
                     ))}
+
+                    {/* Add Product Card */}
+                    <button 
+                        onClick={() => setView('FORM_PRODUCT')}
+                        className="min-h-[350px] rounded-3xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8 hover:border-[#997B55] hover:bg-[#997B55]/5 transition-all group gap-4"
+                    >
+                        <div className="w-16 h-16 rounded-full bg-[#997B55]/10 group-hover:bg-[#997B55] flex items-center justify-center text-[#997B55] group-hover:text-white transition-colors">
+                            <Plus size={32} />
+                        </div>
+                        <span className="font-bold text-lg text-gray-600 group-hover:text-[#997B55]">+ Tambah Produk</span>
+                    </button>
                 </div>
             )}
 
@@ -668,9 +759,9 @@ export default function UMKMDashboardPage() {
                         </div>
                     ) : (
                         salesData.map((sale) => (
-                            <div key={sale.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center">
+                            <div key={sale.id} className="group bg-white p-4 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row items-center gap-4 md:gap-6">
                                 {/* Product Image */}
-                                <div className="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+                                <div className="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-100">
                                     {sale.produk?.foto_produk && sale.produk.foto_produk.length > 0 ? (
                                         <img src={sale.produk.foto_produk[0]} className="w-full h-full object-cover" />
                                     ) : (
@@ -678,43 +769,48 @@ export default function UMKMDashboardPage() {
                                     )}
                                 </div>
 
-                                {/* Order Info */}
-                                <div className="flex-grow">
-                                    <div className="flex justify-between items-start mb-1">
-                                         <h3 className="font-bold text-gray-800 text-lg">{sale.produk?.nama_produk || 'Produk Dihapus'}</h3>
-                                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${sale.status === 'BERHASIL' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{sale.status}</span>
-                                    </div>
-                                    <p className="text-sm text-gray-500 mb-2">
-                                        Qty: {sale.jumlah} • Total: <span className="font-bold text-[#997B55]">Rp {sale.total_harga}</span>
-                                    </p>
-                                    <p className="text-xs text-gray-400 mb-1">Pembeli:</p>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
-                                            {sale.buyer?.nama_lengkap?.[0] || '?'}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-semibold">{sale.buyer?.nama_lengkap || 'Guest'}</p>
-                                            <p className="text-xs text-gray-500">{new Date(sale.tanggal).toLocaleDateString()} {new Date(sale.tanggal).toLocaleTimeString()}</p>
-                                        </div>
+                                {/* INFO */}
+                                <div className="flex-grow text-center md:text-left">
+                                    <h3 className="font-bold text-gray-800 text-lg line-clamp-1">{sale.produk?.nama_produk || 'Produk Dihapus'}</h3>
+                                    <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-500 mt-1">
+                                        <span className="bg-gray-100 px-2 py-0.5 rounded-lg text-xs font-semibold">{sale.jumlah} pcs</span>
+                                        <span>•</span>
+                                        <span className="font-bold text-[#997B55]">Rp {sale.total_harga}</span>
+                                        <span>•</span>
+                                        <span className="text-gray-400">{sale.buyer?.nama_lengkap?.split(' ')[0] || 'Guest'}</span>
                                     </div>
                                 </div>
+                                
+                                {/* STATUS */}
+                                <div className="hidden md:block">
+                                    <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-[#E8F2FC] text-[#1964D3] border border-[#D0E1F7] tracking-wider uppercase">
+                                        {sale.status === 'BERHASIL' ? 'SELESAI' : 'MENUNGGU'}
+                                    </span>
+                                </div>
 
-                                {/* Actions */}
-                                <div className="w-full md:w-auto">
-                                    {sale.buyer?.no_wa ? (
+                                {/* ACTIONS */}
+                                <div className="flex items-center gap-2 w-full md:w-auto">
+                                     {sale.buyer?.no_wa ? (
                                         <a 
-                                            href={`https://wa.me/${sale.buyer.no_wa.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo ${sale.buyer.nama_lengkap}, saya dari ${umkmData?.nama_umkm || 'Toko'}. Terimakasih sudah memesan ${sale.produk?.nama_produk}.`)}`}
+                                            href={`https://wa.me/${sale.buyer.no_wa.replace(/^0/, '62')}?text=${encodeURIComponent(`Halo Kak ${sale.buyer.nama_lengkap || ''}, saya dari ${umkmData?.nama_umkm || 'Toko'}. Terima kasih sudah memesan *${sale.produk?.nama_produk}*.\n\nPesanan Kakak sudah kami terima dan segera kami proses. Mohon ditunggu ya! 🙏`)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3 bg-[#25D366] text-white font-bold rounded-xl hover:bg-[#128C7E] transition-colors shadow-lg shadow-green-200"
+                                            className="h-10 px-4 bg-[#25D366]/10 text-[#25D366] font-bold rounded-xl hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center gap-2 text-sm flex-1 md:flex-none border border-[#25D366]/20"
+                                            title="Hubungi Pembeli"
                                         >
-                                            <MessageCircle size={18} /> Hubungi via WA
+                                            <MessageCircle size={18} /> <span className="md:hidden">WhatsApp</span>
                                         </a>
                                     ) : (
-                                        <button disabled className="flex items-center justify-center gap-2 w-full md:w-auto px-6 py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed">
-                                            <MessageCircle size={18} /> No WhatsApp Tidak Ada
-                                        </button>
+                                        <button disabled className="h-10 px-4 bg-gray-100 text-gray-400 rounded-xl cursor-not-allowed flex items-center justify-center"><MessageCircle size={18} /></button>
                                     )}
+
+                                    <button 
+                                        onClick={() => { setSelectedSale(sale); setShowDetailModal(true); }}
+                                        className="h-10 w-10 flex items-center justify-center bg-gray-100 text-gray-600 rounded-xl hover:bg-[#997B55] hover:text-white transition-all border border-gray-200"
+                                        title="Detail Pesanan"
+                                    >
+                                        <Info size={18} />
+                                    </button>
                                 </div>
                             </div>
                         ))
